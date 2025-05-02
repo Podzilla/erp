@@ -20,22 +20,22 @@ public class CourierReportController {
 
     @GetMapping("/delivery-counts")
     public List<CourierDeliveryCountDTO> getCourierDeliveryCounts(
-            @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate) {
+            @RequestParam("startDate") LocalDate startDate,
+            @RequestParam("endDate") LocalDate endDate) {
         return courierAnalyticsService.getCourierDeliveryCounts(startDate, endDate);
     }
 
     @GetMapping("/success-rate")
     public List<CourierSuccessRateDTO> getCourierSuccessRate(
-            @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate) {
+            @RequestParam("startDate") LocalDate startDate,
+            @RequestParam("endDate") LocalDate endDate) {
         return courierAnalyticsService.getCourierSuccessRate(startDate, endDate);
     }
 
     @GetMapping("/average-rating")
     public List<CourierAverageRatingDTO> getCourierAverageRating(
-            @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate) {
+            @RequestParam("startDate") LocalDate startDate,
+            @RequestParam("endDate") LocalDate endDate) {
         return courierAnalyticsService.getCourierAverageRating(startDate, endDate);
     }
 
