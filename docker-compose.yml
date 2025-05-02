@@ -1,64 +1,46 @@
 
 services:
-
-  # Database Service (PostgreSQL)
-  db:
-    image: postgres:15-alpine # Use a lightweight PostgreSQL image
-    container_name: analytics-db
-    ports:
-      - "5432:5432" # Map host port 5432 to container port 5432 (optional, useful for direct access)
-    environment:
-      POSTGRES_DB: analytics_db_dev       # Database name
-      POSTGRES_USER: analytics_user   # Database user
-      POSTGRES_PASSWORD: password # Database password
-    volumes:
-      - db_data:/var/lib/postgresql/data # Persist data to a named volume
-    healthcheck: # Optional but recommended health check
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Message Queue Service (RabbitMQ with Management UI)
-  rabbitmq:
-    image: rabbitmq:3.12-management-alpine # Use RabbitMQ with the management plugin
-    container_name: analytics-rabbitmq
-    ports:
-      - "5672:5672" # Default AMQP port
-      - "15672:15672" # Management UI port (access at http://localhost:15672)
-    environment:
-      RABBITMQ_DEFAULT_USER: analytics_mq_user # RabbitMQ user
-      RABBITMQ_DEFAULT_PASS: analytics_mq_password # RabbitMQ password
-    healthcheck: # Basic health check for RabbitMQ
-      test: ["CMD", "rabbitmq-diagnostics", "check_system_status"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Your Spring Boot Application Service
   analytics-app:
-    build: . # Build the Docker image using the Dockerfile in the current directory
+    build: .
     container_name: analytics-app
     ports:
-      - "8080:8080" # Map host port 8080 to the app's internal port 8080 (or your custom port)
-    environment: # Pass environment variables to your Spring Boot app
-      # Database Configuration (Matches application.yml property names often via Spring Boot convention)
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/analytics_db # 'db' is the service name in docker-compose
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/analytics_db_dev
       SPRING_DATASOURCE_USERNAME: analytics_user
-      SPRING_DATASOURCE_PASSWORD: analytics_password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update # Set DDL auto behavior (be cautious in prod!)
-      # RabbitMQ Configuration
-      SPRING_RABBITMQ_HOST: rabbitmq       # 'rabbitmq' is the service name in docker-compose
-      SPRING_RABBITMQ_PORT: 5672
-      SPRING_RABBITMQ_USERNAME: analytics_mq_user
-      SPRING_RABBITMQ_PASSWORD: analytics_mq_password
-      # Add any other necessary Spring Boot properties via environment variables
-    depends_on: # Ensure DB and RabbitMQ are running before starting the app
-      db:
-        condition: service_healthy # Wait for DB health check to pass
-      rabbitmq:
-        condition: service_healthy # Wait for RabbitMQ health check to pass
+      SPRING_DATASOURCE_PASSWORD: password
+    depends_on:
+      - db
 
-# Define named volumes for data persistence
+  db:
+    image: postgres
+    container_name: analytics-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: analytics_db_dev
+      POSTGRES_USER: analytics_user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+
+  # rabbitmq:
+  #   image: rabbitmq:3.12-management-alpine # Use RabbitMQ with the management plugin
+  #   container_name: analytics-rabbitmq
+  #   ports:
+  #     - "5672:5672" # Default AMQP port
+  #     - "15672:15672" # Management UI port (access at http://localhost:15672)
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: analytics_mq_user # RabbitMQ user
+  #     RABBITMQ_DEFAULT_PASS: analytics_mq_password # RabbitMQ password
+  #   healthcheck: # Basic health check for RabbitMQ
+  #     test: ["CMD", "rabbitmq-diagnostics", "check_system_status"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+
 volumes:
-  db_data: # Data volume for the database
+  db_data:
+  
