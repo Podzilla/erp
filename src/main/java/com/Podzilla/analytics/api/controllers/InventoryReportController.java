@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("inventory")
+@RequestMapping("/inventory")
 public class InventoryReportController {
     private final InventoryAnalyticsService inventoryAnalyticsService;
 }
