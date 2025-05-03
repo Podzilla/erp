@@ -4,35 +4,39 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.Podzilla.analytics.api.dtos.InventoryValueByCategoryDTO;
+import com.Podzilla.analytics.api.dtos.LowStockProductDTO;
 import com.Podzilla.analytics.repositories.InventorySnapshotRepository;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class InventoryAnalyticsService {
     private final InventorySnapshotRepository inventorySnapshotRepository;
 
-    public InventoryAnalyticsService(InventorySnapshotRepository inventorySnapshotRepository) {
-        this.inventorySnapshotRepository = inventorySnapshotRepository;
+    public List<InventoryValueByCategoryDTO> getInventoryValueByCategory() {
+        List<InventoryValueByCategoryDTO> inventoryValueByCategory = inventorySnapshotRepository
+                .getInventoryValueByCategory()
+                .stream()
+                .map(row -> InventoryValueByCategoryDTO.builder()
+                        .category(row.getCategory())
+                        .totalStockValue(row.getTotalStockValue())
+                        .build())
+                .toList();
+        return inventoryValueByCategory;
     }
 
-    public List<Map<String, Object>> getInventoryValueByCategory() {
-        return inventorySnapshotRepository.getInventoryValueByCategory().stream()
-                .map(row -> Map.of(
-                        "category", row[0],
-                        "totalStockValue", row[1]))
-                .collect(Collectors.toList());
-    }
-
-    public Page<Map<String, Object>> getLowStockProducts(int page, int size) {
+    public Page<LowStockProductDTO> getLowStockProducts(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        return inventorySnapshotRepository.getLowStockProducts(pageRequest)
-                .map(row -> Map.of(
-                        "productId", row[0],
-                        "productName", row[1],
-                        "currentQuantity", row[2],
-                        "threshold", row[3]));
+        Page<LowStockProductDTO> lowStockProducts = inventorySnapshotRepository.getLowStockProducts(pageRequest)
+                .map(row -> LowStockProductDTO.builder()
+                        .productId(row.getProductId())
+                        .productName(row.getProductName())
+                        .currentQuantity(row.getCurrentQuantity())
+                        .threshold(row.getThreshold())
+                        .build());
+        return lowStockProducts;
     }
 }
