@@ -8,6 +8,7 @@ import com.Podzilla.analytics.api.DTOs.TopSellerRequest;
 import com.Podzilla.analytics.api.DTOs.TopSellerRequest.SortBy; 
 import com.Podzilla.analytics.api.DTOs.TopSellerResponse;
 import com.Podzilla.analytics.services.ProductAnalyticsService;
+import com.Podzilla.analytics.utils.ValidationUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,25 +24,22 @@ public class ProductReportController {
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
         @RequestParam(defaultValue = "10") Integer limit,
-        @RequestParam(defaultValue = "REVENUE") SortBy sortBy // Spring can convert String param to enum
+        @RequestParam(defaultValue = "REVENUE") SortBy sortBy
     ) {
         // --- Validation ---
-        if (startDate == null || endDate == null) {
-             return ResponseEntity.badRequest().body(null);
+        ResponseEntity<List<TopSellerResponse>> validationError = ValidationUtils.validateDateRange(startDate, endDate);
+        if (validationError != null) {
+            return validationError;
         }
 
-        if (startDate.isAfter(endDate)) {
-            return ResponseEntity.badRequest().body(null); 
+        validationError = ValidationUtils.validatePositiveLimit(limit);
+        if (validationError != null) {
+            return validationError;
         }
 
-        if (limit == null || limit <= 0) {
-             return ResponseEntity.badRequest().body(null);
-        }
-
-        if (sortBy == null) {
-             // This case should be handled by @RequestParam's conversion or defaultValue,
-             // but an explicit check can add robustness if the string value is invalid.
-             return ResponseEntity.badRequest().body(null); // Invalid sortBy value
+        validationError = ValidationUtils.validateEnumNotNull(sortBy);
+        if (validationError != null) {
+            return validationError;
         }
         // --- End Validation ---
 

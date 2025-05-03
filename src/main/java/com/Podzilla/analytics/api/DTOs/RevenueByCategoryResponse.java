@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class RevenueByCategoryResponse {
     private String category;
-    private BigDecimal totalRevenue; // Using camelCase for DTO fields is standard practice
+    private BigDecimal totalRevenue;
 }

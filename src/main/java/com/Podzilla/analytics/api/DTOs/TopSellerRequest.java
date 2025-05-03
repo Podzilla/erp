@@ -12,10 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class TopSellerRequest {
-
     private LocalDate startDate;
     private LocalDate endDate;
-    private Integer limit; // Use Integer to allow null if not provided (though @RequestParam default handles this)
+    private Integer limit;
     private SortBy sortBy;
 
     public enum SortBy {

@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class RevenueSummaryResponse {
-    LocalDate period_start_date;
-
-    BigDecimal total_revenue;
+    private LocalDate periodStartDate;
+    private BigDecimal totalRevenue;
 }

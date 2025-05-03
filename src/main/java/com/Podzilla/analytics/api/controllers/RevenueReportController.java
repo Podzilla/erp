@@ -13,6 +13,7 @@ import com.Podzilla.analytics.api.DTOs.RevenueSummaryRequest;
 import com.Podzilla.analytics.api.DTOs.RevenueSummaryRequest.Period;
 import com.Podzilla.analytics.api.DTOs.RevenueSummaryResponse;
 import com.Podzilla.analytics.services.RevenueReportService;
+import com.Podzilla.analytics.utils.ValidationUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,19 +23,21 @@ import lombok.RequiredArgsConstructor;
 public class RevenueReportController {
     private final RevenueReportService revenueReportService;
 
-      @GetMapping("/summary")
+    @GetMapping("/summary")
     public ResponseEntity<List<RevenueSummaryResponse>> getRevenueSummary(
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-        @RequestParam Period period // Spring will try to convert the String param to your Period enum
+        @RequestParam Period period
     ) {
         // --- Validation ---
-        if (startDate == null || endDate == null || period == null) {
-             return ResponseEntity.badRequest().body(null);
+        ResponseEntity<List<RevenueSummaryResponse>> validationError = ValidationUtils.validateDateRange(startDate, endDate);
+        if (validationError != null) {
+            return validationError;
         }
 
-        if (startDate.isAfter(endDate)) {
-            return ResponseEntity.badRequest().body(null);
+        validationError = ValidationUtils.validateEnumNotNull(period);
+        if (validationError != null) {
+            return validationError;
         }
 
         RevenueSummaryRequest requestDTO = RevenueSummaryRequest.builder()
@@ -45,27 +48,20 @@ public class RevenueReportController {
 
         return ResponseEntity.ok(revenueReportService.getRevenueSummary(requestDTO));
     }
- @GetMapping("/by-category") // Specific path for this report
+
+    @GetMapping("/by-category")
     public ResponseEntity<List<RevenueByCategoryResponse>> getRevenueByCategory(
-        // Receive parameters from the URL using @RequestParam
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
         // --- Validation ---
-        if (startDate == null || endDate == null) {
-             return ResponseEntity.badRequest().body(null); // Consider a specific error response body
-        }
-
-        if (startDate.isAfter(endDate)) {
-            return ResponseEntity.badRequest().body(null); // Consider a specific error response body
+        ResponseEntity<List<RevenueByCategoryResponse>> validationError = ValidationUtils.validateDateRange(startDate, endDate);
+        if (validationError != null) {
+            return validationError;
         }
         // --- End Validation ---
 
-        // --- Call the Service Layer ---
         List<RevenueByCategoryResponse> summaryList = revenueReportService.getRevenueByCategory(startDate, endDate);
-
-        // Return the list of summary data with OK status
         return ResponseEntity.ok(summaryList);
     }
-
 }

@@ -13,11 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class RevenueSummaryRequest {
-    LocalDate  startDate;
-
-    LocalDate  endDate;
-
-    Period period;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private Period period;
 
     public enum Period {
         DAILY,

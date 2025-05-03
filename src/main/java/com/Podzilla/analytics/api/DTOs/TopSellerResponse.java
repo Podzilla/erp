@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TopSellerResponse {
     private Long productId;
-    private String productName; // Assuming Product entity has a 'name' field
-    private String category;    // Assuming Product entity has a 'category' field
-    private BigDecimal value;   // This will hold either total revenue or total units, use BigDecimal for flexibility
+    private String productName;
+    private String category;
+    private BigDecimal value;
 }
