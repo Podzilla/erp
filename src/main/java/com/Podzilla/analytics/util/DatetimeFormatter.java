@@ -5,10 +5,14 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class DatetimeFormatter {
-    public static LocalDateTime convertStartDateToDatetime(LocalDate startDate) {
+    public static LocalDateTime convertStartDateToDatetime(
+        final LocalDate startDate
+    ) {
         return startDate.atStartOfDay();
     }
-    public static LocalDateTime convertEndDateToDatetime(LocalDate endDate) {
+    public static LocalDateTime convertEndDateToDatetime(
+        final LocalDate endDate
+    ) {
         return endDate.atTime(LocalTime.MAX);
     }
 }

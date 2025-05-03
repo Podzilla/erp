@@ -16,8 +16,11 @@ public interface CourierRepository extends JpaRepository<Courier, Long> {
             SELECT c.id AS courierId,
                    c.name AS courierName,
                    COUNT(o.id) AS deliveryCount,
-                   SUM(CASE WHEN o.status = 'COMPLETED' THEN 1 ELSE 0 END) AS completedCount,
-                   AVG(CASE WHEN o.status = 'COMPLETED' THEN o.courier_rating ELSE NULL END) AS averageRating
+                   SUM(CASE WHEN o.status = 'COMPLETED' THEN 1 ELSE 0 END)
+                    AS completedCount,
+                   AVG(CASE WHEN o.status = 'COMPLETED'
+                    THEN o.courier_rating ELSE NULL END)
+                    AS averageRating
             FROM couriers c
             LEFT JOIN orders o
                 ON c.id = o.courier_id

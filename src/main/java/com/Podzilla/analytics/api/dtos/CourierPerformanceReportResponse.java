@@ -1,7 +1,10 @@
 package com.Podzilla.analytics.api.dtos;
 
 import java.math.BigDecimal;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Data
@@ -19,7 +22,10 @@ public class CourierPerformanceReportResponse {
     @Schema(description = "Total number of deliveries", example = "87")
     private Long deliveryCount;
 
-    @Schema(description = "Success rate as a decimal value (e.g., 0.92 for 92%)", example = "0.92")
+    @Schema(
+        description = "Success rate as a decimal value (e.g., 0.92 for 92%)",
+        example = "0.92"
+    )
     private BigDecimal successRate;
 
     @Schema(description = "Average customer rating", example = "4.8")

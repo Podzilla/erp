@@ -20,65 +20,88 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class CourierAnalyticsService {
-    private final CourierRepository courierRepository;
+        private final CourierRepository courierRepository;
 
-    private List<CourierPerformanceProjection> getCourierPerformanceData(LocalDate startDate, LocalDate endDate) {
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+        private List<CourierPerformanceProjection> getCourierPerformanceData(
+                final LocalDate startDate,
+                final LocalDate endDate
+        ) {
+                LocalDateTime startDateTime = startDate.atStartOfDay();
+                LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
 
-        return courierRepository.findCourierPerformanceBetweenDates(startDateTime, endDateTime);
-    }
+                return courierRepository.findCourierPerformanceBetweenDates(
+                        startDateTime,
+                        endDateTime
+                );
+        }
 
-    public List<CourierDeliveryCountResponse> getCourierDeliveryCounts(LocalDate startDate, LocalDate endDate) {
-        List<CourierPerformanceProjection> performanceData = getCourierPerformanceData(startDate, endDate);
-        return performanceData.stream()
-                .map(data -> CourierDeliveryCountResponse.builder()
-                        .courierId(data.getCourierId())
-                        .courierName(data.getCourierName())
-                        .deliveryCount(data.getDeliveryCount())
-                        .build())
-                .toList();
-    }
+        public List<CourierDeliveryCountResponse> getCourierDeliveryCounts(
+                final LocalDate startDate,
+                final LocalDate endDate
+        ) {
+                List<CourierPerformanceProjection> performanceData =
+                        getCourierPerformanceData(startDate, endDate);
+                return performanceData.stream()
+                        .map(data -> CourierDeliveryCountResponse.builder()
+                                .courierId(data.getCourierId())
+                                .courierName(data.getCourierName())
+                                .deliveryCount(data.getDeliveryCount())
+                                .build())
+                        .toList();
+        }
 
-    public List<CourierSuccessRateResponse> getCourierSuccessRate(LocalDate startDate, LocalDate endDate) {
-        List<CourierPerformanceProjection> performanceData = getCourierPerformanceData(startDate, endDate);
-        return performanceData.stream()
-                .map(data -> CourierSuccessRateResponse.builder()
-                        .courierId(data.getCourierId())
-                        .courierName(data.getCourierName())
-                        .successRate(
-                                MetricCalculator.calculatePercentage(
-                                        data.getCompletedCount(),
-                                        data.getDeliveryCount()))
-                        .build())
-                .toList();
-    }
+        public List<CourierSuccessRateResponse> getCourierSuccessRate(
+                final LocalDate startDate,
+                final LocalDate endDate
+        ) {
+                List<CourierPerformanceProjection> performanceData =
+                        getCourierPerformanceData(startDate, endDate);
+                return performanceData.stream()
+                        .map(data -> CourierSuccessRateResponse.builder()
+                                .courierId(data.getCourierId())
+                                .courierName(data.getCourierName())
+                                .successRate(
+                                        MetricCalculator.calculatePercentage(
+                                                data.getCompletedCount(),
+                                                data.getDeliveryCount()
+                                        ))
+                                .build())
+                        .toList();
+        }
 
-    public List<CourierAverageRatingResponse> getCourierAverageRating(LocalDate startDate, LocalDate endDate) {
-        List<CourierPerformanceProjection> performanceData = getCourierPerformanceData(startDate, endDate);
-        return performanceData.stream()
-                .map(data -> CourierAverageRatingResponse.builder()
-                        .courierId(data.getCourierId())
-                        .courierName(data.getCourierName())
-                        .averageRating(data.getAverageRating())
-                        .build())
-                .toList();
-    }
+        public List<CourierAverageRatingResponse> getCourierAverageRating(
+                final LocalDate startDate,
+                final LocalDate endDate
+                ) {
+                List<CourierPerformanceProjection> performanceData =
+                        getCourierPerformanceData(startDate, endDate);
+                return performanceData.stream()
+                        .map(data -> CourierAverageRatingResponse.builder()
+                                .courierId(data.getCourierId())
+                                .courierName(data.getCourierName())
+                                .averageRating(data.getAverageRating())
+                                .build())
+                        .toList();
+        }
 
-    public List<CourierPerformanceReportResponse> getCourierPerformanceReport(LocalDate startDate,
-            LocalDate endDate) {
-        List<CourierPerformanceProjection> performanceData = getCourierPerformanceData(startDate, endDate);
-        return performanceData.stream()
-                .map(data -> CourierPerformanceReportResponse.builder()
-                        .courierId(data.getCourierId())
-                        .courierName(data.getCourierName())
-                        .deliveryCount(data.getDeliveryCount())
-                        .successRate(
-                                MetricCalculator.calculatePercentage(
-                                        data.getCompletedCount(),
-                                        data.getDeliveryCount()))
-                        .averageRating(data.getAverageRating())
-                        .build())
-                .toList();
-    }
+        public List<CourierPerformanceReportResponse>
+        getCourierPerformanceReport(
+                final LocalDate startDate,
+                final LocalDate endDate
+        ) {
+                List<CourierPerformanceProjection> performanceData =
+                        getCourierPerformanceData(startDate, endDate);
+                return performanceData.stream()
+                        .map(data -> CourierPerformanceReportResponse.builder()
+                                .courierId(data.getCourierId())
+                                .courierName(data.getCourierName())
+                                .deliveryCount(data.getDeliveryCount())
+                                .successRate(
+                                        MetricCalculator.calculatePercentage(
+                                                data.getCompletedCount(),
+                                                data.getDeliveryCount()))
+                                .averageRating(data.getAverageRating())
+                                .build())
+                        .toList();
+        }
 }
