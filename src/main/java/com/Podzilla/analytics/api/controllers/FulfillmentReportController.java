@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("fulfillment")
+@RequestMapping("/fulfillment")
 public class FulfillmentReportController {
     private final FulfillmentAnalyticsService fulfillmentAnalyticsService;
 }
