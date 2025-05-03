@@ -1,9 +1,7 @@
 package com.Podzilla.analytics.services;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -16,8 +14,6 @@ import com.Podzilla.analytics.api.projections.order.OrderFailureRateProjection;
 import com.Podzilla.analytics.api.projections.order.OrderFailureReasonsProjection;
 import com.Podzilla.analytics.api.projections.order.OrderRegionProjection;
 import com.Podzilla.analytics.api.projections.order.OrderStatusProjection;
-import com.Podzilla.analytics.models.Order;
-import com.Podzilla.analytics.models.Order.OrderStatus;
 import com.Podzilla.analytics.repositories.OrderRepository;
 import com.Podzilla.analytics.util.DatetimeFormatter;
 

@@ -15,7 +15,7 @@ import com.Podzilla.analytics.models.Order;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    @Query(value = 
+    @Query(value =
     """
         Select o.region_id as regionId,
             r.city as city,
