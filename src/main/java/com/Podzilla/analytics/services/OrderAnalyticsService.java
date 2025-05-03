@@ -46,10 +46,16 @@ public class OrderAnalyticsService {
             .toList();
     }
 
-    public List<OrderStatusDTO> getOrdersStatusCounts(LocalDate startDate, LocalDate endDate) {
-        LocalDateTime startDateTime = DatetimeFormatter.convertStartDateToDatetime(startDate);
-        LocalDateTime endDateTime = DatetimeFormatter.convertEndDateToDatetime(endDate);
-        List<OrderStatusProjection> orderStatusCounts = orderRepository.findOrderStatusCounts(startDateTime, endDateTime);
+    public List<OrderStatusDTO> getOrdersStatusCounts(
+        final LocalDate startDate,
+        final LocalDate endDate
+    ) {
+        LocalDateTime startDateTime =
+            DatetimeFormatter.convertStartDateToDatetime(startDate);
+        LocalDateTime endDateTime =
+            DatetimeFormatter.convertEndDateToDatetime(endDate);
+        List<OrderStatusProjection> orderStatusCounts =
+            orderRepository.findOrderStatusCounts(startDateTime, endDateTime);
         return orderStatusCounts.stream()
             .map(data -> OrderStatusDTO.builder()
                     .status(data.getStatus())
@@ -58,11 +64,18 @@ public class OrderAnalyticsService {
             .toList();
     }
 
-    public OrderFailureDTO getOrdersFailures(LocalDate startDate, LocalDate endDate) {
-        LocalDateTime startDateTime = DatetimeFormatter.convertStartDateToDatetime(startDate);
-        LocalDateTime endDateTime = DatetimeFormatter.convertEndDateToDatetime(endDate);
-        List<OrderFailureReasonsProjection> failureReasons = orderRepository.findFailureReasons(startDateTime, endDateTime);
-        OrderFailureRateProjection failureRate = orderRepository.calculateFailureRate(startDateTime, endDateTime);
+    public OrderFailureDTO getOrdersFailures(
+        final LocalDate startDate,
+        final LocalDate endDate
+    ) {
+        LocalDateTime startDateTime =
+            DatetimeFormatter.convertStartDateToDatetime(startDate);
+        LocalDateTime endDateTime =
+            DatetimeFormatter.convertEndDateToDatetime(endDate);
+        List<OrderFailureReasonsProjection> failureReasons =
+            orderRepository.findFailureReasons(startDateTime, endDateTime);
+        OrderFailureRateProjection failureRate =
+            orderRepository.calculateFailureRate(startDateTime, endDateTime);
         List<OrderFailureReasonsDTO> failureReasonsDTO = failureReasons.stream()
             .map(data -> OrderFailureReasonsDTO.builder()
                     .reason(data.getReason())
