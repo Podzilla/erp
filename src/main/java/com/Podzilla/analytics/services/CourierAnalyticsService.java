@@ -7,10 +7,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.Podzilla.analytics.api.dtos.CourierAverageRatingDTO;
-import com.Podzilla.analytics.api.dtos.CourierDeliveryCountDTO;
-import com.Podzilla.analytics.api.dtos.CourierPerformanceReportDTO;
-import com.Podzilla.analytics.api.dtos.CourierSuccessRateDTO;
+import com.Podzilla.analytics.api.dtos.CourierAverageRatingResponse;
+import com.Podzilla.analytics.api.dtos.CourierDeliveryCountResponse;
+import com.Podzilla.analytics.api.dtos.CourierPerformanceReportResponse;
+import com.Podzilla.analytics.api.dtos.CourierSuccessRateResponse;
 import com.Podzilla.analytics.api.projections.CourierPerformanceProjection;
 import com.Podzilla.analytics.repositories.CourierRepository;
 import com.Podzilla.analytics.util.MetricCalculator;
@@ -29,10 +29,10 @@ public class CourierAnalyticsService {
         return courierRepository.findCourierPerformanceBetweenDates(startDateTime, endDateTime);
     }
 
-    public List<CourierDeliveryCountDTO> getCourierDeliveryCounts(LocalDate startDate, LocalDate endDate) {
+    public List<CourierDeliveryCountResponse> getCourierDeliveryCounts(LocalDate startDate, LocalDate endDate) {
         List<CourierPerformanceProjection> performanceData = getCourierPerformanceData(startDate, endDate);
         return performanceData.stream()
-                .map(data -> CourierDeliveryCountDTO.builder()
+                .map(data -> CourierDeliveryCountResponse.builder()
                         .courierId(data.getCourierId())
                         .courierName(data.getCourierName())
                         .deliveryCount(data.getDeliveryCount())
@@ -40,22 +40,24 @@ public class CourierAnalyticsService {
                 .toList();
     }
 
-    public List<CourierSuccessRateDTO> getCourierSuccessRate(LocalDate startDate, LocalDate endDate) {
+    public List<CourierSuccessRateResponse> getCourierSuccessRate(LocalDate startDate, LocalDate endDate) {
         List<CourierPerformanceProjection> performanceData = getCourierPerformanceData(startDate, endDate);
         return performanceData.stream()
-                .map(data -> CourierSuccessRateDTO.builder()
+                .map(data -> CourierSuccessRateResponse.builder()
                         .courierId(data.getCourierId())
                         .courierName(data.getCourierName())
                         .successRate(
-                                MetricCalculator.calculatePercentage(data.getCompletedCount(), data.getDeliveryCount()))
+                                MetricCalculator.calculatePercentage(
+                                        data.getCompletedCount(),
+                                        data.getDeliveryCount()))
                         .build())
                 .toList();
     }
 
-    public List<CourierAverageRatingDTO> getCourierAverageRating(LocalDate startDate, LocalDate endDate) {
+    public List<CourierAverageRatingResponse> getCourierAverageRating(LocalDate startDate, LocalDate endDate) {
         List<CourierPerformanceProjection> performanceData = getCourierPerformanceData(startDate, endDate);
         return performanceData.stream()
-                .map(data -> CourierAverageRatingDTO.builder()
+                .map(data -> CourierAverageRatingResponse.builder()
                         .courierId(data.getCourierId())
                         .courierName(data.getCourierName())
                         .averageRating(data.getAverageRating())
@@ -63,15 +65,18 @@ public class CourierAnalyticsService {
                 .toList();
     }
 
-    public List<CourierPerformanceReportDTO> getCourierPerformanceReport(LocalDate startDate, LocalDate endDate) {
+    public List<CourierPerformanceReportResponse> getCourierPerformanceReport(LocalDate startDate,
+            LocalDate endDate) {
         List<CourierPerformanceProjection> performanceData = getCourierPerformanceData(startDate, endDate);
         return performanceData.stream()
-                .map(data -> CourierPerformanceReportDTO.builder()
+                .map(data -> CourierPerformanceReportResponse.builder()
                         .courierId(data.getCourierId())
                         .courierName(data.getCourierName())
                         .deliveryCount(data.getDeliveryCount())
                         .successRate(
-                                MetricCalculator.calculatePercentage(data.getCompletedCount(), data.getDeliveryCount()))
+                                MetricCalculator.calculatePercentage(
+                                        data.getCompletedCount(),
+                                        data.getDeliveryCount()))
                         .averageRating(data.getAverageRating())
                         .build())
                 .toList();
