@@ -25,11 +25,16 @@ public class OrderAnalyticsService {
 
 
     private final OrderRepository orderRepository;
-    
-    public List<OrderRegionDTO> getOrdersByRegion(LocalDate startDate, LocalDate endDate) {
-        LocalDateTime startDateTime = DatetimeFormatter.convertStartDateToDatetime(startDate);
-        LocalDateTime endDateTime = DatetimeFormatter.convertEndDateToDatetime(endDate);
-        List<OrderRegionProjection> ordersByRegion = orderRepository.findOrdersByRegion(startDateTime, endDateTime);
+    public List<OrderRegionDTO> getOrdersByRegion(
+        final LocalDate startDate,
+        final LocalDate endDate
+    ) {
+        LocalDateTime startDateTime =
+            DatetimeFormatter.convertStartDateToDatetime(startDate);
+        LocalDateTime endDateTime =
+            DatetimeFormatter.convertEndDateToDatetime(endDate);
+        List<OrderRegionProjection> ordersByRegion =
+            orderRepository.findOrdersByRegion(startDateTime, endDateTime);
         return ordersByRegion.stream()
             .map(data -> OrderRegionDTO.builder()
                     .regionId(data.getRegionId())

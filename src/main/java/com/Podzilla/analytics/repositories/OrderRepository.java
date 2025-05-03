@@ -15,8 +15,7 @@ import com.Podzilla.analytics.models.Order;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    @Query(value =
-    """
+    @Query(value = """
         Select o.region_id as regionId,
             r.city as city,
             r.country as country,
@@ -27,30 +26,26 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         where o.final_status_timestamp between :startDate and :endDate
         Group by o.region_id, r.city, r.country
         Order by orderCount desc, averageOrderValue desc
-    """
-    , nativeQuery = true)
+    """, nativeQuery = true)
     List<OrderRegionProjection> findOrdersByRegion(
         @Param("startDate") LocalDateTime startDate,
         @Param("endDate") LocalDateTime endDate
     );
 
-    @Query(value = 
-    """
+    @Query(value = """
         Select o.status as status,
             count(o.id) as count
         From orders o
         where o.final_status_timestamp between :startDate and :endDate
         Group by o.status
         Order by count desc
-    """
-    , nativeQuery = true)
+    """, nativeQuery = true)
     List<OrderStatusProjection> findOrderStatusCounts(
         @Param("startDate") LocalDateTime startDate,
         @Param("endDate") LocalDateTime endDate
     );
 
-    @Query(value = 
-    """
+    @Query(value = """
         Select o.failure_reason as reason,
             count(o.id) as count
         From orders o
@@ -58,21 +53,18 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         and o.status = 'FAILED'
         Group by o.failure_reason
         Order by count desc
-    """
-    , nativeQuery = true)
+    """, nativeQuery = true)
     List<OrderFailureReasonsProjection> findFailureReasons(
         @Param("startDate") LocalDateTime startDate,
         @Param("endDate") LocalDateTime endDate
     );
 
-    @Query(value = 
-    """
-        Select (Sum(Case when o.status = 'FAILED' then 1 else 0 end) / 
+    @Query(value = """
+        Select (Sum(Case when o.status = 'FAILED' then 1 else 0 end) /
             (count(*)*1.0) ) as failureRate
         From orders o
         where o.final_status_timestamp between :startDate and :endDate
-    """
-    , nativeQuery = true)
+    """, nativeQuery = true)
     OrderFailureRateProjection calculateFailureRate(
         @Param("startDate") LocalDateTime startDate,
         @Param("endDate") LocalDateTime endDate
