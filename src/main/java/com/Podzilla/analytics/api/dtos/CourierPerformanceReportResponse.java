@@ -7,8 +7,11 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CourierSuccessRateDTO {
+public class CourierPerformanceReportResponse {
     private Long courierId;
     private String courierName;
+    private Long deliveryCount;
     private BigDecimal successRate;
+    private BigDecimal averageRating;
+
 }

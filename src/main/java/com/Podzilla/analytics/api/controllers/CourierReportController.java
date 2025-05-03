@@ -1,18 +1,18 @@
 package com.Podzilla.analytics.api.controllers;
 
-import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.Podzilla.analytics.api.dtos.CourierAverageRatingDTO;
-import com.Podzilla.analytics.api.dtos.CourierDeliveryCountDTO;
-import com.Podzilla.analytics.api.dtos.CourierPerformanceReportDTO;
-import com.Podzilla.analytics.api.dtos.CourierSuccessRateDTO;
+import com.Podzilla.analytics.api.dtos.CourierAverageRatingResponse;
+import com.Podzilla.analytics.api.dtos.CourierDeliveryCountResponse;
+import com.Podzilla.analytics.api.dtos.CourierPerformanceReportResponse;
+import com.Podzilla.analytics.api.dtos.CourierSuccessRateResponse;
+import com.Podzilla.analytics.api.dtos.DateRangeRequest;
 import com.Podzilla.analytics.services.CourierAnalyticsService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -22,39 +22,40 @@ public class CourierReportController {
     private final CourierAnalyticsService courierAnalyticsService;
 
     @GetMapping("/delivery-counts")
-    public ResponseEntity<List<CourierDeliveryCountDTO>> getCourierDeliveryCounts(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+    public ResponseEntity<List<CourierDeliveryCountResponse>> getCourierDeliveryCounts(
+            @Valid @ModelAttribute DateRangeRequest dateRange) {
 
-        List<CourierDeliveryCountDTO> counts = courierAnalyticsService.getCourierDeliveryCounts(startDate, endDate);
+        List<CourierDeliveryCountResponse> counts = courierAnalyticsService
+                .getCourierDeliveryCounts(dateRange.getStartDate(), dateRange.getEndDate());
         return ResponseEntity.ok(counts);
     }
 
     @GetMapping("/success-rate")
-    public ResponseEntity<List<CourierSuccessRateDTO>> getCourierSuccessRate(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+    public ResponseEntity<List<CourierSuccessRateResponse>> getCourierSuccessRate(
+            @Valid @ModelAttribute DateRangeRequest dateRange) {
 
-        List<CourierSuccessRateDTO> rates = courierAnalyticsService.getCourierSuccessRate(startDate, endDate);
+        List<CourierSuccessRateResponse> rates = courierAnalyticsService.getCourierSuccessRate(dateRange.getStartDate(),
+                dateRange.getEndDate());
         return ResponseEntity.ok(rates);
     }
 
     @GetMapping("/average-rating")
-    public ResponseEntity<List<CourierAverageRatingDTO>> getCourierAverageRating(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+    public ResponseEntity<List<CourierAverageRatingResponse>> getCourierAverageRating(
+            @Valid @ModelAttribute DateRangeRequest dateRange) {
 
-        List<CourierAverageRatingDTO> ratings = courierAnalyticsService.getCourierAverageRating(startDate, endDate);
+        List<CourierAverageRatingResponse> ratings = courierAnalyticsService.getCourierAverageRating(
+                dateRange.getStartDate(),
+                dateRange.getEndDate());
         return ResponseEntity.ok(ratings);
     }
 
     @GetMapping("/performance-report")
-    public ResponseEntity<List<CourierPerformanceReportDTO>> getCourierPerformanceReport(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+    public ResponseEntity<List<CourierPerformanceReportResponse>> getCourierPerformanceReport(
+            @Valid @ModelAttribute DateRangeRequest dateRange) {
 
-        List<CourierPerformanceReportDTO> report = courierAnalyticsService.getCourierPerformanceReport(startDate, endDate);
+        List<CourierPerformanceReportResponse> report = courierAnalyticsService.getCourierPerformanceReport(
+                dateRange.getStartDate(),
+                dateRange.getEndDate());
         return ResponseEntity.ok(report);
     }
-
 }
