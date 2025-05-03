@@ -24,7 +24,7 @@ public interface CourierRepository extends JpaRepository<Courier, Long> {
                 AND o.final_status_timestamp BETWEEN :startDate AND :endDate
                 AND o.status IN ('COMPLETED', 'FAILED')
             GROUP BY c.id, c.name
-            ORDER BY completedCount DESC
+            ORDER BY courierId
             """, nativeQuery = true)
     List<CourierPerformanceProjection> findCourierPerformanceBetweenDates(
             @Param("startDate") LocalDateTime startDate,
