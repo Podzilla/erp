@@ -15,7 +15,7 @@ public class eventHandlerDispatcherConfig {
 
         //TODO should add all the events here 
         //Example: 
-        //dispatcher.registerHandler(aDTO.class, new aHandler()); 
+        // dispatcher.registerHandler(aDTO.class, new aHandler()); 
         return dispatcher;
     }
 }
