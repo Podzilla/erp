@@ -1,6 +1,16 @@
 package com.Podzilla.analytics.eventhandler;
 
+/**
+ * Generic interface for handling events.
+ *
+ * @param <T> the type of the event DTO
+ */
+public interface IEventHandler<T> {
 
-public interface IEventHandler<T> { //T should be the DTO of the event
+    /**
+     * Handles the given event DTO.
+     *
+     * @param eventDto the data transfer object representing the event
+     */
     void handle(T eventDto);
 }

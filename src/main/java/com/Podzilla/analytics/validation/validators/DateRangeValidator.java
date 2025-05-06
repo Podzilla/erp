@@ -6,10 +6,24 @@ import com.Podzilla.analytics.validation.annotations.ValidDateRange;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class DateRangeValidator implements ConstraintValidator<ValidDateRange, DateRangeRequest> {
+/**
+ * Validator for ensuring valid date ranges in DateRangeRequest objects.
+ */
+public final class DateRangeValidator implements
+        ConstraintValidator<ValidDateRange, DateRangeRequest> {
 
+    /**
+     * Validates that the end date is after the start date in a date range
+     *  request.
+     *
+     * @param request the date range request to validate
+     * @param context the validation context
+     * @return true if the date range is valid or if dates are null,
+     *  false otherwise
+     */
     @Override
-    public boolean isValid(DateRangeRequest request, ConstraintValidatorContext context) {
+    public boolean isValid(final DateRangeRequest request,
+            final ConstraintValidatorContext context) {
         if (request.getStartDate() == null || request.getEndDate() == null) {
             return true;
         }
