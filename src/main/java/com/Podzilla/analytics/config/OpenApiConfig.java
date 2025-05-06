@@ -6,13 +6,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class OpenApiConfig {
+public final class OpenApiConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
                         .title("Podzilla Analytics API")
                         .version("1.0")
-                        .description("API documentation for analytics services."));
+                        .description(
+                                "API documentation for analytics services."));
     }
 }

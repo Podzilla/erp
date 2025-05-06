@@ -1,6 +1,9 @@
 package com.Podzilla.analytics.api.dtos;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Data
@@ -15,6 +18,9 @@ public class CourierDeliveryCountResponse {
     @Schema(description = "Full name of the courier", example = "Jane Smith")
     private String courierName;
 
-    @Schema(description = "Total number of deliveries (successful + failed)", example = "134")
+    @Schema(
+        description = "Total number of deliveries (successful + failed)",
+        example = "134"
+    )
     private Long deliveryCount;
 }

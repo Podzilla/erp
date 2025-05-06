@@ -6,10 +6,11 @@ import com.Podzilla.analytics.validation.annotations.ValidDateRange;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class DateRangeValidator implements ConstraintValidator<ValidDateRange, DateRangeRequest> {
-
+public final class DateRangeValidator implements
+        ConstraintValidator<ValidDateRange, DateRangeRequest> {
     @Override
-    public boolean isValid(DateRangeRequest request, ConstraintValidatorContext context) {
+    public boolean isValid(final DateRangeRequest request,
+            final ConstraintValidatorContext context) {
         if (request.getStartDate() == null || request.getEndDate() == null) {
             return true;
         }
