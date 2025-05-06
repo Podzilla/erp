@@ -1,12 +1,3 @@
-/**
- * DatabaseSeeder is responsible for populating the database with test data
- * during application startup. This is useful for local development and testing.
- *
- * Notes:
- * - All magic numbers have been replaced with constants for clarity.
- * - Line length is limited to 80 characters for readability.
- */
-// CHECKSTYLE:OFF
 package com.Podzilla.analytics.config;
 
 import com.Podzilla.analytics.models.Courier;
@@ -34,9 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Seeds the database with initial test data for development and testing.
- */
+
 @Component
 @RequiredArgsConstructor
 public class DatabaseSeeder implements CommandLineRunner {
@@ -49,7 +38,6 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final InventorySnapshotRepository inventorySnapshotRepository;
 
     private final Random random = new Random();
-
     private static final int LOW_STOCK_PROD1 = 10;
     private static final int LOW_STOCK_PROD2 = 20;
     private static final int LOW_STOCK_PROD3 = 50;
@@ -103,17 +91,11 @@ public class DatabaseSeeder implements CommandLineRunner {
     private static final int INVENTORY_QUANTITY_PROD3 = 140;
     private static final int INVENTORY_QUANTITY_PROD4 = 70;
 
-    private static final int INDEX_ZERO = 0;
-
-    private static final int INDEX_ONE = 1;
-
-    private static final int INDEX_TWO = 2;
-
     private static final int INDEX_THREE = 3;
 
     @Override
     @Transactional
-    public final void run(final String... args) {
+    public void run(final String... args) {
         System.out.println("Checking if database needs seeding...");
 
         if (courierRepository.count() > 0) {
@@ -315,7 +297,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .courierRating(RATING_EXCELLENT)
                 .build();
         SalesLineItem itemFourthOrderFirst = SalesLineItem.builder()
-                .order(order4).product(products.get(INDEX_ZERO)).quantity(1)
+                .order(order4).product(products.get(0)).quantity(1)
                 .pricePerUnit(PRICE_PROD1).build();
         SalesLineItem itemFourthOrderSecond = SalesLineItem.builder()
                 .order(order4).product(products.get(INDEX_THREE)).quantity(1)
@@ -335,11 +317,11 @@ public class DatabaseSeeder implements CommandLineRunner {
     }
 
     private void seedInventorySnapshots(final List<Product> products) {
-        seedInventorySnapshot(products.get(INDEX_ZERO), INVENTORY_RANGE_PROD1,
+        seedInventorySnapshot(products.get(0), INVENTORY_RANGE_PROD1,
                 INVENTORY_QUANTITY_PROD1);
-        seedInventorySnapshot(products.get(INDEX_ONE), INVENTORY_RANGE_PROD2,
+        seedInventorySnapshot(products.get(1), INVENTORY_RANGE_PROD2,
                 INVENTORY_QUANTITY_PROD2);
-        seedInventorySnapshot(products.get(INDEX_TWO), INVENTORY_RANGE_PROD3,
+        seedInventorySnapshot(products.get(2), INVENTORY_RANGE_PROD3,
                 INVENTORY_QUANTITY_PROD3);
         seedInventorySnapshot(products.get(INDEX_THREE), INVENTORY_RANGE_PROD4,
                 INVENTORY_QUANTITY_PROD4);
