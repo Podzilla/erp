@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.Podzilla.analytics.api.dtos.CourierAverageRatingResponse;
-import com.Podzilla.analytics.api.dtos.CourierDeliveryCountResponse;
-import com.Podzilla.analytics.api.dtos.CourierPerformanceReportResponse;
-import com.Podzilla.analytics.api.dtos.CourierSuccessRateResponse;
 import com.Podzilla.analytics.api.dtos.DateRangeRequest;
+import com.Podzilla.analytics.api.dtos.courier.CourierAverageRatingResponse;
+import com.Podzilla.analytics.api.dtos.courier.CourierDeliveryCountResponse;
+import com.Podzilla.analytics.api.dtos.courier.CourierPerformanceReportResponse;
+import com.Podzilla.analytics.api.dtos.courier.CourierSuccessRateResponse;
 import com.Podzilla.analytics.services.CourierAnalyticsService;
 
 import io.swagger.v3.oas.annotations.Operation;
