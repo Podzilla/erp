@@ -13,6 +13,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Podzilla Analytics API")
                         .version("1.0")
-                        .description("API documentation for analytics services."));
+                        .description(
+                                "API documentation for analytics services."));
     }
 }

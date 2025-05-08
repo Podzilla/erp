@@ -19,44 +19,52 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BindException.class)
-    public ResponseEntity<ErrorResponse> handleBindException(BindException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleBindException(
+            final BindException ex,
+            final WebRequest request) {
 
         Map<String, String> fieldErrors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .collect(Collectors.toMap(
                         FieldError::getField,
-                        fieldError -> fieldError.getDefaultMessage() != null ? fieldError.getDefaultMessage()
+                        fieldError -> fieldError.getDefaultMessage() != null
+                                ? fieldError.getDefaultMessage()
                                 : "Invalid value"));
 
-        log.warn("Validation failed for request {}: {}", request.getDescription(false), fieldErrors);
+        log.warn("Validation failed for request {}: {}",
+                request.getDescription(false), fieldErrors);
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
-                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                .message("Validation failed. Check field errors for details.")
+                .error("Validation failed")
                 .fieldErrors(fieldErrors)
-                .path(request.getDescription(false).replace("uri=", ""))
                 .build();
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleGenericException(
+            final Exception ex,
+            final WebRequest request) {
 
-        log.error("Unexpected error occurred processing request {}: {}", request.getDescription(false), ex.getMessage(),
+        log.error("Unexpected error occurred processing request {}: {}",
+                request.getDescription(false),
+                ex.getMessage(),
                 ex);
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()) // "Internal Server Error"
-                .message("An unexpected internal error occurred. Please try again later.") // Keep message generic
-                .path(request.getDescription(false).replace("uri=", ""))
+                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+                .message("An unexpected internal error occurred.")
+                .path(request.getDescription(false)
+                        .replace("uri=", ""))
                 .build();
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(errorResponse,
+                HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
