@@ -7,10 +7,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.Podzilla.analytics.api.dtos.CourierAverageRatingResponse;
-import com.Podzilla.analytics.api.dtos.CourierDeliveryCountResponse;
-import com.Podzilla.analytics.api.dtos.CourierPerformanceReportResponse;
-import com.Podzilla.analytics.api.dtos.CourierSuccessRateResponse;
+import com.Podzilla.analytics.api.dtos.courier.CourierAverageRatingResponse;
+import com.Podzilla.analytics.api.dtos.courier.CourierDeliveryCountResponse;
+import com.Podzilla.analytics.api.dtos.courier.CourierPerformanceReportResponse;
+import com.Podzilla.analytics.api.dtos.courier.CourierSuccessRateResponse;
 import com.Podzilla.analytics.api.projections.CourierPerformanceProjection;
 import com.Podzilla.analytics.repositories.CourierRepository;
 import com.Podzilla.analytics.util.MetricCalculator;

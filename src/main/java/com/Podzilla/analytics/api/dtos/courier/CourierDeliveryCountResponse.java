@@ -1,4 +1,4 @@
-package com.Podzilla.analytics.api.dtos;
+package com.Podzilla.analytics.api.dtos.courier;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

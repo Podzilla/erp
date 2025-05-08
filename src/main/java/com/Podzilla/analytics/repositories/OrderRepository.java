@@ -17,15 +17,15 @@ import com.Podzilla.analytics.models.Order;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    @Query(value = "Select o.region_id as regionId,"
-            + "r.city as city,"
-            + "r.country as country,"
-            + "count(o.id) as orderCount,"
-            + "avg(o.total_amount) as averageOrderValue"
-        + "From orders o"
-        + "inner join regions r on o.region_id = r.id"
-        + "where o.final_status_timestamp between :startDate and :endDate"
-        + "Group by o.region_id, r.city, r.country"
+    @Query(value = "Select o.region_id as regionId, "
+            + "r.city as city, "
+            + "r.country as country, "
+            + "count(o.id) as orderCount, "
+            + "avg(o.total_amount) as averageOrderValue "
+        + "From orders o "
+        + "inner join regions r on o.region_id = r.id "
+        + "where o.final_status_timestamp between :startDate and :endDate "
+        + "Group by o.region_id, r.city, r.country "
         + "Order by orderCount desc, averageOrderValue desc",
     nativeQuery = true)
     List<OrderRegionProjection> findOrdersByRegion(
@@ -33,11 +33,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         @Param("endDate") LocalDateTime endDate
     );
 
-    @Query(value = "Select o.status as status,"
-            + "count(o.id) as count"
-        + "From orders o"
-        + "where o.final_status_timestamp between :startDate and :endDate"
-        + "Group by o.status"
+    @Query(value = "Select o.status as status, "
+            + "count(o.id) as count "
+        + "From orders o "
+        + "where o.final_status_timestamp between :startDate and :endDate "
+        + "Group by o.status "
         + "Order by count desc",
     nativeQuery = true)
     List<OrderStatusProjection> findOrderStatusCounts(
@@ -45,12 +45,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         @Param("endDate") LocalDateTime endDate
     );
 
-    @Query(value = "Select o.failure_reason as reason,"
-            + "count(o.id) as count"
-        + "From orders o"
-        + "where o.final_status_timestamp between :startDate and :endDate"
-        + "and o.status = 'FAILED'"
-        + "Group by o.failure_reason"
+    @Query(value = "Select o.failure_reason as reason, "
+            + "count(o.id) as count "
+        + "From orders o "
+        + "where o.final_status_timestamp between :startDate and :endDate "
+        + "and o.status = 'FAILED' "
+        + "Group by o.failure_reason "
         + "Order by count desc",
     nativeQuery = true)
     List<OrderFailureReasonsProjection> findFailureReasons(
@@ -59,9 +59,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     );
 
     @Query(value =
-        "Select (Sum(Case when o.status = 'FAILED' then 1 else 0 end) /"
-            + "(count(*)*1.0) ) as failureRate"
-        + "From orders o"
+        "Select (Sum(Case when o.status = 'FAILED' then 1 else 0 end)/"
+            + "(count(*)*1.0) ) as failureRate "
+        + "From orders o "
         + "where o.final_status_timestamp between :startDate and :endDate",
     nativeQuery = true)
     OrderFailureRateProjection calculateFailureRate(

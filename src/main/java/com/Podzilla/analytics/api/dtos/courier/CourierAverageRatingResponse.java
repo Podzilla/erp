@@ -1,4 +1,4 @@
-package com.Podzilla.analytics.api.dtos;
+package com.Podzilla.analytics.api.dtos.courier;
 
 import java.math.BigDecimal;
 import io.swagger.v3.oas.annotations.media.Schema;

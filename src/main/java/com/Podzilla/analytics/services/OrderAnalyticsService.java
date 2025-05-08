@@ -6,10 +6,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.Podzilla.analytics.api.dtos.order.OrderFailureDTO;
-import com.Podzilla.analytics.api.dtos.order.OrderFailureReasonsDTO;
-import com.Podzilla.analytics.api.dtos.order.OrderRegionDTO;
-import com.Podzilla.analytics.api.dtos.order.OrderStatusDTO;
+import com.Podzilla.analytics.api.dtos.order.OrderFailureResponse;
+import com.Podzilla.analytics.api.dtos.order.OrderFailureReasonsResponse;
+import com.Podzilla.analytics.api.dtos.order.OrderRegionResponse;
+import com.Podzilla.analytics.api.dtos.order.OrderStatusResponse;
 import com.Podzilla.analytics.api.projections.order.OrderFailureRateProjection;
 import com.Podzilla.analytics.api.projections.order.OrderFailureReasonsProjection;
 import com.Podzilla.analytics.api.projections.order.OrderRegionProjection;
@@ -25,7 +25,7 @@ public class OrderAnalyticsService {
 
 
     private final OrderRepository orderRepository;
-    public List<OrderRegionDTO> getOrdersByRegion(
+    public List<OrderRegionResponse> getOrdersByRegion(
         final LocalDate startDate,
         final LocalDate endDate
     ) {
@@ -33,10 +33,14 @@ public class OrderAnalyticsService {
             DatetimeFormatter.convertStartDateToDatetime(startDate);
         LocalDateTime endDateTime =
             DatetimeFormatter.convertEndDateToDatetime(endDate);
+            System.out.println("Start date a1a1: " + startDate);
+            System.out.println("End date b1b1: " + endDate);
         List<OrderRegionProjection> ordersByRegion =
             orderRepository.findOrdersByRegion(startDateTime, endDateTime);
+            System.out.println("Start date a2a2: " + startDate);
+            System.out.println("End date b2b2: " + endDate);
         return ordersByRegion.stream()
-            .map(data -> OrderRegionDTO.builder()
+            .map(data -> OrderRegionResponse.builder()
                     .regionId(data.getRegionId())
                     .city(data.getCity())
                     .country(data.getCountry())
@@ -46,7 +50,7 @@ public class OrderAnalyticsService {
             .toList();
     }
 
-    public List<OrderStatusDTO> getOrdersStatusCounts(
+    public List<OrderStatusResponse> getOrdersStatusCounts(
         final LocalDate startDate,
         final LocalDate endDate
     ) {
@@ -57,14 +61,14 @@ public class OrderAnalyticsService {
         List<OrderStatusProjection> orderStatusCounts =
             orderRepository.findOrderStatusCounts(startDateTime, endDateTime);
         return orderStatusCounts.stream()
-            .map(data -> OrderStatusDTO.builder()
+            .map(data -> OrderStatusResponse.builder()
                     .status(data.getStatus())
                     .count(data.getCount())
                     .build())
             .toList();
     }
 
-    public OrderFailureDTO getOrdersFailures(
+    public OrderFailureResponse getOrdersFailures(
         final LocalDate startDate,
         final LocalDate endDate
     ) {
@@ -76,13 +80,14 @@ public class OrderAnalyticsService {
             orderRepository.findFailureReasons(startDateTime, endDateTime);
         OrderFailureRateProjection failureRate =
             orderRepository.calculateFailureRate(startDateTime, endDateTime);
-        List<OrderFailureReasonsDTO> failureReasonsDTO = failureReasons.stream()
-            .map(data -> OrderFailureReasonsDTO.builder()
+        List<OrderFailureReasonsResponse>
+            failureReasonsDTO = failureReasons.stream()
+            .map(data -> OrderFailureReasonsResponse.builder()
                     .reason(data.getReason())
                     .count(data.getCount())
                     .build())
             .toList();
-        return OrderFailureDTO.builder()
+        return OrderFailureResponse.builder()
             .reasons(failureReasonsDTO)
             .failureRate(failureRate.getFailureRate())
             .build();
