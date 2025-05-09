@@ -1,4 +1,4 @@
-package com.Podzilla.analytics.api.dtos;
+package com.Podzilla.analytics.api.dtos.inventory;
 
 import java.math.BigDecimal;
 import lombok.*;
@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InventoryValueByCategoryDTO {
+public class InventoryValueByCategoryResponse {
     private String category;
     private BigDecimal totalStockValue;
 }

@@ -3,31 +3,40 @@ package com.Podzilla.analytics.api.controllers;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import com.Podzilla.analytics.api.dtos.InventoryValueByCategoryDTO;
-import com.Podzilla.analytics.api.dtos.LowStockProductDTO;
+import com.Podzilla.analytics.api.dtos.inventory.InventoryValueByCategoryResponse;
+import com.Podzilla.analytics.api.dtos.inventory.LowStockProductResponse;
+import com.Podzilla.analytics.api.dtos.PaginationRequest;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.Podzilla.analytics.services.InventoryAnalyticsService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 
+@Tag(name = "Inventory Reports", description = "APIs for inventory analytics and reporting")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/inventory")
 public class InventoryReportController {
     private final InventoryAnalyticsService inventoryAnalyticsService;
 
+    @Operation(summary = "Get inventory value by category", description = "Returns the total value of inventory grouped by product categories")
     @GetMapping("/value/by-category")
-    public List<InventoryValueByCategoryDTO> getInventoryValueByCategory() {
+    public List<InventoryValueByCategoryResponse> getInventoryValueByCategory() {
         return inventoryAnalyticsService.getInventoryValueByCategory();
     }
 
+    @Operation(summary = "Get low stock products", description = "Returns a paginated list of products that are running low on stock")
     @GetMapping("/low-stock")
-    public Page<LowStockProductDTO> getLowStockProducts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return inventoryAnalyticsService.getLowStockProducts(page, size);
+    public Page<LowStockProductResponse> getLowStockProducts(
+            @Valid @ModelAttribute final PaginationRequest paginationRequest) {
+        return inventoryAnalyticsService.getLowStockProducts(
+                paginationRequest.getPage(),
+                paginationRequest.getSize());
     }
 }

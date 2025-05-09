@@ -1,4 +1,4 @@
-package com.Podzilla.analytics.api.dtos;
+package com.Podzilla.analytics.api.dtos.customer;
 
 import java.math.BigDecimal;
 import lombok.*;
@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomersTopSpendersDTO {
+public class CustomersTopSpendersResponse {
     private Long customerId;
     private String customerName;
     private BigDecimal totalSpending;
