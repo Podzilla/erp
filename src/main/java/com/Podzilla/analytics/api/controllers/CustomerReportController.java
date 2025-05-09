@@ -16,14 +16,17 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-@Tag(name = "Customer Reports", description = "APIs for customer analytics and reporting")
+@Tag(name = "Customer Reports", description = "APIs for customer analytics and"
+        + "reporting")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/customers")
 public class CustomerReportController {
     private final CustomerAnalyticsService customerAnalyticsService;
 
-    @Operation(summary = "Get top spending customers", description = "Returns a paginated list of customers who have spent the most money within the specified date range")
+    @Operation(summary = "Get top spending customers", description = "Returns"
+            + "a paginated list of customers who have spent"
+            + "the most money within the specified date range")
     @GetMapping("/top-spenders")
     public List<CustomersTopSpendersResponse> getTopSpenders(
             @Valid @ModelAttribute final DateRangePaginationRequest request) {

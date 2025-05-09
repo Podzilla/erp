@@ -14,29 +14,31 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class InventoryAnalyticsService {
-    private final InventorySnapshotRepository inventorySnapshotRepository;
+    private final InventorySnapshotRepository inventoryRepo;
 
-    public List<InventoryValueByCategoryResponse> getInventoryValueByCategory() {
-        List<InventoryValueByCategoryResponse> inventoryValueByCategory = inventorySnapshotRepository
-                .getInventoryValueByCategory()
-                .stream()
-                .map(row -> InventoryValueByCategoryResponse.builder()
-                        .category(row.getCategory())
-                        .totalStockValue(row.getTotalStockValue())
-                        .build())
+public List<InventoryValueByCategoryResponse> getInventoryValueByCategory() {
+List<InventoryValueByCategoryResponse> invVByCy = inventoryRepo
+.getInventoryValueByCategory()
+.stream()
+.map(row -> InventoryValueByCategoryResponse.builder()
+.category(row.getCategory())
+.totalStockValue(row.getTotalStockValue())
+.build())
                 .toList();
-        return inventoryValueByCategory;
+        return invVByCy;
     }
 
-    public Page<LowStockProductResponse> getLowStockProducts(int page, int size) {
+public Page<LowStockProductResponse> getLowStockProducts(final int page,
+ final int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<LowStockProductResponse> lowStockProducts = inventorySnapshotRepository.getLowStockProducts(pageRequest)
+Page<LowStockProductResponse> lowStockPro =
+ inventoryRepo.getLowStockProducts(pageRequest)
                 .map(row -> LowStockProductResponse.builder()
                         .productId(row.getProductId())
                         .productName(row.getProductName())
                         .currentQuantity(row.getCurrentQuantity())
                         .threshold(row.getThreshold())
                         .build());
-        return lowStockProducts;
+        return lowStockPro;
     }
 }

@@ -1,7 +1,10 @@
 package com.Podzilla.analytics.api.dtos.inventory;
 
 import java.math.BigDecimal;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Data
 @Builder
