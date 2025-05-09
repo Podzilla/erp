@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.Podzilla.analytics.api.dtos.InventoryValueByCategoryDTO;
 import com.Podzilla.analytics.api.dtos.LowStockProductDTO;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import com.Podzilla.analytics.services.InventoryAnalyticsService;
 
 import lombok.RequiredArgsConstructor;
