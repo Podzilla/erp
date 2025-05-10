@@ -6,7 +6,8 @@ import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDate; // Keep import if TopSellerRequest still uses LocalDate
+import java.time.LocalDateTime; // Import LocalDateTime
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -35,73 +36,88 @@ class ProductAnalyticsServiceTest {
         productAnalyticsService = new ProductAnalyticsService(productRepository);
     }
 
- @Test
-void getTopSellers_SortByRevenue_ShouldReturnCorrectList() {
-    // Arrange
-    LocalDate startDate = LocalDate.of(2025, 1, 1);
-    LocalDate endDate = LocalDate.of(2025, 12, 31);
-    TopSellerRequest request = TopSellerRequest.builder()
-            .startDate(startDate)
-            .endDate(endDate)
-            .limit(2) // Ensure limit is set to 2
-            .sortBy(TopSellerRequest.SortBy.REVENUE)
-            .build();
+    @Test
+    void getTopSellers_SortByRevenue_ShouldReturnCorrectList() {
+        // Arrange
+        // Assuming TopSellerRequest still uses LocalDate for input
+        LocalDate requestStartDate = LocalDate.of(2025, 1, 1);
+        LocalDate requestEndDate = LocalDate.of(2025, 12, 31);
 
-    // Mocking the repository to return 2 projections
-    List<TopSellingProductProjection> projections = Arrays.asList(
-        createProjection(1L, "iPhone", "Electronics", new BigDecimal("1000.00"), 5L),
-        createProjection(2L, "MacBook", "Electronics", new BigDecimal("2000.00"), 2L)
-    );
+        TopSellerRequest request = TopSellerRequest.builder()
+                .startDate(requestStartDate)
+                .endDate(requestEndDate)
+                .limit(2) // Ensure limit is set to 2
+                .sortBy(TopSellerRequest.SortBy.REVENUE)
+                .build();
 
-    // Ensure the mock returns the correct results based on the given arguments
-    when(productRepository.findTopSellers(
-        eq(startDate), 
-        eq(endDate), 
-        eq(2), 
-        eq("REVENUE")))
-    .thenReturn(projections);
+        // Convert LocalDate from request to LocalDateTime for repository call
+        // Start of the start day
+        LocalDateTime startDate = requestStartDate.atStartOfDay();
+        // Start of the day AFTER the end day to include the whole end day in the query
+        LocalDateTime endDate = requestEndDate.plusDays(1).atStartOfDay();
 
-    // Act
-    List<TopSellerResponse> result = productAnalyticsService.getTopSellers(request);
+        // Mocking the repository to return 2 projections
+        List<TopSellingProductProjection> projections = Arrays.asList(
+            createProjection(1L, "iPhone", "Electronics", new BigDecimal("1000.00"), 5L),
+            createProjection(2L, "MacBook", "Electronics", new BigDecimal("2000.00"), 2L)
+        );
 
-    // Log the result to help with debugging
-    result.forEach(item -> System.out.println("Product ID: " + item.getProductId() + " Revenue: " + item.getValue()));
+        // Ensure the mock returns the correct results based on the given arguments
+        // Use LocalDateTime for the eq() matchers
+        when(productRepository.findTopSellers(
+            eq(startDate),
+            eq(endDate),
+            eq(2),
+            eq("REVENUE")))
+        .thenReturn(projections);
 
-    // Assert (Ensure the order is correct as per revenue)
-    assertEquals(2, result.size(), "Expected 2 products in the list.");
-    assertEquals(2L, result.get(0).getProductId());  // MacBook should come first due to higher revenue
-    assertEquals("MacBook", result.get(0).getProductName());
-    assertEquals("Electronics", result.get(0).getCategory());
-    assertEquals(new BigDecimal("2000.00"), result.get(0).getValue());
+        // Act
+        List<TopSellerResponse> result = productAnalyticsService.getTopSellers(request);
 
-    assertEquals(1L, result.get(1).getProductId());
-    assertEquals("iPhone", result.get(1).getProductName());
-    assertEquals("Electronics", result.get(1).getCategory());
-    assertEquals(new BigDecimal("1000.00"), result.get(1).getValue());
-}
+        // Log the result to help with debugging
+        result.forEach(item -> System.out.println("Product ID: " + item.getProductId() + " Revenue: " + item.getValue()));
+
+        // Assert (Ensure the order is correct as per revenue)
+        assertEquals(2, result.size(), "Expected 2 products in the list.");
+        assertEquals(2L, result.get(0).getProductId());  // MacBook should come first due to higher revenue
+        assertEquals("MacBook", result.get(0).getProductName());
+        assertEquals("Electronics", result.get(0).getCategory());
+        assertEquals(new BigDecimal("2000.00"), result.get(0).getValue());
+
+        assertEquals(1L, result.get(1).getProductId());
+        assertEquals("iPhone", result.get(1).getProductName());
+        assertEquals("Electronics", result.get(1).getCategory());
+        assertEquals(new BigDecimal("1000.00"), result.get(1).getValue());
+    }
 
 
     @Test
     void getTopSellers_SortByUnits_ShouldReturnCorrectList() {
         // Arrange
-        LocalDate startDate = LocalDate.of(2025, 1, 1);
-        LocalDate endDate = LocalDate.of(2025, 12, 31);
+        LocalDate requestStartDate = LocalDate.of(2025, 1, 1);
+        LocalDate requestEndDate = LocalDate.of(2025, 12, 31);
+
         TopSellerRequest request = TopSellerRequest.builder()
-                .startDate(startDate)
-                .endDate(endDate)
+                .startDate(requestStartDate)
+                .endDate(requestEndDate)
                 .limit(2)
                 .sortBy(TopSellerRequest.SortBy.UNITS)
                 .build();
+
+        // Convert LocalDate from request to LocalDateTime for repository call
+        LocalDateTime startDate = requestStartDate.atStartOfDay();
+        LocalDateTime endDate = requestEndDate.plusDays(1).atStartOfDay();
 
         List<TopSellingProductProjection> projections = Arrays.asList(
             createProjection(1L, "iPhone", "Electronics", new BigDecimal("1000.00"), 5L),
             createProjection(2L, "MacBook", "Electronics", new BigDecimal("2000.00"), 2L)
         );
 
+        // Use LocalDateTime for the eq() matchers
         when(productRepository.findTopSellers(
-            eq(startDate), 
-            eq(endDate), 
-            eq(2), 
+            eq(startDate),
+            eq(endDate),
+            eq(2),
             eq("UNITS")))
         .thenReturn(projections);
 
@@ -113,7 +129,10 @@ void getTopSellers_SortByRevenue_ShouldReturnCorrectList() {
         assertEquals(1L, result.get(0).getProductId());  // iPhone comes first because of more units sold
         assertEquals("iPhone", result.get(0).getProductName());
         assertEquals("Electronics", result.get(0).getCategory());
+        // Note: The projection returns revenue and units as BigDecimal and Long respectively.
+        // The conversion to TopSellerResponse seems to put units into the 'value' field for this case.
         assertEquals(new BigDecimal("5"), result.get(0).getValue());
+
 
         assertEquals(2L, result.get(1).getProductId());
         assertEquals("MacBook", result.get(1).getProductName());
@@ -124,16 +143,23 @@ void getTopSellers_SortByRevenue_ShouldReturnCorrectList() {
     @Test
     void getTopSellers_WithEmptyResult_ShouldReturnEmptyList() {
         // Arrange
-        LocalDate startDate = LocalDate.of(2025, 1, 1);
-        LocalDate endDate = LocalDate.of(2025, 12, 31);
+        LocalDate requestStartDate = LocalDate.of(2025, 1, 1);
+        LocalDate requestEndDate = LocalDate.of(2025, 12, 31);
+
         TopSellerRequest request = TopSellerRequest.builder()
-                .startDate(startDate)
-                .endDate(endDate)
+                .startDate(requestStartDate)
+                .endDate(requestEndDate)
                 .limit(10)
                 .sortBy(TopSellerRequest.SortBy.REVENUE)
                 .build();
 
-        when(productRepository.findTopSellers(any(), any(), any(), any()))
+        // Convert LocalDate from request to LocalDateTime for repository call
+        LocalDateTime startDate = requestStartDate.atStartOfDay();
+        LocalDateTime endDate = requestEndDate.plusDays(1).atStartOfDay();
+
+
+        // Use any() matchers for LocalDateTime parameters
+        when(productRepository.findTopSellers(any(LocalDateTime.class), any(LocalDateTime.class), any(), any()))
             .thenReturn(Collections.emptyList());
 
         // Act
@@ -146,23 +172,29 @@ void getTopSellers_SortByRevenue_ShouldReturnCorrectList() {
     @Test
     void getTopSellers_WithNullSortBy_ShouldDefaultToRevenue() {
         // Arrange
-        LocalDate startDate = LocalDate.of(2025, 1, 1);
-        LocalDate endDate = LocalDate.of(2025, 12, 31);
+        LocalDate requestStartDate = LocalDate.of(2025, 1, 1);
+        LocalDate requestEndDate = LocalDate.of(2025, 12, 31);
+
         TopSellerRequest request = TopSellerRequest.builder()
-                .startDate(startDate)
-                .endDate(endDate)
+                .startDate(requestStartDate)
+                .endDate(requestEndDate)
                 .limit(2)
                 .sortBy(null)  // Testing null sort criteria
                 .build();
+
+        // Convert LocalDate from request to LocalDateTime for repository call
+        LocalDateTime startDate = requestStartDate.atStartOfDay();
+        LocalDateTime endDate = requestEndDate.plusDays(1).atStartOfDay();
 
         List<TopSellingProductProjection> projections = Arrays.asList(
             createProjection(1L, "iPhone", "Electronics", new BigDecimal("1000.00"), 5L)
         );
 
+        // Use LocalDateTime for the eq() matchers
         when(productRepository.findTopSellers(
-            eq(startDate), 
-            eq(endDate), 
-            eq(2), 
+            eq(startDate),
+            eq(endDate),
+            eq(2),
             eq("REVENUE")))  // Should default to REVENUE
         .thenReturn(projections);
 
@@ -177,19 +209,25 @@ void getTopSellers_SortByRevenue_ShouldReturnCorrectList() {
     @Test
     void getTopSellers_WithZeroLimit_ShouldReturnEmptyList() {
         // Arrange
-        LocalDate startDate = LocalDate.of(2025, 1, 1);
-        LocalDate endDate = LocalDate.of(2025, 12, 31);
+        LocalDate requestStartDate = LocalDate.of(2025, 1, 1);
+        LocalDate requestEndDate = LocalDate.of(2025, 12, 31);
         TopSellerRequest request = TopSellerRequest.builder()
-                .startDate(startDate)
-                .endDate(endDate)
+                .startDate(requestStartDate)
+                .endDate(requestEndDate)
                 .limit(0)
                 .sortBy(TopSellerRequest.SortBy.REVENUE)
                 .build();
 
+        // Convert LocalDate from request to LocalDateTime for repository call
+        LocalDateTime startDate = requestStartDate.atStartOfDay();
+        LocalDateTime endDate = requestEndDate.plusDays(1).atStartOfDay();
+
+
+        // Use LocalDateTime for the eq() matchers
         when(productRepository.findTopSellers(
-            eq(startDate), 
-            eq(endDate), 
-            eq(0), 
+            eq(startDate),
+            eq(endDate),
+            eq(0),
             eq("REVENUE")))
         .thenReturn(Collections.emptyList());
 
@@ -201,10 +239,10 @@ void getTopSellers_SortByRevenue_ShouldReturnCorrectList() {
     }
 
     private TopSellingProductProjection createProjection(
-            final Long id, 
-            final String name, 
-            final String category, 
-            final BigDecimal revenue, 
+            final Long id,
+            final String name,
+            final String category,
+            final BigDecimal revenue,
             final Long units) {
         return new TopSellingProductProjection() {
             @Override
@@ -228,5 +266,5 @@ void getTopSellers_SortByRevenue_ShouldReturnCorrectList() {
                 return units;
             }
         };
-    } 
+    }
 }

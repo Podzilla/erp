@@ -28,8 +28,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             JOIN
                 products p ON sli.product_id = p.id
             WHERE
-                o.order_placed_timestamp >= :startDate
-                AND o.order_placed_timestamp < :endDate
+                o.final_status_timestamp >= :startDate
+                AND o.final_status_timestamp < :endDate
                 AND o.status = 'COMPLETED'
             GROUP BY
                 p.id, p.name, p.category
@@ -49,8 +49,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                      """, nativeQuery = true) // Use nativeQuery = true for table names and database functions
 
     List<TopSellingProductProjection> findTopSellers(
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
             @Param("limit") Integer limit,
             @Param("sortBy") String sortBy // Pass the enum name as a String
     );
