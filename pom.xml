@@ -74,8 +74,22 @@
 			<artifactId>spring-rabbit-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		 <dependency>
+		<groupId>com.github.Podzilla</groupId>
+		<artifactId>mq-utils-lib</artifactId>
+		<version>main-SNAPSHOT</version>
+	</dependency>
 	</dependencies>
-
+<repositories>
+<repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+	<snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+    </snapshots>
+</repository>
+</repositories>
 	<build>
 		<plugins>
 			<plugin>

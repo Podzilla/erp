@@ -34,7 +34,6 @@ public class RevenueReportController {
         if (validationError != null) {
             return validationError;
         }
-
         validationError = ValidationUtils.validateEnumNotNull(period);
         if (validationError != null) {
             return validationError;
