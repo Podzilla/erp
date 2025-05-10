@@ -111,15 +111,21 @@
 			<version>1.14.12</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>test</scope>
+</dependency>
+
 	</dependencies>
 <repositories>
 <repository>
     <id>jitpack.io</id>
     <url>https://jitpack.io</url>
-	<snapshots>
+	<!-- <snapshots>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
-    </snapshots>
+    </snapshots> -->
 </repository>
 </repositories>
 	<build>
