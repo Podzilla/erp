@@ -2,10 +2,10 @@ package com.Podzilla.analytics.api.controllers;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.Podzilla.analytics.services.FulfillmentAnalyticsService;
 
@@ -23,21 +23,31 @@ public class FulfillmentReportController {
 
     @GetMapping("/place-to-ship-time")
     public ResponseEntity<List<Map<String, Object>>> getPlaceToShipTime(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam FulfillmentAnalyticsService.PlaceToShipGroupBy groupBy) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            final LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            final LocalDate endDate,
+            @RequestParam
+            final FulfillmentAnalyticsService.PlaceToShipGroupBy groupBy) {
 
-        List<Map<String, Object>> reportData = fulfillmentAnalyticsService.getAveragePlaceToShipTime(startDate, endDate, groupBy);
+        List<Map<String, Object>> reportData =
+                fulfillmentAnalyticsService.getAveragePlaceToShipTime(
+                        startDate, endDate, groupBy);
         return ResponseEntity.ok(reportData);
     }
 
     @GetMapping("/ship-to-deliver-time")
     public ResponseEntity<List<Map<String, Object>>> getShipToDeliverTime(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam FulfillmentAnalyticsService.ShipToDeliverGroupBy groupBy) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            final LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            final LocalDate endDate,
+            @RequestParam
+            final FulfillmentAnalyticsService.ShipToDeliverGroupBy groupBy) {
 
-        List<Map<String, Object>> reportData = fulfillmentAnalyticsService.getAverageShipToDeliverTime(startDate, endDate, groupBy);
+        List<Map<String, Object>> reportData =
+                fulfillmentAnalyticsService.getAverageShipToDeliverTime(
+                        startDate, endDate, groupBy);
         return ResponseEntity.ok(reportData);
     }
 }

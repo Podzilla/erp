@@ -27,35 +27,53 @@ public class FulfillmentAnalyticsService {
         REGION, OVERALL, COURIER
     }
 
-    public List<Map<String, Object>> getAveragePlaceToShipTime(LocalDate startDate, LocalDate endDate, PlaceToShipGroupBy groupBy) {
+    public List<Map<String, Object>> getAveragePlaceToShipTime(
+            final LocalDate startDate, final LocalDate endDate,
+            final PlaceToShipGroupBy groupBy) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
         List<Map<String, Object>> results = new ArrayList<>();
 
         switch (groupBy) {
             case OVERALL:
-                Double avgOverall = orderRepository.findAveragePlaceToShipTimeOverall(startDateTime, endDateTime);
+                Double avgOverall = orderRepository
+                        .findAveragePlaceToShipTimeOverall(
+                                startDateTime,
+                                endDateTime);
                 if (avgOverall != null) {
                     Map<String, Object> overallResult = new HashMap<>();
                     overallResult.put("groupByValue", "OVERALL");
-                    overallResult.put("averageDuration", avgOverall / SECONDS_PER_HOUR); // Convert seconds to hours
+                    // Convert seconds to hours
+                    overallResult.put("averageDuration",
+                            avgOverall / SECONDS_PER_HOUR);
                     results.add(overallResult);
                 }
                 break;
             case REGION:
-                List<Object[]> avgByRegion = orderRepository.findAveragePlaceToShipTimeByRegion(startDateTime, endDateTime);
+                List<Object[]> avgByRegion = orderRepository
+                        .findAveragePlaceToShipTimeByRegion(
+                                startDateTime,
+                                endDateTime);
                 for (Object[] row : avgByRegion) {
                     Map<String, Object> regionResult = new HashMap<>();
-                    regionResult.put("groupByValue", "RegionID_" + row[0]); // Example: Prefixing for clarity
-                    regionResult.put("averageDuration", (Double) row[1] / SECONDS_PER_HOUR); // Convert seconds to hours
+                    // Example: Prefixing for clarity
+                    regionResult.put("groupByValue", "RegionID_" + row[0]);
+                    // Convert seconds to hours
+                    regionResult.put("averageDuration",
+                            (Double) row[1] / SECONDS_PER_HOUR);
                     results.add(regionResult);
                 }
+                break;
+            default:
+                // Optionally handle unknown groupBy or throw an exception
                 break;
         }
         return results;
     }
 
-    public List<Map<String, Object>> getAverageShipToDeliverTime(LocalDate startDate, LocalDate endDate, ShipToDeliverGroupBy groupBy) {
+    public List<Map<String, Object>> getAverageShipToDeliverTime(
+            final LocalDate startDate, final LocalDate endDate,
+            final ShipToDeliverGroupBy groupBy) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
         List<Map<String, Object>> results = new ArrayList<>();
@@ -63,31 +81,49 @@ public class FulfillmentAnalyticsService {
         // Note: Using shippedTimestamp for the date range check here
         switch (groupBy) {
             case OVERALL:
-                Double avgOverall = orderRepository.findAverageShipToDeliverTimeOverall(startDateTime, endDateTime);
+                Double avgOverall = orderRepository
+                        .findAverageShipToDeliverTimeOverall(
+                                startDateTime,
+                                endDateTime);
                 if (avgOverall != null) {
                     Map<String, Object> overallResult = new HashMap<>();
                     overallResult.put("groupByValue", "OVERALL");
-                    overallResult.put("averageDuration", avgOverall / SECONDS_PER_HOUR); // Convert seconds to hours
+                    // Convert seconds to hours
+                    overallResult.put("averageDuration",
+                            avgOverall / SECONDS_PER_HOUR);
                     results.add(overallResult);
                 }
                 break;
             case REGION:
-                List<Object[]> avgByRegion = orderRepository.findAverageShipToDeliverTimeByRegion(startDateTime, endDateTime);
+                List<Object[]> avgByRegion = orderRepository
+                        .findAverageShipToDeliverTimeByRegion(
+                                startDateTime,
+                                endDateTime);
                 for (Object[] row : avgByRegion) {
                     Map<String, Object> regionResult = new HashMap<>();
                     regionResult.put("groupByValue", "RegionID_" + row[0]);
-                    regionResult.put("averageDuration", (Double) row[1] / SECONDS_PER_HOUR);
+                    // Convert seconds to hours
+                    regionResult.put("averageDuration",
+                            (Double) row[1] / SECONDS_PER_HOUR);
                     results.add(regionResult);
                 }
                 break;
             case COURIER:
-                 List<Object[]> avgByCourier = orderRepository.findAverageShipToDeliverTimeByCourier(startDateTime, endDateTime);
+                 List<Object[]> avgByCourier = orderRepository
+                         .findAverageShipToDeliverTimeByCourier(
+                                 startDateTime,
+                                 endDateTime);
                  for (Object[] row : avgByCourier) {
                     Map<String, Object> courierResult = new HashMap<>();
                     courierResult.put("groupByValue", "CourierID_" + row[0]);
-                    courierResult.put("averageDuration", (Double) row[1] / SECONDS_PER_HOUR);
+                    // Convert seconds to hours
+                    courierResult.put("averageDuration",
+                            (Double) row[1] / SECONDS_PER_HOUR);
                     results.add(courierResult);
                 }
+                break;
+            default:
+                // Optionally handle unknown groupBy or throw an exception
                 break;
         }
         return results;
