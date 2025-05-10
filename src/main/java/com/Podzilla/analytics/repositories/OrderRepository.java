@@ -1,5 +1,6 @@
 package com.Podzilla.analytics.repositories;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -7,13 +8,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.Podzilla.analytics.api.projections.RevenueByCategoryProjection;
+import com.Podzilla.analytics.api.projections.RevenueSummaryProjection;
 import com.Podzilla.analytics.api.projections.order.OrderFailureRateProjection;
 import com.Podzilla.analytics.api.projections.order.OrderFailureReasonsProjection;
 import com.Podzilla.analytics.api.projections.order.OrderRegionProjection;
 import com.Podzilla.analytics.api.projections.order.OrderStatusProjection;
 import com.Podzilla.analytics.models.Order;
-
-
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
@@ -67,5 +68,62 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     OrderFailureRateProjection calculateFailureRate(
         @Param("startDate") LocalDateTime startDate,
         @Param("endDate") LocalDateTime endDate
+    );    @Query(value = """
+        SELECT
+            CASE :reportPeriod
+                WHEN 'DAILY' THEN CAST(o.order_placed_timestamp AS DATE)
+                WHEN 'WEEKLY' THEN DATEADD('DAY', 
+                    -(EXTRACT(DAY FROM o.order_placed_timestamp) - 1),
+                    CAST(o.order_placed_timestamp AS DATE))
+                WHEN 'MONTHLY' THEN DATEADD('DAY', 
+                    -(EXTRACT(DAY FROM o.order_placed_timestamp) - 1),
+                    CAST(o.order_placed_timestamp AS DATE))
+            END as period,
+            SUM(o.total_amount) as totalRevenue
+        FROM
+            orders o
+        WHERE
+            o.order_placed_timestamp >= :startDate
+            AND o.order_placed_timestamp < :endDate
+            AND o.status IN ('COMPLETED')
+        GROUP BY
+            CASE :reportPeriod
+                WHEN 'DAILY' THEN CAST(o.order_placed_timestamp AS DATE)
+                WHEN 'WEEKLY' THEN DATEADD('DAY', 
+                    -(EXTRACT(DAY FROM o.order_placed_timestamp) - 1),
+                    CAST(o.order_placed_timestamp AS DATE))
+                WHEN 'MONTHLY' THEN DATEADD('DAY', 
+                    -(EXTRACT(DAY FROM o.order_placed_timestamp) - 1),
+                    CAST(o.order_placed_timestamp AS DATE))
+            END
+        ORDER BY
+            period
+        """, nativeQuery = true)
+    List<RevenueSummaryProjection> findRevenueSummaryByPeriod(
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate,
+        @Param("reportPeriod") String reportPeriod
+    );    @Query(value = """
+        SELECT
+            p.category,
+            SUM(sli.quantity * sli.price_per_unit) as totalRevenue
+        FROM
+            orders o
+        JOIN
+            sales_line_items sli ON o.id = sli.order_id
+        JOIN
+            products p ON sli.product_id = p.id
+        WHERE
+            o.order_placed_timestamp >= :startDate
+            AND o.order_placed_timestamp < :endDate
+            AND o.status IN ('COMPLETED')
+        GROUP BY
+            p.category
+        ORDER BY
+            SUM(sli.quantity * sli.price_per_unit) DESC
+        """, nativeQuery = true)
+    List<RevenueByCategoryProjection> findRevenueByCategory(
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate
     );
 }
