@@ -1,23 +1,79 @@
 package com.Podzilla.analytics.repositories;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.Podzilla.analytics.api.projections.order.OrderFailureRateProjection;
+import com.Podzilla.analytics.api.projections.order.OrderFailureReasonsProjection;
+import com.Podzilla.analytics.api.projections.order.OrderRegionProjection;
+import com.Podzilla.analytics.api.projections.order.OrderStatusProjection;
 import com.Podzilla.analytics.models.Order;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
+    @Query(value = "Select o.region_id as regionId, "
+            + "r.city as city, "
+            + "r.country as country, "
+            + "count(o.id) as orderCount, "
+            + "avg(o.total_amount) as averageOrderValue "
+        + "From orders o "
+        + "inner join regions r on o.region_id = r.id "
+        + "where o.final_status_timestamp between :startDate and :endDate "
+        + "Group by o.region_id, r.city, r.country "
+        + "Order by orderCount desc, averageOrderValue desc",
+    nativeQuery = true)
+    List<OrderRegionProjection> findOrdersByRegion(
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate
+    );
 
-     @Query(value = """
+    @Query(value = "Select o.status as status, "
+            + "count(o.id) as count "
+        + "From orders o "
+        + "where o.final_status_timestamp between :startDate and :endDate "
+        + "Group by o.status "
+        + "Order by count desc",
+    nativeQuery = true)
+    List<OrderStatusProjection> findOrderStatusCounts(
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate
+    );
+
+    @Query(value = "Select o.failure_reason as reason, "
+            + "count(o.id) as count "
+        + "From orders o "
+        + "where o.final_status_timestamp between :startDate and :endDate "
+        + "and o.status = 'FAILED' "
+        + "Group by o.failure_reason "
+        + "Order by count desc",
+    nativeQuery = true)
+    List<OrderFailureReasonsProjection> findFailureReasons(
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate
+    );
+
+    @Query(value =
+        "Select (Sum(Case when o.status = 'FAILED' then 1 else 0 end)/"
+            + "(count(*)*1.0) ) as failureRate "
+        + "From orders o "
+        + "where o.final_status_timestamp between :startDate and :endDate",
+    nativeQuery = true)
+    OrderFailureRateProjection calculateFailureRate(
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate
+    );
+
+    @Query(value = """
         SELECT
             CASE :reportPeriod
-                WHEN 'DAILY' THEN DATE(o.order_placed_timestamp) -- Adjust date functions for your DB
-                WHEN 'WEEKLY' THEN DATE_TRUNC('week', o.order_placed_timestamp) -- Adjust date functions for your DB
-                WHEN 'MONTHLY' THEN DATE_TRUNC('month', o.order_placed_timestamp) -- Adjust date functions for your DB
+                WHEN 'DAILY' THEN DATE(o.order_placed_timestamp)
+                WHEN 'WEEKLY' THEN DATE_TRUNC('week', o.order_placed_timestamp)
+                WHEN 'MONTHLY' THEN DATE_TRUNC('month', o.order_placed_timestamp)
             END,
             SUM(o.total_amount)
         FROM
@@ -28,40 +84,38 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             AND o.status IN ('COMPLETED')
         GROUP BY
             CASE :reportPeriod
-                WHEN 'DAILY' THEN DATE(o.order_placed_timestamp) -- Adjust date functions for your DB
-                WHEN 'WEEKLY' THEN DATE_TRUNC('week', o.order_placed_timestamp) -- Adjust date functions for your DB
-                WHEN 'MONTHLY' THEN DATE_TRUNC('month', o.order_placed_timestamp) -- Adjust date functions for your DB
+                WHEN 'DAILY' THEN DATE(o.order_placed_timestamp)
+                WHEN 'WEEKLY' THEN DATE_TRUNC('week', o.order_placed_timestamp)
+                WHEN 'MONTHLY' THEN DATE_TRUNC('month', o.order_placed_timestamp)
             END
         ORDER BY
-            1 -- Order by the first selected column (period_start_date)
-        """, nativeQuery = true) // Use nativeQuery = true for database-specific functions
+            1
+        """, nativeQuery = true)
     List<Object[]> findRevenueSummaryByPeriod(
-        @Param("startDate") LocalDate startDate, // Use Date type matching your DTO/entity
-        @Param("endDate") LocalDate endDate,   // Use Date type matching your DTO/entity
-        @Param("reportPeriod") String reportPeriod // Pass the period as a String
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate,
+        @Param("reportPeriod") String reportPeriod
     );
 
     @Query(value = """
         SELECT
-            p.category,                      -- Select the product category
-            SUM(sli.quantity * sli.price_per_unit) -- Calculate sum of revenue for each line item
+            p.category,
+            SUM(sli.quantity * sli.price_per_unit)
         FROM
             orders o
         JOIN
-            sales_line_items sli ON o.orderId = sli.orderId -- Join orders with line items
+            sales_line_items sli ON o.orderId = sli.orderId
         JOIN
-            products p ON sli.productId = p.productId   -- Join line items with products to get category
+            products p ON sli.productId = p.productId
         WHERE
             o.order_placed_timestamp >= :startDate
             AND o.order_placed_timestamp < :endDate
-            AND o.status IN ('COMPLETED') -- Filter for completed orders
+            AND o.status IN ('COMPLETED')
         GROUP BY
-            p.category                      -- Group results by category
+            p.category
         ORDER BY
-            SUM(sli.quantity * sli.price_per_unit) DESC -- Order by revenue (highest first)
-            -- Or ORDER BY p.category ASC for alphabetical order
-        """, nativeQuery = true) // Use nativeQuery = true for table names and database functions
-
+            SUM(sli.quantity * sli.price_per_unit) DESC
+        """, nativeQuery = true)
     List<Object[]> findRevenueByCategory(
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate

@@ -12,6 +12,8 @@ import com.Podzilla.analytics.api.DTOs.RevenueByCategoryResponse;
 import com.Podzilla.analytics.api.DTOs.RevenueSummaryRequest;
 import com.Podzilla.analytics.api.DTOs.RevenueSummaryRequest.Period;
 import com.Podzilla.analytics.api.DTOs.RevenueSummaryResponse;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import com.Podzilla.analytics.services.RevenueReportService;
 import com.Podzilla.analytics.utils.ValidationUtils;
 
@@ -63,4 +65,5 @@ public class RevenueReportController {
         List<RevenueByCategoryResponse> summaryList = revenueReportService.getRevenueByCategory(startDate, endDate);
         return ResponseEntity.ok(summaryList);
     }
+
 }
