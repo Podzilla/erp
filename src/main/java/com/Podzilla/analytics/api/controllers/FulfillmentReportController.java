@@ -4,6 +4,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.Podzilla.analytics.services.FulfillmentAnalyticsService;
 
 import lombok.RequiredArgsConstructor;
@@ -14,7 +17,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("fulfillment")
+@RequestMapping("/fulfillment")
 public class FulfillmentReportController {
     private final FulfillmentAnalyticsService fulfillmentAnalyticsService;
 
