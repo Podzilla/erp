@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.Podzilla.analytics.api.dtos.TopSellerRequest;
 import com.Podzilla.analytics.api.dtos.TopSellerRequest.SortBy; // Import SortBy enum
 import com.Podzilla.analytics.api.dtos.TopSellerResponse;
+import com.Podzilla.analytics.api.projections.TopSellingProductProjection;
 import com.Podzilla.analytics.repositories.ProductRepository; // Import ProductRepository
 
 import lombok.RequiredArgsConstructor;
@@ -34,27 +35,26 @@ public class ProductAnalyticsService {
         SortBy sortBy = request.getSortBy();
         String sortByString = sortBy != null ? sortBy.name() : SortBy.REVENUE.name(); // Get enum name as String, default to REVENUE
 
-        List<Object[]> queryResults = productRepository.findTopSellers(startDate, endDate, limit, sortByString);
+        List<TopSellingProductProjection> queryResults = productRepository.findTopSellers(startDate, endDate, limit, sortByString);
 
 
         List<TopSellerResponse> topSellersList = new ArrayList<>();
 
         // Each row is [product_id, product_name, category, total_revenue, total_units]
-        for (Object[] row : queryResults) {
-            Long productId = (Long) row[0];
-            String productName = (String) row[1];
-            String category = (String) row[2];
-            BigDecimal totalRevenue = (BigDecimal) row[3]; 
-            BigDecimal totalUnits = (BigDecimal) row[4];  
-            BigDecimal value = (sortBy == SortBy.UNITS) ? totalUnits : totalRevenue; 
+        for (TopSellingProductProjection row : queryResults) {
+            BigDecimal value = (sortBy == SortBy.UNITS) ? BigDecimal.valueOf(row.getTotalUnits()) : row.getTotalRevenue();
             TopSellerResponse topSellerItem = TopSellerResponse.builder()
-                                                .productId(productId)
-                                                .productName(productName)
-                                                .category(category)
+                                                .productId(row.getId())
+                                                .productName(row.getName())
+                                                .category(row.getCategory())
                                                 .value(value) 
                                                 .build();
 
             topSellersList.add(topSellerItem);
+        }
+        topSellersList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
+        if (limit != null && limit > 0 && limit < topSellersList.size()) {
+            topSellersList = topSellersList.subList(0, limit);
         }
 
         return topSellersList;

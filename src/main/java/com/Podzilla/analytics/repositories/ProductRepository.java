@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import com.Podzilla.analytics.api.projections.TopSellingProductProjection;
 import com.Podzilla.analytics.models.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
@@ -39,7 +41,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
          LIMIT :limit -- Apply the limit
          """, nativeQuery = true) // Use nativeQuery = true for table names and database functions
 
-     List<Object[]> findTopSellers(
+     List<TopSellingProductProjection> findTopSellers(
          @Param("startDate") LocalDate startDate,
          @Param("endDate") LocalDate endDate,
          @Param("limit") Integer limit,

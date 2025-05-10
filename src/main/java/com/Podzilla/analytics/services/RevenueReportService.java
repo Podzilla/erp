@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import com.Podzilla.analytics.api.dtos.RevenueByCategoryResponse;
 import com.Podzilla.analytics.api.dtos.RevenueSummaryRequest;
 import com.Podzilla.analytics.api.dtos.RevenueSummaryResponse;
+import com.Podzilla.analytics.api.projections.RevenueByCategoryProjection;
+import com.Podzilla.analytics.api.projections.RevenueSummaryProjection;
 import com.Podzilla.analytics.repositories.OrderRepository; 
 
 import lombok.RequiredArgsConstructor;
@@ -26,18 +28,15 @@ public class RevenueReportService {
         LocalDate endDate = request.getEndDate();
         String periodString = request.getPeriod().name();
 
-        List<Object[]> revenueData = orderRepository.findRevenueSummaryByPeriod(startDate, endDate, periodString);
+        List<RevenueSummaryProjection> revenueData = orderRepository.findRevenueSummaryByPeriod(startDate, endDate, periodString);
 
 
         List<RevenueSummaryResponse> summaryList = new ArrayList<>();
 
-        for (Object[] row : revenueData) {
-            LocalDate periodStartDate = (LocalDate) row[0];
-            BigDecimal totalRevenue = (BigDecimal) row[1];
-
+        for (RevenueSummaryProjection row : revenueData) {
             RevenueSummaryResponse summaryItem = RevenueSummaryResponse.builder()
-                                                    .periodStartDate(periodStartDate)
-                                                    .totalRevenue(totalRevenue)
+                                                    .periodStartDate(row.getPeriod())
+                                                    .totalRevenue(row.getTotalRevenue())
                                                     .build();
 
             summaryList.add(summaryItem);
@@ -55,18 +54,16 @@ public class RevenueReportService {
      */
     public List<RevenueByCategoryResponse> getRevenueByCategory(LocalDate startDate, LocalDate endDate) {
 
-        List<Object[]> queryResults = orderRepository.findRevenueByCategory(startDate, endDate);
+        List<RevenueByCategoryProjection> queryResults = orderRepository.findRevenueByCategory(startDate, endDate);
 
 
         List<RevenueByCategoryResponse> summaryList = new ArrayList<>();
 
         // Each row is [category_string, total_revenue_bigdecimal]
-        for (Object[] row : queryResults) {
-            String category = (String) row[0]; 
-            BigDecimal totalRevenue = (BigDecimal) row[1]; 
+        for (RevenueByCategoryProjection row : queryResults) {
             RevenueByCategoryResponse summaryItem = RevenueByCategoryResponse.builder()
-                                                       .category(category)
-                                                       .totalRevenue(totalRevenue)
+                                                       .category(row.getCategory())
+                                                       .totalRevenue(row.getTotalRevenue())
                                                        .build();
 
             summaryList.add(summaryItem);

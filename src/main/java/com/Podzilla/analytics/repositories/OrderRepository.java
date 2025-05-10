@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.Podzilla.analytics.api.projections.RevenueByCategoryProjection;
+import com.Podzilla.analytics.api.projections.RevenueSummaryProjection;
 import com.Podzilla.analytics.api.projections.order.OrderFailureRateProjection;
 import com.Podzilla.analytics.api.projections.order.OrderFailureReasonsProjection;
 import com.Podzilla.analytics.api.projections.order.OrderRegionProjection;
@@ -91,7 +93,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         ORDER BY
             1
         """, nativeQuery = true)
-    List<Object[]> findRevenueSummaryByPeriod(
+    List<RevenueSummaryProjection> findRevenueSummaryByPeriod(
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate,
         @Param("reportPeriod") String reportPeriod
@@ -116,7 +118,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         ORDER BY
             SUM(sli.quantity * sli.price_per_unit) DESC
         """, nativeQuery = true)
-    List<Object[]> findRevenueByCategory(
+    List<RevenueByCategoryProjection> findRevenueByCategory(
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate
     );
