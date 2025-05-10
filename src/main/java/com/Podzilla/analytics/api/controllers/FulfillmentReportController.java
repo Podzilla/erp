@@ -6,16 +6,20 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.Podzilla.analytics.api.dtos.DateRangeRequest;
+import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentRequestDTO;
+import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentRequestDTO.PlaceToShipGroupBy;
+import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentRequestDTO.ShipToDeliverGroupBy;
 import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentTimeResponse;
 import com.Podzilla.analytics.services.FulfillmentAnalyticsService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/fulfillment")
@@ -29,14 +33,20 @@ public class FulfillmentReportController {
             + " by the specified dimension")
     @GetMapping("/place-to-ship-time")
     public ResponseEntity<List<FulfillmentTimeResponse>> getPlaceToShipTime(
-            @Valid @ModelAttribute final DateRangeRequest dateRange,
+            @Valid @ModelAttribute final FulfillmentRequestDTO request) {
 
-            final FulfillmentAnalyticsService.PlaceToShipGroupBy groupBy) {
+        PlaceToShipGroupBy groupBy;
+        try {
+            groupBy = PlaceToShipGroupBy.valueOf(request.getGroupBy());
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid groupBy value: {}", request.getGroupBy());
+            return ResponseEntity.badRequest().build();
+        }
 
         List<FulfillmentTimeResponse> reportData = fulfillmentAnalyticsService
                 .getPlaceToShipTimeResponse(
-                        dateRange.getStartDate(),
-                        dateRange.getEndDate(),
+                        request.getStartDate(),
+                        request.getEndDate(),
                         groupBy);
         return ResponseEntity.ok(reportData);
     }
@@ -48,14 +58,20 @@ public class FulfillmentReportController {
             + " by the specified dimension")
     @GetMapping("/ship-to-deliver-time")
     public ResponseEntity<List<FulfillmentTimeResponse>> getShipToDeliverTime(
-            @Valid @ModelAttribute final DateRangeRequest dateRange,
+            @Valid @ModelAttribute final FulfillmentRequestDTO request) {
 
-            final FulfillmentAnalyticsService.ShipToDeliverGroupBy groupBy) {
+        ShipToDeliverGroupBy groupBy;
+        try {
+            groupBy = ShipToDeliverGroupBy.valueOf(request.getGroupBy());
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid groupBy value: {}", request.getGroupBy());
+            return ResponseEntity.badRequest().build();
+        }
 
         List<FulfillmentTimeResponse> reportData = fulfillmentAnalyticsService
                 .getShipToDeliverTimeResponse(
-                        dateRange.getStartDate(),
-                        dateRange.getEndDate(),
+                        request.getStartDate(),
+                        request.getEndDate(),
                         groupBy);
         return ResponseEntity.ok(reportData);
     }

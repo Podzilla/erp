@@ -3,6 +3,8 @@ package com.Podzilla.analytics.services;
 import org.springframework.stereotype.Service;
 import com.Podzilla.analytics.repositories.OrderRepository;
 import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentTimeResponse;
+import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentRequestDTO.PlaceToShipGroupBy;
+import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentRequestDTO.ShipToDeliverGroupBy;
 import com.Podzilla.analytics.api.projections.fulfillment.FulfillmentTimeProjection;
 import lombok.RequiredArgsConstructor;
 
@@ -12,7 +14,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -20,15 +21,6 @@ import java.util.stream.Collectors;
 public class FulfillmentAnalyticsService {
 
     private final OrderRepository orderRepository;
-    private static final double SECONDS_PER_HOUR = 3600.0;
-
-    public enum PlaceToShipGroupBy {
-        REGION, OVERALL
-    }
-
-    public enum ShipToDeliverGroupBy {
-        REGION, OVERALL, COURIER
-    }
 
     public List<FulfillmentTimeResponse> getPlaceToShipTimeResponse(
         final LocalDate startDate,
@@ -109,35 +101,5 @@ public class FulfillmentAnalyticsService {
             .averageDuration(
                 BigDecimal.valueOf(projection.getAverageDuration()))
             .build();
-    }
-
-    private FulfillmentTimeResponse convertToFulfillmentTimeResponse(
-        final Map<String, Object> data
-    ) {
-        return FulfillmentTimeResponse.builder()
-            .groupByValue((String) data.get("groupByValue"))
-            .averageDuration(BigDecimal.valueOf(
-                (Double) data.get("averageDuration")))
-            .build();
-    }
-
-    ///////////////////////
-
-    public List<Map<String, Object>> getAveragePlaceToShipTime(
-        final LocalDate startDate,
-        final LocalDate endDate,
-        final PlaceToShipGroupBy groupBy
-    ) {
-        // This method is kept for backward compatibility
-        return new ArrayList<>();
-    }
-
-    public List<Map<String, Object>> getAverageShipToDeliverTime(
-        final LocalDate startDate,
-        final LocalDate endDate,
-        final ShipToDeliverGroupBy groupBy
-    ) {
-        // This method is kept for backward compatibility
-        return new ArrayList<>();
     }
 }
