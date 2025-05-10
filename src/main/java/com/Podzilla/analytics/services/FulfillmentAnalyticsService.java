@@ -2,15 +2,18 @@ package com.Podzilla.analytics.services;
 
 import org.springframework.stereotype.Service;
 import com.Podzilla.analytics.repositories.OrderRepository;
+import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentTimeResponse;
+import com.Podzilla.analytics.api.projections.fulfillment.FulfillmentTimeProjection;
 import lombok.RequiredArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -27,105 +30,114 @@ public class FulfillmentAnalyticsService {
         REGION, OVERALL, COURIER
     }
 
-    public List<Map<String, Object>> getAveragePlaceToShipTime(
-            final LocalDate startDate, final LocalDate endDate,
-            final PlaceToShipGroupBy groupBy) {
+    public List<FulfillmentTimeResponse> getPlaceToShipTimeResponse(
+        final LocalDate startDate,
+        final LocalDate endDate,
+        final PlaceToShipGroupBy groupBy
+    ) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
-        List<Map<String, Object>> results = new ArrayList<>();
+        List<FulfillmentTimeResponse> results = new ArrayList<>();
 
         switch (groupBy) {
-            case OVERALL:
-                Double avgOverall = orderRepository
-                        .findAveragePlaceToShipTimeOverall(
-                                startDateTime,
-                                endDateTime);
-                if (avgOverall != null) {
-                    Map<String, Object> overallResult = new HashMap<>();
-                    overallResult.put("groupByValue", "OVERALL");
-                    // Convert seconds to hours
-                    overallResult.put("averageDuration",
-                            avgOverall / SECONDS_PER_HOUR);
-                    results.add(overallResult);
-                }
-                break;
-            case REGION:
-                List<Object[]> avgByRegion = orderRepository
-                        .findAveragePlaceToShipTimeByRegion(
-                                startDateTime,
-                                endDateTime);
-                for (Object[] row : avgByRegion) {
-                    Map<String, Object> regionResult = new HashMap<>();
-                    // Example: Prefixing for clarity
-                    regionResult.put("groupByValue", "RegionID_" + row[0]);
-                    // Convert seconds to hours
-                    regionResult.put("averageDuration",
-                            (Double) row[1] / SECONDS_PER_HOUR);
-                    results.add(regionResult);
-                }
-                break;
-            default:
-                // Optionally handle unknown groupBy or throw an exception
-                break;
+        case OVERALL:
+            FulfillmentTimeProjection overall = orderRepository
+                .findPlaceToShipTimeOverall(startDateTime, endDateTime);
+            if (overall != null) {
+                results.add(convertToResponse(overall));
+            }
+            break;
+        case REGION:
+            List<FulfillmentTimeProjection> byRegion = orderRepository
+                .findPlaceToShipTimeByRegion(startDateTime, endDateTime);
+            results.addAll(byRegion.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList()));
+            break;
+        default:
+            // Handle unknown groupBy or throw an exception
+            break;
         }
+
         return results;
     }
 
-    public List<Map<String, Object>> getAverageShipToDeliverTime(
-            final LocalDate startDate, final LocalDate endDate,
-            final ShipToDeliverGroupBy groupBy) {
+    public List<FulfillmentTimeResponse> getShipToDeliverTimeResponse(
+        final LocalDate startDate,
+        final LocalDate endDate,
+        final ShipToDeliverGroupBy groupBy
+    ) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
-        List<Map<String, Object>> results = new ArrayList<>();
+        List<FulfillmentTimeResponse> results = new ArrayList<>();
 
-        // Note: Using shippedTimestamp for the date range check here
         switch (groupBy) {
-            case OVERALL:
-                Double avgOverall = orderRepository
-                        .findAverageShipToDeliverTimeOverall(
-                                startDateTime,
-                                endDateTime);
-                if (avgOverall != null) {
-                    Map<String, Object> overallResult = new HashMap<>();
-                    overallResult.put("groupByValue", "OVERALL");
-                    // Convert seconds to hours
-                    overallResult.put("averageDuration",
-                            avgOverall / SECONDS_PER_HOUR);
-                    results.add(overallResult);
-                }
-                break;
-            case REGION:
-                List<Object[]> avgByRegion = orderRepository
-                        .findAverageShipToDeliverTimeByRegion(
-                                startDateTime,
-                                endDateTime);
-                for (Object[] row : avgByRegion) {
-                    Map<String, Object> regionResult = new HashMap<>();
-                    regionResult.put("groupByValue", "RegionID_" + row[0]);
-                    // Convert seconds to hours
-                    regionResult.put("averageDuration",
-                            (Double) row[1] / SECONDS_PER_HOUR);
-                    results.add(regionResult);
-                }
-                break;
-            case COURIER:
-                 List<Object[]> avgByCourier = orderRepository
-                         .findAverageShipToDeliverTimeByCourier(
-                                 startDateTime,
-                                 endDateTime);
-                 for (Object[] row : avgByCourier) {
-                    Map<String, Object> courierResult = new HashMap<>();
-                    courierResult.put("groupByValue", "CourierID_" + row[0]);
-                    // Convert seconds to hours
-                    courierResult.put("averageDuration",
-                            (Double) row[1] / SECONDS_PER_HOUR);
-                    results.add(courierResult);
-                }
-                break;
-            default:
-                // Optionally handle unknown groupBy or throw an exception
-                break;
+        case OVERALL:
+            FulfillmentTimeProjection overall = orderRepository
+                .findShipToDeliverTimeOverall(startDateTime, endDateTime);
+            if (overall != null) {
+                results.add(convertToResponse(overall));
+            }
+            break;
+        case REGION:
+            List<FulfillmentTimeProjection> byRegion = orderRepository
+                .findShipToDeliverTimeByRegion(startDateTime, endDateTime);
+            results.addAll(byRegion.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList()));
+            break;
+        case COURIER:
+            List<FulfillmentTimeProjection> byCourier = orderRepository
+                .findShipToDeliverTimeByCourier(startDateTime, endDateTime);
+            results.addAll(byCourier.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList()));
+            break;
+        default:
+            // Handle unknown groupBy or throw an exception
+            break;
         }
+
         return results;
+    }
+
+    private FulfillmentTimeResponse convertToResponse(
+        final FulfillmentTimeProjection projection
+    ) {
+        return FulfillmentTimeResponse.builder()
+            .groupByValue(projection.getGroupByValue())
+            .averageDuration(
+                BigDecimal.valueOf(projection.getAverageDuration()))
+            .build();
+    }
+
+    private FulfillmentTimeResponse convertToFulfillmentTimeResponse(
+        final Map<String, Object> data
+    ) {
+        return FulfillmentTimeResponse.builder()
+            .groupByValue((String) data.get("groupByValue"))
+            .averageDuration(BigDecimal.valueOf(
+                (Double) data.get("averageDuration")))
+            .build();
+    }
+
+    ///////////////////////
+
+    public List<Map<String, Object>> getAveragePlaceToShipTime(
+        final LocalDate startDate,
+        final LocalDate endDate,
+        final PlaceToShipGroupBy groupBy
+    ) {
+        // This method is kept for backward compatibility
+        return new ArrayList<>();
+    }
+
+    public List<Map<String, Object>> getAverageShipToDeliverTime(
+        final LocalDate startDate,
+        final LocalDate endDate,
+        final ShipToDeliverGroupBy groupBy
+    ) {
+        // This method is kept for backward compatibility
+        return new ArrayList<>();
     }
 }

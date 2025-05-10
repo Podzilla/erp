@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.Podzilla.analytics.api.projections.fulfillment.FulfillmentTimeProjection;
 import com.Podzilla.analytics.api.projections.order.OrderFailureRateProjection;
 import com.Podzilla.analytics.api.projections.order.OrderFailureReasonsProjection;
 import com.Podzilla.analytics.api.projections.order.OrderRegionProjection;
@@ -15,63 +16,71 @@ import com.Podzilla.analytics.models.Order;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    // --- Place to Ship Time ---
 
-    @Query("SELECT AVG(FUNCTION('TIMESTAMPDIFF', SECOND, "
-           + "o.orderPlacedTimestamp, o.shippedTimestamp)) "
-           + "FROM Order o "
-           + "WHERE o.orderPlacedTimestamp BETWEEN :startDate AND :endDate "
-           + "AND o.shippedTimestamp IS NOT NULL")
-    Double findAveragePlaceToShipTimeOverall(
+    @Query(value = "SELECT 'OVERALL' as groupByValue, "
+           + "AVG(TIMESTAMPDIFF(SECOND, o.order_placed_timestamp, "
+           + "o.shipped_timestamp)) as averageDuration "
+           + "FROM orders o "
+           + "WHERE o.order_placed_timestamp BETWEEN :startDate AND :endDate "
+           + "AND o.shipped_timestamp IS NOT NULL",
+           nativeQuery = true)
+    FulfillmentTimeProjection findPlaceToShipTimeOverall(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Query("SELECT o.region.id, "
-           + "AVG(FUNCTION('TIMESTAMPDIFF', SECOND, "
-           + "o.orderPlacedTimestamp, o.shippedTimestamp)) "
-           + "FROM Order o "
-           + "WHERE o.orderPlacedTimestamp BETWEEN :startDate AND :endDate "
-           + "AND o.shippedTimestamp IS NOT NULL "
-           + "GROUP BY o.region.id")
-    List<Object[]> findAveragePlaceToShipTimeByRegion(
+    @Query(value = "SELECT CONCAT('RegionID_', o.region_id) as groupByValue, "
+           + "AVG(TIMESTAMPDIFF(SECOND, o.order_placed_timestamp, "
+           + "o.shipped_timestamp)) as averageDuration "
+           + "FROM orders o "
+           + "WHERE o.order_placed_timestamp BETWEEN :startDate AND :endDate "
+           + "AND o.shipped_timestamp IS NOT NULL "
+           + "GROUP BY o.region_id",
+           nativeQuery = true)
+    List<FulfillmentTimeProjection> findPlaceToShipTimeByRegion(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    // --- Ship to Deliver Time ---
+    // --- Ship to Deliver Time Projections ---
 
-    @Query("SELECT AVG(FUNCTION('TIMESTAMPDIFF', SECOND, "
-           + "o.shippedTimestamp, o.deliveredTimestamp)) "
-           + "FROM Order o "
-           + "WHERE o.shippedTimestamp BETWEEN :startDate AND :endDate "
-           + "AND o.deliveredTimestamp IS NOT NULL "
-           + "AND o.status = 'COMPLETED'")
-    Double findAverageShipToDeliverTimeOverall(
+    @Query(value = "SELECT 'OVERALL' as groupByValue, "
+           + "AVG(TIMESTAMPDIFF(SECOND, o.shipped_timestamp, "
+           + "o.delivered_timestamp)) as averageDuration "
+           + "FROM orders o "
+           + "WHERE o.shipped_timestamp BETWEEN :startDate AND :endDate "
+           + "AND o.delivered_timestamp IS NOT NULL "
+           + "AND o.status = 'COMPLETED'",
+           nativeQuery = true)
+    FulfillmentTimeProjection findShipToDeliverTimeOverall(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Query("SELECT o.region.id, "
-           + "AVG(FUNCTION('TIMESTAMPDIFF', SECOND, "
-           + "o.shippedTimestamp, o.deliveredTimestamp)) "
-           + "FROM Order o "
-           + "WHERE o.shippedTimestamp BETWEEN :startDate AND :endDate "
-           + "AND o.deliveredTimestamp IS NOT NULL "
+    @Query(value = "SELECT CONCAT('RegionID_', o.region_id) as groupByValue, "
+           + "AVG(TIMESTAMPDIFF(SECOND, o.shipped_timestamp, "
+           + "o.delivered_timestamp)) as averageDuration "
+           + "FROM orders o "
+           + "WHERE o.shipped_timestamp BETWEEN :startDate AND :endDate "
+           + "AND o.delivered_timestamp IS NOT NULL "
            + "AND o.status = 'COMPLETED' "
-           + "GROUP BY o.region.id")
-    List<Object[]> findAverageShipToDeliverTimeByRegion(
+           + "GROUP BY o.region_id",
+           nativeQuery = true)
+    List<FulfillmentTimeProjection> findShipToDeliverTimeByRegion(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Query("SELECT o.courier.id, "
-           + "AVG(FUNCTION('TIMESTAMPDIFF', SECOND, "
-           + "o.shippedTimestamp, o.deliveredTimestamp)) "
-           + "FROM Order o "
-           + "WHERE o.shippedTimestamp BETWEEN :startDate AND :endDate "
-           + "AND o.deliveredTimestamp IS NOT NULL "
+    @Query(value = "SELECT CONCAT('CourierID_', o.courier_id) as groupByValue, "
+           + "AVG(TIMESTAMPDIFF(SECOND, o.shipped_timestamp, "
+           + "o.delivered_timestamp)) as averageDuration "
+           + "FROM orders o "
+           + "WHERE o.shipped_timestamp BETWEEN :startDate AND :endDate "
+           + "AND o.delivered_timestamp IS NOT NULL "
            + "AND o.status = 'COMPLETED' "
-           + "GROUP BY o.courier.id")
-    List<Object[]> findAverageShipToDeliverTimeByCourier(
+           + "GROUP BY o.courier_id",
+           nativeQuery = true)
+    List<FulfillmentTimeProjection> findShipToDeliverTimeByCourier(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
+
+    //////////////
 
     @Query(value = "Select o.region_id as regionId, "
             + "r.city as city, "
