@@ -1,18 +1,15 @@
 package com.Podzilla.analytics.api.controllers;
-<<<<<<< HEAD
 import java.time.LocalDate;
 import java.util.List; 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.Podzilla.analytics.api.DTOs.TopSellerRequest;
-import com.Podzilla.analytics.api.DTOs.TopSellerRequest.SortBy; 
-import com.Podzilla.analytics.api.DTOs.TopSellerResponse;
-=======
+import com.Podzilla.analytics.api.dtos.TopSellerRequest;
+import com.Podzilla.analytics.api.dtos.TopSellerRequest.SortBy; 
+import com.Podzilla.analytics.api.dtos.TopSellerResponse;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
->>>>>>> dev
 import com.Podzilla.analytics.services.ProductAnalyticsService;
 import com.Podzilla.analytics.utils.ValidationUtils;
 
@@ -24,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 public class ProductReportController {
 
     private final ProductAnalyticsService productAnalyticsService;
-<<<<<<< HEAD
 
     @GetMapping("/top-sellers") 
     public ResponseEntity<List<TopSellerResponse>> getTopSellers(
@@ -62,6 +58,3 @@ public class ProductReportController {
         return ResponseEntity.ok(topSellersList);
     }
 }
-=======
-}
->>>>>>> dev

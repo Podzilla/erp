@@ -7,9 +7,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.Podzilla.analytics.api.DTOs.RevenueByCategoryResponse;
-import com.Podzilla.analytics.api.DTOs.RevenueSummaryRequest;
-import com.Podzilla.analytics.api.DTOs.RevenueSummaryResponse;
+import com.Podzilla.analytics.api.dtos.RevenueByCategoryResponse;
+import com.Podzilla.analytics.api.dtos.RevenueSummaryRequest;
+import com.Podzilla.analytics.api.dtos.RevenueSummaryResponse;
 import com.Podzilla.analytics.repositories.OrderRepository; 
 
 import lombok.RequiredArgsConstructor;

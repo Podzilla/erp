@@ -74,13 +74,11 @@
 			<artifactId>spring-rabbit-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-<<<<<<< HEAD
 		 <dependency>
 		<groupId>com.github.Podzilla</groupId>
 		<artifactId>mq-utils-lib</artifactId>
 		<version>main-SNAPSHOT</version>
 	</dependency>
-=======
 		<dependency>
 			<groupId>jakarta.validation</groupId>
 			<artifactId>jakarta.validation-api</artifactId>
@@ -91,7 +89,6 @@
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.5.0</version>
 		</dependency>
->>>>>>> dev
 	</dependencies>
 <repositories>
 <repository>

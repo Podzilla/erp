@@ -7,13 +7,13 @@ import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import com.Podzilla.analytics.api.DTOs.RevenueByCategoryResponse;
-import com.Podzilla.analytics.api.DTOs.RevenueSummaryRequest;
-import com.Podzilla.analytics.api.DTOs.RevenueSummaryRequest.Period;
-import com.Podzilla.analytics.api.DTOs.RevenueSummaryResponse;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.Podzilla.analytics.api.dtos.RevenueByCategoryResponse;
+import com.Podzilla.analytics.api.dtos.RevenueSummaryRequest;
+import com.Podzilla.analytics.api.dtos.RevenueSummaryResponse;
+import com.Podzilla.analytics.api.dtos.RevenueSummaryRequest.Period;
 import com.Podzilla.analytics.services.RevenueReportService;
 import com.Podzilla.analytics.utils.ValidationUtils;
 

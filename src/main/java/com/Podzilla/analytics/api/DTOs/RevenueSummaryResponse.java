@@ -1,4 +1,4 @@
-package com.Podzilla.analytics.api.DTOs;
+package com.Podzilla.analytics.api.dtos;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
