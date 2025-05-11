@@ -1,4 +1,4 @@
-package com.Podzilla.analytics.api.DTOs;
+package com.Podzilla.analytics.api.dtos;
 
 import java.math.BigDecimal;
 
@@ -17,4 +17,4 @@ public class ProfitByCategoryDTO {
     private BigDecimal totalCost;
     private BigDecimal grossProfit;
     private BigDecimal grossProfitMargin;
-} 
+}

@@ -9,8 +9,6 @@ import com.Podzilla.analytics.models.SalesLineItem;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface SalesLineItemRepository
-        extends JpaRepository<SalesLineItem, Long> {
 public interface SalesLineItemRepository extends JpaRepository<SalesLineItem, Long> {
     
     @Query("SELECT sli.product.category as category, "
