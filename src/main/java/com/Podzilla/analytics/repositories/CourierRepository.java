@@ -23,7 +23,6 @@ public interface CourierRepository extends JpaRepository<Courier, Long> {
             + "LEFT JOIN orders o "
             + "ON c.id = o.courier_id "
             + "AND o.final_status_timestamp BETWEEN :startDate AND :endDate "
-            + "AND o.status IN ('COMPLETED', 'FAILED') "
             + "GROUP BY c.id, c.name "
             + "ORDER BY courierId", nativeQuery = true)
     List<CourierPerformanceProjection> findCourierPerformanceBetweenDates(
