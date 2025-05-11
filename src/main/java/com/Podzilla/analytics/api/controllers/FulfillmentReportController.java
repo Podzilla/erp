@@ -61,7 +61,7 @@ public class FulfillmentReportController {
         }
     }
 
-     
+
     @Operation(
         summary = "Get average time from shipping to delivery",
         description = "Returns the average time (in hours) between when"
@@ -91,7 +91,7 @@ public class FulfillmentReportController {
         }
     }
 
-     
+
     private ResponseEntity<List<FulfillmentTimeResponse>> createErrorResponse(
             final HttpStatus status) {
         return ResponseEntity.status(status)
