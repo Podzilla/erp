@@ -2,7 +2,8 @@ package com.Podzilla.analytics.services;
 
 import org.springframework.stereotype.Service;
 
-import com.Podzilla.analytics.api.dtos.ProfitByCategoryDTO;
+import com.Podzilla.analytics.api.dtos.profit.ProfitByCategory;
+import com.Podzilla.analytics.api.projections.profit.ProfitByCategoryProjection;
 import com.Podzilla.analytics.repositories.SalesLineItemRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -12,8 +13,8 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -22,41 +23,41 @@ public class ProfitAnalyticsService {
     // Precision constant for percentage calculations
     private static final int PERCENTAGE_PRECISION = 4;
 
-    public List<ProfitByCategoryDTO> getProfitByCategory(
+    public List<ProfitByCategory> getProfitByCategory(
             final LocalDate startDate,
             final LocalDate endDate) {
         // Convert LocalDate to LocalDateTime for start of day and end of day
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
 
-        List<Object[]> salesData = salesLineItemRepository
+        List<ProfitByCategoryProjection> salesData = salesLineItemRepository
                 .findSalesByCategoryBetweenDates(startDateTime, endDateTime);
-        List<ProfitByCategoryDTO> result = new ArrayList<>();
 
-        for (Object[] data : salesData) {
-            String category = (String) data[0];
-            BigDecimal totalRevenue = (BigDecimal) data[1];
-            BigDecimal totalCost = (BigDecimal) data[2];
-            BigDecimal grossProfit = totalRevenue.subtract(totalCost);
+        return salesData.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
 
-            BigDecimal grossProfitMargin = BigDecimal.ZERO;
-            if (totalRevenue.compareTo(BigDecimal.ZERO) > 0) {
-                // Using decimal places for percentage calculation
-                grossProfitMargin = grossProfit
-                        .divide(totalRevenue, PERCENTAGE_PRECISION,
-                                RoundingMode.HALF_UP)
-                        .multiply(new BigDecimal("100"));
-            }
+    private ProfitByCategory convertToDTO(
+            final ProfitByCategoryProjection projection) {
+        BigDecimal totalRevenue = projection.getTotalRevenue();
+        BigDecimal totalCost = projection.getTotalCost();
+        BigDecimal grossProfit = totalRevenue.subtract(totalCost);
 
-            result.add(ProfitByCategoryDTO.builder()
-                    .category(category)
-                    .totalRevenue(totalRevenue)
-                    .totalCost(totalCost)
-                    .grossProfit(grossProfit)
-                    .grossProfitMargin(grossProfitMargin)
-                    .build());
+        BigDecimal grossProfitMargin = BigDecimal.ZERO;
+        if (totalRevenue.compareTo(BigDecimal.ZERO) > 0) {
+            grossProfitMargin = grossProfit
+                    .divide(totalRevenue, PERCENTAGE_PRECISION,
+                            RoundingMode.HALF_UP)
+                    .multiply(new BigDecimal("100"));
         }
 
-        return result;
+        return ProfitByCategory.builder()
+                .category(projection.getCategory())
+                .totalRevenue(totalRevenue)
+                .totalCost(totalCost)
+                .grossProfit(grossProfit)
+                .grossProfitMargin(grossProfitMargin)
+                .build();
     }
 }
