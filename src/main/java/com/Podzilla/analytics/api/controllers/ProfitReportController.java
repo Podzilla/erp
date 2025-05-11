@@ -14,7 +14,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("profit")
+@RequestMapping("/profit")
 public class ProfitReportController {
     private final ProfitAnalyticsService profitAnalyticsService;
     
