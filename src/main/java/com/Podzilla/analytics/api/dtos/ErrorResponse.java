@@ -1,4 +1,4 @@
-package com.Podzilla.analytics.api.dtos; // Or a common errors package
+package com.Podzilla.analytics.api.dtos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 @Data
 @Builder
@@ -17,8 +16,5 @@ import java.util.Map;
 public class ErrorResponse {
     private LocalDateTime timestamp;
     private int status;
-    private String error;
     private String message;
-    private Map<String, String> fieldErrors;
-    private String path;
 }
