@@ -1,6 +1,5 @@
 package com.Podzilla.analytics.api.controllers;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.web.bind.MethodArgumentNotValidException;
 // import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -22,7 +21,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -42,23 +40,12 @@ public class FulfillmentReportController {
     public ResponseEntity<List<FulfillmentTimeResponse>> getPlaceToShipTime(
             @Valid @ModelAttribute final FulfillmentPlaceToShipRequest req) {
 
-        if (req.getGroupBy() == null || req.getStartDate() == null
-                          || req.getEndDate() == null) {
-            log.warn("Missing required parameter: groupBy");
-            return createErrorResponse(HttpStatus.BAD_REQUEST);
-        }
-
-        try {
-            final List<FulfillmentTimeResponse> reportData =
-                    fulfillmentAnalyticsService.getPlaceToShipTimeResponse(
-                            req.getStartDate(),
-                            req.getEndDate(),
-                            req.getGroupBy());
-            return ResponseEntity.ok(reportData);
-        } catch (Exception ex) {
-            log.error("Place-ship error", ex);
-            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        final List<FulfillmentTimeResponse> reportData =
+                fulfillmentAnalyticsService.getPlaceToShipTimeResponse(
+                        req.getStartDate(),
+                        req.getEndDate(),
+                        req.getGroupBy());
+        return ResponseEntity.ok(reportData);
     }
 
 
@@ -72,29 +59,11 @@ public class FulfillmentReportController {
     public ResponseEntity<List<FulfillmentTimeResponse>> getShipToDeliverTime(
             @Valid @ModelAttribute final FulfillmentShipToDeliverRequest req) {
 
-        if (req.getGroupBy() == null || req.getStartDate() == null
-                          || req.getEndDate() == null) {
-            log.warn("Missing required parameter: groupBy");
-            return createErrorResponse(HttpStatus.BAD_REQUEST);
-        }
-
-        try {
-            final List<FulfillmentTimeResponse> reportData =
-                    fulfillmentAnalyticsService.getShipToDeliverTimeResponse(
-                            req.getStartDate(),
-                            req.getEndDate(),
-                            req.getGroupBy());
-            return ResponseEntity.ok(reportData);
-        } catch (Exception ex) {
-            log.error("Ship-deliver error", ex);
-            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-
-    private ResponseEntity<List<FulfillmentTimeResponse>> createErrorResponse(
-            final HttpStatus status) {
-        return ResponseEntity.status(status)
-                .body(Collections.emptyList());
+        final List<FulfillmentTimeResponse> reportData =
+                fulfillmentAnalyticsService.getShipToDeliverTimeResponse(
+                        req.getStartDate(),
+                        req.getEndDate(),
+                        req.getGroupBy());
+        return ResponseEntity.ok(reportData);
     }
 }

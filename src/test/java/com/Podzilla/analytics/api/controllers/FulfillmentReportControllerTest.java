@@ -220,7 +220,6 @@ public class FulfillmentReportControllerTest {
         mockMvc.perform(get("/fulfillment/place-to-ship-time")
                 .param("startDate", startDate.toString())
                 .param("endDate", endDate.toString())
-                .param("groupBy", "INVALID_VALUE")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -231,7 +230,6 @@ public class FulfillmentReportControllerTest {
         mockMvc.perform(get("/fulfillment/ship-to-deliver-time")
                 .param("startDate", startDate.toString())
                 .param("endDate", endDate.toString())
-                .param("groupBy", "INVALID_VALUE")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
