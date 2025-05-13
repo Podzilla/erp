@@ -23,7 +23,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/fulfillment")
+@RequestMapping("/fulfillment-analytics")
 public class FulfillmentReportController {
     private final FulfillmentAnalyticsService fulfillmentAnalyticsService;
 
