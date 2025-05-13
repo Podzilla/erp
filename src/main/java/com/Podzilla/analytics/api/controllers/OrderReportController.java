@@ -22,7 +22,7 @@ import com.Podzilla.analytics.api.dtos.order.OrderStatusResponse;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/order-analytics")
 public class OrderReportController {
     private final OrderAnalyticsService orderAnalyticsService;
 

@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/revenue")
+@RequestMapping("/revenue-analytics")
 public class RevenueReportController {
     private final RevenueReportService revenueReportService;
 }
