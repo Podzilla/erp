@@ -68,34 +68,38 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     OrderFailureRateProjection calculateFailureRate(
         @Param("startDate") LocalDateTime startDate,
         @Param("endDate") LocalDateTime endDate
-    );    @Query(value = """
+    );
+      @Query(value = """
         SELECT
-            CASE :reportPeriod
-                WHEN 'DAILY' THEN CAST(o.order_placed_timestamp AS DATE)
-                WHEN 'WEEKLY' THEN date_trunc('week', o.order_placed_timestamp)::date
-                WHEN 'MONTHLY' THEN date_trunc('month', o.order_placed_timestamp)::date
-            END as period,
-            SUM(o.total_amount) as totalRevenue
-        FROM
-            orders o
-        WHERE
-            o.order_placed_timestamp >= :startDate
-            AND o.order_placed_timestamp < :endDate
-            AND o.status IN ('COMPLETED')
+            t.period,
+            SUM(t.total_amount) as totalRevenue
+        FROM (
+            SELECT
+                CASE :reportPeriod
+                    WHEN 'DAILY' THEN CAST(o.order_placed_timestamp AS DATE)
+                    WHEN 'WEEKLY' THEN date_trunc('week', o.order_placed_timestamp)::date -- Correct PostgreSQL syntax
+                    WHEN 'MONTHLY' THEN date_trunc('month', o.order_placed_timestamp)::date -- Correct PostgreSQL syntax
+                END as period,
+                o.total_amount
+            FROM
+                orders o
+            WHERE
+                o.order_placed_timestamp >= :startDate
+                AND o.order_placed_timestamp < :endDate
+                AND o.status IN ('COMPLETED')
+        ) t
         GROUP BY
-            CASE :reportPeriod
-                WHEN 'DAILY' THEN CAST(o.order_placed_timestamp AS DATE)
-                WHEN 'WEEKLY' THEN date_trunc('week', o.order_placed_timestamp)::date
-                WHEN 'MONTHLY' THEN date_trunc('month', o.order_placed_timestamp)::date
-            END
+            t.period
         ORDER BY
-            period
-        """, nativeQuery = true)
+            t.period
+        """,
+        nativeQuery = true)
     List<RevenueSummaryProjection> findRevenueSummaryByPeriod(
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate,
         @Param("reportPeriod") String reportPeriod
-    );    @Query(value = """
+    );
+        @Query(value = """
         SELECT
             p.category,
             SUM(sli.quantity * sli.price_per_unit) as totalRevenue

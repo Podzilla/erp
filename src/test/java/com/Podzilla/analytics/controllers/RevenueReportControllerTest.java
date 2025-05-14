@@ -1,36 +1,39 @@
 // package com.Podzilla.analytics.controllers;
 
-// import com.Podzilla.analytics.api.dtos.RevenueSummaryResponse;
-// import com.Podzilla.analytics.api.controllers.RevenueReportController;
-// import com.Podzilla.analytics.api.dtos.RevenueSummaryRequest.Period;
-// import com.Podzilla.analytics.services.RevenueReportService;
-
-// import org.junit.jupiter.api.Test;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-// import org.springframework.boot.test.mock.mockito.MockBean;
-// import org.springframework.http.MediaType;
-// import org.springframework.test.web.servlet.MockMvc;
-
 // import java.math.BigDecimal;
 // import java.time.LocalDate;
 // import java.util.Collections;
 // import java.util.List;
 
+// import static org.hamcrest.Matchers.hasSize;
+// import static org.hamcrest.Matchers.is;
+// import org.junit.jupiter.api.Test;
 // import static org.mockito.ArgumentMatchers.any;
 // import static org.mockito.Mockito.when;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc; // Changed from @WebMvcTest
+// import org.springframework.boot.test.context.SpringBootTest; // Added
+// import org.springframework.http.MediaType;
+// import org.springframework.test.context.bean.override.mockito.MockitoBean;
+// import org.springframework.test.web.servlet.MockMvc;
 // import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 // import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-// import static org.hamcrest.Matchers.*; // For jsonPath matchers
+// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-// @WebMvcTest(RevenueReportController.class) // Specify the controller to test
+// import com.Podzilla.analytics.api.dtos.RevenueSummaryRequest.Period;
+// import com.Podzilla.analytics.api.dtos.RevenueSummaryResponse;
+// import com.Podzilla.analytics.services.RevenueReportService;
+
+// // Using @SpringBootTest loads the full application context
+// @SpringBootTest
+// // @AutoConfigureMockMvc sets up MockMvc to test the web layer within the full context
+// @AutoConfigureMockMvc
 // class RevenueReportControllerTest {
 
 //     @Autowired
-//     private MockMvc mockMvc; // Injected for performing HTTP requests
-
-//     @MockBean // Create a mock instance of the service dependency
+//     private MockMvc mockMvc;
+// // Keep @MockitoBean to mock the service as per your original test logic
+//     @MockitoBean
 //     private RevenueReportService revenueReportService;
 
 //     // Helper method to create a valid URL with parameters
@@ -78,18 +81,6 @@
 //         // You could add more assertions here to check the response body for validation error details
 //     }
 
-// //      @Test
-// //     void getRevenueSummary_EndDateBeforeStartDate_ReturnsBadRequest() throws Exception {
-// //         // Arrange: Invalid date range (endDate before startDate) - testing @AssertTrue
-// //         LocalDate startDate = LocalDate.of(2023, 1, 31);
-// //         LocalDate endDate = LocalDate.of(2023, 1, 1); // Invalid date range
-// //         Period period = Period.MONTHLY;
-// //         // Act & Assert: Perform request and expect HTTP 400 Bad Request due to @AssertTrue
-// //         mockMvc.perform(get(buildSummaryUrl(startDate, endDate, period))
-// //                        .contentType(MediaType.APPLICATION_JSON))
-// //                .andExpect(status().isBadRequest());
-// //                // Again, check response body for specific validation error message if needed
-// //     }
 //     @Test
 //     void getRevenueSummary_EndDateBeforeStartDate_ReturnsBadRequest() throws Exception {
 //         // Arrange: Invalid date range (endDate before startDate) - testing @AssertTrue
@@ -98,28 +89,10 @@
 //         Period period = Period.MONTHLY;
 
 //         // Act & Assert: Perform request and expect HTTP 400 Bad Request due to @AssertTrue
-//         try {
-//             mockMvc.perform(get(buildSummaryUrl(startDate, endDate, period))
-//                     .contentType(MediaType.APPLICATION_JSON));
-//             // .andExpect(status().isBadRequest()); // Temporarily comment this out
-//         } catch (Exception e) {
-//             // Catch the exception and print its type
-//             System.out.println("===================================================");
-//             System.out.println("Caught Exception Type: " + e.getClass().getName());
-//             System.out.println("Exception Message: " + e.getMessage());
-//             if (e.getCause() != null) {
-//                 System.out.println("Cause Exception Type: " + e.getCause().getClass().getName());
-//                 System.out.println("Cause Exception Message: " + e.getCause().getMessage());
-//             }
-//             System.out.println("===================================================");
-//             throw e; // Re-throw the exception so the test still fails
-//         }
-
-//         // If the try block completes without exception (which is happening now, resulting in 200),
-//         // the assertion below will fail, confirming the status issue.
 //         mockMvc.perform(get(buildSummaryUrl(startDate, endDate, period))
 //                 .contentType(MediaType.APPLICATION_JSON))
-//                 .andExpect(status().isBadRequest()); // Keep the original assertion to confirm the failure
+//                 .andExpect(status().isBadRequest());
+//         // Again, check response body for specific validation error message if needed
 //     }
 
 //     @Test
@@ -141,4 +114,6 @@
 //                 .andExpect(jsonPath("$", hasSize(0))); // Expect an empty JSON array
 //     }
 
+//     // Add similar tests for other scenarios: missing parameters, invalid format, etc.
+//     // And add tests for the /revenue/by-category endpoint here as well.
 // }
