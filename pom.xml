@@ -130,16 +130,13 @@
             <version>8.0.1.Final</version> 
         </dependency>
 	</dependencies>
-
-<repository>
-    <id>jitpack.io</id>
-    <url>https://jitpack.io</url>
-	<!-- <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-    </snapshots> -->
-</repository>
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
 </repositories>
+
 	<build>
 		<plugins>
 			<plugin>
