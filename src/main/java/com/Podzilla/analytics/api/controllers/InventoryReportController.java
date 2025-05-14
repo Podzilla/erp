@@ -22,7 +22,7 @@ import java.util.List;
         + "and reporting")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/inventory")
+@RequestMapping("/inventory-analytics")
 public class InventoryReportController {
     private final InventoryAnalyticsService inventoryAnalyticsService;
 

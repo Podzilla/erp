@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 @Data
 @Builder
@@ -17,8 +16,5 @@ import java.util.Map;
 public class ErrorResponse {
     private LocalDateTime timestamp;
     private int status;
-    private String error;
     private String message;
-    private Map<String, String> fieldErrors;
-    private String path;
 }

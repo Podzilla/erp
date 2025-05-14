@@ -20,7 +20,7 @@ import java.util.List;
         + "reporting")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/customers")
+@RequestMapping("/customer-analytics")
 public class CustomerReportController {
     private final CustomerAnalyticsService customerAnalyticsService;
 

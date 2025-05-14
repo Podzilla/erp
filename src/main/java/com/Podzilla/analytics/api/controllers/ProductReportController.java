@@ -16,7 +16,8 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/products") 
+
+@RequestMapping("/product-analytics")
 public class ProductReportController {
 
     private final ProductAnalyticsService productAnalyticsService;

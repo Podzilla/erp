@@ -7,7 +7,7 @@
     import org.springframework.web.bind.annotation.ModelAttribute;
     import org.springframework.web.bind.annotation.RequestMapping;
     import org.springframework.web.bind.annotation.RestController;
-
+  
     import com.Podzilla.analytics.api.dtos.RevenueByCategoryRequest;
     import com.Podzilla.analytics.api.dtos.RevenueByCategoryResponse;
     import com.Podzilla.analytics.api.dtos.RevenueSummaryRequest;
@@ -19,7 +19,7 @@
 
     @RequiredArgsConstructor
     @RestController
-    @RequestMapping("/revenue")
+    @RequestMapping("/revenue-analytics")
     public class RevenueReportController {
         private final RevenueReportService revenueReportService;
         @GetMapping("/summary")
@@ -31,7 +31,7 @@
 
         @GetMapping("/by-category")
         public ResponseEntity<List<RevenueByCategoryResponse>> getRevenueByCategory(
-            @Valid @ModelAttribute RevenueByCategoryRequest requestDTO // Use @ModelAttribute and @Valid
+            @Valid @ModelAttribute RevenueByCategoryRequest requestDTO 
         ) {
         
             List<RevenueByCategoryResponse> summaryList = revenueReportService.getRevenueByCategory(
@@ -42,3 +42,4 @@
         }
 
     }
+

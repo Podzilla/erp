@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Courier Reports", description = "Endpoints for courier"
         + " analytics and performance metrics")
 @RestController
-@RequestMapping("/couriers")
+@RequestMapping("/courier-analytics")
 @RequiredArgsConstructor
 public final class CourierReportController {
 
