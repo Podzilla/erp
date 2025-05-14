@@ -53,7 +53,7 @@ public class RevenueReportService {
      */
     public List<RevenueByCategoryResponse> getRevenueByCategory(final LocalDate startDate, final LocalDate endDate) {
 
-        final List<RevenueByCategoryProjection> queryResults = orderRepository.findRevenueByCategory(startDate, endDate);
+    final List<RevenueByCategoryProjection> queryResults = orderRepository.findRevenueByCategory(startDate, endDate);
 
         final List<RevenueByCategoryResponse> summaryList = new ArrayList<>();
 

@@ -142,7 +142,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                 CASE :reportPeriod
                     WHEN 'DAILY' THEN CAST(o.order_placed_timestamp AS DATE)
                     WHEN 'WEEKLY' THEN date_trunc('week', o.order_placed_timestamp)::date -- Correct PostgreSQL syntax
-                    WHEN 'MONTHLY' THEN date_trunc('month', o.order_placed_timestamp)::date -- Correct PostgreSQL syntax
+            WHEN 'MONTHLY' THEN date_trunc('month', o.order_placed_timestamp)::date -- Correct PostgreSQL syntax
                 END as period,
                 o.total_amount
             FROM
