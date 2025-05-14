@@ -130,56 +130,44 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Query(value = """
-            SELECT
-                t.period,
-                SUM(t.total_amount) as totalRevenue
-            FROM (
-                SELECT
-                    CASE :reportPeriod
-                        WHEN 'DAILY' THEN CAST(o.order_placed_timestamp AS DATE)
-                        WHEN 'WEEKLY' THEN date_trunc('week', o.order_placed_timestamp)::date -- Correct PostgreSQL syntax
-                        WHEN 'MONTHLY' THEN date_trunc('month', o.order_placed_timestamp)::date -- Correct PostgreSQL syntax
-                    END as period,
-                    o.total_amount
-                FROM
-                    orders o
-                WHERE
-                    o.order_placed_timestamp >= :startDate
-                    AND o.order_placed_timestamp < :endDate
-                    AND o.status IN ('COMPLETED')
-            ) t
-            GROUP BY
-                t.period
-            ORDER BY
-                t.period
-            """,
-            nativeQuery = true)
+            @Query(value = "SELECT "
+            + "t.period, "
+            + "SUM(t.total_amount) as totalRevenue "
+            + "FROM ( "
+            + "SELECT "
+            + "CASE :reportPeriod "
+            + "WHEN 'DAILY' THEN CAST(o.order_placed_timestamp AS DATE) "
+            + "WHEN 'WEEKLY' THEN date_trunc('week', o.order_placed_timestamp)::date "
+            + "WHEN 'MONTHLY' THEN date_trunc('month', o.order_placed_timestamp)::date "
+            + "END as period, "
+            + "o.total_amount "
+            + "FROM orders o "
+            + "WHERE o.order_placed_timestamp >= :startDate "
+            + "AND o.order_placed_timestamp < :endDate "
+            + "AND o.status IN ('COMPLETED') "
+            + ") t "
+            + "GROUP BY t.period "
+            + "ORDER BY t.period",
+        nativeQuery = true)
     List<RevenueSummaryProjection> findRevenueSummaryByPeriod(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("reportPeriod") String reportPeriod
     );
 
-    @Query(value = """
-            SELECT
-                p.category,
-                SUM(sli.quantity * sli.price_per_unit) as totalRevenue
-            FROM
-                orders o
-            JOIN
-                sales_line_items sli ON o.id = sli.order_id
-            JOIN
-                products p ON sli.product_id = p.id
-            WHERE
-                o.order_placed_timestamp >= :startDate
-                AND o.order_placed_timestamp < :endDate
-                AND o.status IN ('COMPLETED')
-            GROUP BY
-                p.category
-            ORDER BY
-                SUM(sli.quantity * sli.price_per_unit) DESC
-            """, nativeQuery = true)
+    @Query(value = "SELECT "
+    + "p.category, "
+    + "SUM(sli.quantity * sli.price_per_unit) as totalRevenue "
+    + "FROM orders o "
+    + "JOIN sales_line_items sli ON o.id = sli.order_id "
+    + "JOIN products p ON sli.product_id = p.id "
+    + "WHERE o.order_placed_timestamp >= :startDate "
+    + "AND o.order_placed_timestamp < :endDate "
+    + "AND o.status IN ('COMPLETED') "
+    + "GROUP BY p.category "
+    + "ORDER BY SUM(sli.quantity * sli.price_per_unit) DESC",
+nativeQuery = true)
+
     List<RevenueByCategoryProjection> findRevenueByCategory(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
