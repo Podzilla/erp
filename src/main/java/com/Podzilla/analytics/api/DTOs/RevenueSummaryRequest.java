@@ -39,15 +39,11 @@ public class RevenueSummaryRequest {
         MONTHLY
     }
 
- 
-    @AssertTrue(message = "End date must be equal to or after start date") // The validation message
+    @AssertTrue(message = "End date must be equal to or after start date")
     private boolean isEndDateOnOrAfterStartDate() {
         if (startDate == null || endDate == null) {
-            // If either date is null, we let @NotNull handle the error.
-            // Returning true here prevents a secondary error message from @AssertTrue.
             return true;
         }
-
         return !endDate.isBefore(startDate);
     }
 }

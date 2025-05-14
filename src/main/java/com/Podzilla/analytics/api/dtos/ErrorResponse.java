@@ -1,4 +1,4 @@
-package com.Podzilla.analytics.api.dtos; // Or a common errors package
+package com.Podzilla.analytics.api.dtos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
