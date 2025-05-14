@@ -72,12 +72,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         SELECT
             CASE :reportPeriod
                 WHEN 'DAILY' THEN CAST(o.order_placed_timestamp AS DATE)
-                WHEN 'WEEKLY' THEN DATEADD('DAY', 
-                    -(EXTRACT(DAY FROM o.order_placed_timestamp) - 1),
-                    CAST(o.order_placed_timestamp AS DATE))
-                WHEN 'MONTHLY' THEN DATEADD('DAY', 
-                    -(EXTRACT(DAY FROM o.order_placed_timestamp) - 1),
-                    CAST(o.order_placed_timestamp AS DATE))
+                WHEN 'WEEKLY' THEN date_trunc('week', o.order_placed_timestamp)::date
+                WHEN 'MONTHLY' THEN date_trunc('month', o.order_placed_timestamp)::date
             END as period,
             SUM(o.total_amount) as totalRevenue
         FROM
@@ -89,12 +85,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         GROUP BY
             CASE :reportPeriod
                 WHEN 'DAILY' THEN CAST(o.order_placed_timestamp AS DATE)
-                WHEN 'WEEKLY' THEN DATEADD('DAY', 
-                    -(EXTRACT(DAY FROM o.order_placed_timestamp) - 1),
-                    CAST(o.order_placed_timestamp AS DATE))
-                WHEN 'MONTHLY' THEN DATEADD('DAY', 
-                    -(EXTRACT(DAY FROM o.order_placed_timestamp) - 1),
-                    CAST(o.order_placed_timestamp AS DATE))
+                WHEN 'WEEKLY' THEN date_trunc('week', o.order_placed_timestamp)::date
+                WHEN 'MONTHLY' THEN date_trunc('month', o.order_placed_timestamp)::date
             END
         ORDER BY
             period

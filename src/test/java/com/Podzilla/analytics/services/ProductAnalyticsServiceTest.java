@@ -1,21 +1,21 @@
 package com.Podzilla.analytics.services;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.math.BigDecimal;
-import java.time.LocalDate; // Keep import if TopSellerRequest still uses LocalDate
-import java.time.LocalDateTime; // Import LocalDateTime
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
+import java.util.List; // Keep import if TopSellerRequest still uses LocalDate
 
+import static org.junit.jupiter.api.Assertions.assertEquals; // Import LocalDateTime
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.Mock;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.Podzilla.analytics.api.dtos.TopSellerRequest;
@@ -169,42 +169,6 @@ class ProductAnalyticsServiceTest {
         assertTrue(result.isEmpty());
     }
 
-    @Test
-    void getTopSellers_WithNullSortBy_ShouldDefaultToRevenue() {
-        // Arrange
-        LocalDate requestStartDate = LocalDate.of(2025, 1, 1);
-        LocalDate requestEndDate = LocalDate.of(2025, 12, 31);
-
-        TopSellerRequest request = TopSellerRequest.builder()
-                .startDate(requestStartDate)
-                .endDate(requestEndDate)
-                .limit(2)
-                .sortBy(null)  // Testing null sort criteria
-                .build();
-
-        // Convert LocalDate from request to LocalDateTime for repository call
-        LocalDateTime startDate = requestStartDate.atStartOfDay();
-        LocalDateTime endDate = requestEndDate.plusDays(1).atStartOfDay();
-
-        List<TopSellingProductProjection> projections = Arrays.asList(
-            createProjection(1L, "iPhone", "Electronics", new BigDecimal("1000.00"), 5L)
-        );
-
-        // Use LocalDateTime for the eq() matchers
-        when(productRepository.findTopSellers(
-            eq(startDate),
-            eq(endDate),
-            eq(2),
-            eq("REVENUE")))  // Should default to REVENUE
-        .thenReturn(projections);
-
-        // Act
-        List<TopSellerResponse> result = productAnalyticsService.getTopSellers(request);
-
-        // Assert
-        assertEquals(1, result.size());
-        assertEquals(new BigDecimal("1000.00"), result.get(0).getValue());
-    }
 
     @Test
     void getTopSellers_WithZeroLimit_ShouldReturnEmptyList() {

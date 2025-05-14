@@ -1,22 +1,20 @@
 package com.Podzilla.analytics.api.controllers;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.Podzilla.analytics.api.dtos.RevenueByCategoryRequest;
 import com.Podzilla.analytics.api.dtos.RevenueByCategoryResponse;
 import com.Podzilla.analytics.api.dtos.RevenueSummaryRequest;
 import com.Podzilla.analytics.api.dtos.RevenueSummaryResponse;
-import com.Podzilla.analytics.api.dtos.RevenueSummaryRequest.Period;
 import com.Podzilla.analytics.services.RevenueReportService;
-import com.Podzilla.analytics.utils.ValidationUtils;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -24,45 +22,22 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/revenue")
 public class RevenueReportController {
     private final RevenueReportService revenueReportService;
-
     @GetMapping("/summary")
     public ResponseEntity<List<RevenueSummaryResponse>> getRevenueSummary(
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-        @RequestParam Period period
+        @Valid @ModelAttribute RevenueSummaryRequest requestDTO
     ) {
-        // --- Validation ---
-        ResponseEntity<List<RevenueSummaryResponse>> validationError = ValidationUtils.validateDateRange(startDate, endDate);
-        if (validationError != null) {
-            return validationError;
-        }
-        validationError = ValidationUtils.validateEnumNotNull(period);
-        if (validationError != null) {
-            return validationError;
-        }
-
-        RevenueSummaryRequest requestDTO = RevenueSummaryRequest.builder()
-                .startDate(startDate)
-                .endDate(endDate)
-                .period(period)
-                .build();
-
         return ResponseEntity.ok(revenueReportService.getRevenueSummary(requestDTO));
     }
 
     @GetMapping("/by-category")
     public ResponseEntity<List<RevenueByCategoryResponse>> getRevenueByCategory(
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+        @Valid @ModelAttribute RevenueByCategoryRequest requestDTO // Use @ModelAttribute and @Valid
     ) {
-        // --- Validation ---
-        ResponseEntity<List<RevenueByCategoryResponse>> validationError = ValidationUtils.validateDateRange(startDate, endDate);
-        if (validationError != null) {
-            return validationError;
-        }
-        // --- End Validation ---
-
-        List<RevenueByCategoryResponse> summaryList = revenueReportService.getRevenueByCategory(startDate, endDate);
+    
+        List<RevenueByCategoryResponse> summaryList = revenueReportService.getRevenueByCategory(
+            requestDTO.getStartDate(),
+            requestDTO.getEndDate()
+        );
         return ResponseEntity.ok(summaryList);
     }
 

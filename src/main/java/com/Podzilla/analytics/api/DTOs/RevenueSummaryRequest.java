@@ -1,9 +1,9 @@
 package com.Podzilla.analytics.api.dtos;
 
 import java.time.LocalDate;
-import java.util.Date;
 
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,18 +16,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Schema(description = "Request parameters for revenue summary")
 public class RevenueSummaryRequest {
-    @NotNull
+
+    @NotNull(message = "Start date is required") 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @Schema(description = "Start date for the revenue summary (inclusive)", example = "2023-01-01", required = true)
     private LocalDate startDate;
 
-    @NotNull
+    @NotNull(message = "End date is required") 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @Schema(description = "End date for the revenue summary (inclusive)", example = "2023-01-31", required = true)
     private LocalDate endDate;
 
-    @NotNull
+    @NotNull(message = "Period is required") 
     @Schema(description = "Period granularity for summary", required = true, implementation = Period.class)
     private Period period;
 
@@ -35,5 +37,17 @@ public class RevenueSummaryRequest {
         DAILY,
         WEEKLY,
         MONTHLY
+    }
+
+ 
+    @AssertTrue(message = "End date must be equal to or after start date") // The validation message
+    private boolean isEndDateOnOrAfterStartDate() {
+        if (startDate == null || endDate == null) {
+            // If either date is null, we let @NotNull handle the error.
+            // Returning true here prevents a secondary error message from @AssertTrue.
+            return true;
+        }
+
+        return !endDate.isBefore(startDate);
     }
 }
