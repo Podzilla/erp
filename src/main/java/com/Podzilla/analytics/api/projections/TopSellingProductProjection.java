@@ -6,6 +6,6 @@ public interface TopSellingProductProjection {
     Long getId();
     String getName();
     String getCategory();
-    BigDecimal getTotalRevenue();  
-    Long getTotalUnits(); 
+    BigDecimal getTotalRevenue();
+    Long getTotalUnits();
 }

@@ -1,9 +1,7 @@
 package com.Podzilla.analytics.api.dtos;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.time.LocalDate;
-import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,3 +21,4 @@ public class RevenueSummaryResponse {
     @Schema(description = "Total revenue for the specified period", example = "12345.67")
     private BigDecimal totalRevenue;
 }
+

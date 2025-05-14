@@ -1,4 +1,5 @@
 package com.Podzilla.analytics.api.controllers;
+
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -22,11 +23,11 @@ public class ProductReportController {
 
     private final ProductAnalyticsService productAnalyticsService;
 
-    @GetMapping("/top-sellers") 
+    @GetMapping("/top-sellers")
     public ResponseEntity<List<TopSellerResponse>> getTopSellers(
-      @Valid @ModelAttribute TopSellerRequest requestDTO
+            @Valid @ModelAttribute final TopSellerRequest requestDTO
     ) {
-        
+
         List<TopSellerResponse> topSellersList = productAnalyticsService.getTopSellers(requestDTO);
 
         return ResponseEntity.ok(topSellersList);

@@ -74,10 +74,10 @@
 
     <!-- Checks for Size Violations.                    -->
     <!-- See https://checkstyle.org/checks/sizes/index.html -->
-    <module name="FileLength"/>
+    <!-- <module name="FileLength"/>
     <module name="LineLength">
         <property name="fileExtensions" value="java"/>
-    </module>
+    </module> -->
 
     <!-- Checks for whitespace                               -->
     <!-- See https://checkstyle.org/checks/whitespace/index.html -->

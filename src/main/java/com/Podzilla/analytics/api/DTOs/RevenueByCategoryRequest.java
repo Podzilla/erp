@@ -30,7 +30,7 @@ public class RevenueByCategoryRequest {
 
     @AssertTrue(message = "End date must be equal to or after start date")
     private boolean isEndDateOnOrAfterStartDate() {
-      
+
         if (startDate == null || endDate == null) {
             return true;
         }
