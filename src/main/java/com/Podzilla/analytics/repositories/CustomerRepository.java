@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.Podzilla.analytics.api.projections.CustomersTopSpendersProjection;
+import com.Podzilla.analytics.api.projections.customer.CustomersTopSpendersProjection;
 import com.Podzilla.analytics.models.Customer;
 
 import java.time.LocalDateTime;

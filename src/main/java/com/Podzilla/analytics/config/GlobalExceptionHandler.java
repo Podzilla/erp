@@ -1,7 +1,7 @@
 package com.Podzilla.analytics.config;
 
-import com.Podzilla.analytics.api.dtos.ErrorResponse;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -10,8 +10,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-
-import java.time.LocalDateTime;
+import com.Podzilla.analytics.api.dtos.ErrorResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @ControllerAdvice
 @Slf4j

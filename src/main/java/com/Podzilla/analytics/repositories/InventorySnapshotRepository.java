@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.Podzilla.analytics.api.projections.InventoryValueByCategoryProjection;
-import com.Podzilla.analytics.api.projections.LowStockProductProjection;
+import com.Podzilla.analytics.api.projections.inventory.InventoryValueByCategoryProjection;
+import com.Podzilla.analytics.api.projections.inventory.LowStockProductProjection;
 import com.Podzilla.analytics.models.InventorySnapshot;
 
 @Repository

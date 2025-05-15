@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.Podzilla.analytics.api.projections.CourierPerformanceProjection;
+import com.Podzilla.analytics.api.projections.courier.CourierPerformanceProjection;
 import com.Podzilla.analytics.models.Courier;
 
 public interface CourierRepository extends JpaRepository<Courier, Long> {
