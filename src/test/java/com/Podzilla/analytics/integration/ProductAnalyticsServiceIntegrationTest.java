@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.Podzilla.analytics.api.dtos.TopSellerRequest;
-import com.Podzilla.analytics.api.dtos.TopSellerResponse;
+import com.Podzilla.analytics.api.dtos.product.TopSellerRequest;
+import com.Podzilla.analytics.api.dtos.product.TopSellerResponse;
 import com.Podzilla.analytics.models.Courier;
 import com.Podzilla.analytics.models.Customer;
 import com.Podzilla.analytics.models.Order;
@@ -285,8 +285,7 @@ class ProductAnalyticsServiceIntegrationTest {
 
         salesLineItemRepository.saveAll(List.of(
                 item1_1, item1_2, item2_1, item3_1, item3_2,
-                item4_1, item5_1, item5_2, item6_1, item6_2
-        ));
+                item4_1, item5_1, item5_2, item6_1, item6_2));
     }
 
     @Nested
@@ -303,7 +302,10 @@ class ProductAnalyticsServiceIntegrationTest {
                     .sortBy(TopSellerRequest.SortBy.REVENUE)
                     .build();
 
-            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request);
+            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request.getStartDate(),
+                    request.getEndDate(),
+                    request.getLimit(),
+                    request.getSortBy());
 
             System.out.println("Results: " + results);
             assertThat(results).hasSize(5); // Phone, Laptop, Tablet, Headphones, Book
@@ -330,7 +332,10 @@ class ProductAnalyticsServiceIntegrationTest {
                     .sortBy(TopSellerRequest.SortBy.UNITS)
                     .build();
 
-            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request);
+            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request.getStartDate(),
+                    request.getEndDate(),
+                    request.getLimit(),
+                    request.getSortBy());
 
             assertThat(results).hasSize(5);
 
@@ -347,7 +352,8 @@ class ProductAnalyticsServiceIntegrationTest {
                     .collect(Collectors.toMap(TopSellerResponse::getProductName,
                             r -> r.getValue().intValue()));
 
-            // Assuming tie-breaking is by revenue (which is how the repository query is sorted)
+            // Assuming tie-breaking is by revenue (which is how the repository query is
+            // sorted)
             assertTrue(orderMap.get("Smartphone") >= orderMap.get("Wireless Headphones"));
             assertTrue(orderMap.get("Wireless Headphones") >= orderMap.get("Programming Book"));
         }
@@ -362,7 +368,10 @@ class ProductAnalyticsServiceIntegrationTest {
                     .sortBy(TopSellerRequest.SortBy.REVENUE)
                     .build();
 
-            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request);
+            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request.getStartDate(),
+                    request.getEndDate(),
+                    request.getLimit(),
+                    request.getSortBy());
             // System.out.println("Results:**-*-*-*-**-* " + results);
 
             assertThat(results).hasSize(2);
@@ -380,7 +389,10 @@ class ProductAnalyticsServiceIntegrationTest {
                     .limit(5)
                     .build();
 
-            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request);
+            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request.getStartDate(),
+                    request.getEndDate(),
+                    request.getLimit(),
+                    request.getSortBy());
 
             // Should have only phone, book, and tablet (from orders 2 and 3)
             assertThat(results).hasSize(3);
@@ -391,12 +403,14 @@ class ProductAnalyticsServiceIntegrationTest {
 
             // Should include tablets from order 3
             boolean hasTablet = results.stream()
-                    .anyMatch(r -> r.getProductName().equals("Tablet") && r.getValue().compareTo(new BigDecimal("600.00")) == 0);
+                    .anyMatch(r -> r.getProductName().equals("Tablet")
+                            && r.getValue().compareTo(new BigDecimal("600.00")) == 0);
             assertThat(hasTablet).isTrue();
 
             // Should include books from order 3
             boolean hasBook = results.stream()
-                    .anyMatch(r -> r.getProductName().equals("Programming Book") && r.getValue().compareTo(new BigDecimal("200.00")) == 0);
+                    .anyMatch(r -> r.getProductName().equals("Programming Book")
+                            && r.getValue().compareTo(new BigDecimal("200.00")) == 0);
             assertThat(hasBook).isTrue();
 
             // Should NOT include laptop (only in order 1)
@@ -420,7 +434,10 @@ class ProductAnalyticsServiceIntegrationTest {
                     .limit(5)
                     .build();
 
-            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request);
+            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request.getStartDate(),
+                    request.getEndDate(),
+                    request.getLimit(),
+                    request.getSortBy());
 
             assertThat(results).isEmpty();
         }
@@ -435,7 +452,10 @@ class ProductAnalyticsServiceIntegrationTest {
                     .sortBy(TopSellerRequest.SortBy.REVENUE)
                     .build();
 
-            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request);
+            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request.getStartDate(),
+                    request.getEndDate(),
+                    request.getLimit(),
+                    request.getSortBy());
 
             // Should return all 4 products with sales in the period
             assertThat(results).hasSize(0);
@@ -451,7 +471,10 @@ class ProductAnalyticsServiceIntegrationTest {
                     .sortBy(TopSellerRequest.SortBy.REVENUE)
                     .build();
 
-            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request);
+            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request.getStartDate(),
+                    request.getEndDate(),
+                    request.getLimit(),
+                    request.getSortBy());
 
             // Should only include products from order1 (May 1st)
             assertThat(results).hasSize(2);
@@ -459,13 +482,13 @@ class ProductAnalyticsServiceIntegrationTest {
             // Smartphone should be included
             boolean hasPhone = results.stream()
                     .anyMatch(r -> r.getProductName().equals("Smartphone")
-                    && r.getValue().compareTo(new BigDecimal("1000.00")) == 0);
+                            && r.getValue().compareTo(new BigDecimal("1000.00")) == 0);
             assertThat(hasPhone).isTrue();
 
             // Laptop should be included
             boolean hasLaptop = results.stream()
                     .anyMatch(r -> r.getProductName().equals("Laptop")
-                    && r.getValue().compareTo(new BigDecimal("1000.00")) == 0);
+                            && r.getValue().compareTo(new BigDecimal("1000.00")) == 0);
             assertThat(hasLaptop).isTrue();
         }
 
@@ -479,7 +502,10 @@ class ProductAnalyticsServiceIntegrationTest {
                     .sortBy(TopSellerRequest.SortBy.REVENUE)
                     .build();
 
-            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request);
+            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request.getStartDate(),
+                    request.getEndDate(),
+                    request.getLimit(),
+                    request.getSortBy());
 
             // Should be empty because the only order on May 4th was failed
             assertThat(results).isEmpty();
@@ -500,7 +526,10 @@ class ProductAnalyticsServiceIntegrationTest {
                     .sortBy(TopSellerRequest.SortBy.REVENUE)
                     .build();
 
-            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request);
+            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request.getStartDate(),
+                    request.getEndDate(),
+                    request.getLimit(),
+                    request.getSortBy());
 
             // Should only include products from April 30th (order6)
             assertThat(results).hasSize(2);
@@ -508,13 +537,13 @@ class ProductAnalyticsServiceIntegrationTest {
             // Book should be included
             boolean hasBook = results.stream()
                     .anyMatch(r -> r.getProductName().equals("Programming Book")
-                    && r.getValue().compareTo(new BigDecimal("300.00")) == 0);
+                            && r.getValue().compareTo(new BigDecimal("300.00")) == 0);
             assertThat(hasBook).isTrue();
 
             // Phone should be included
             boolean hasPhone = results.stream()
                     .anyMatch(r -> r.getProductName().equals("Smartphone")
-                    && r.getValue().compareTo(new BigDecimal("450.00")) == 0);
+                            && r.getValue().compareTo(new BigDecimal("450.00")) == 0);
             assertThat(hasPhone).isTrue();
         }
     }
@@ -533,7 +562,10 @@ class ProductAnalyticsServiceIntegrationTest {
                     .sortBy(TopSellerRequest.SortBy.REVENUE)
                     .build();
 
-            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request);
+            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request.getStartDate(),
+                    request.getEndDate(),
+                    request.getLimit(),
+                    request.getSortBy());
 
             // Should have both products with $500 revenue
             assertThat(results).hasSize(2);
@@ -562,7 +594,10 @@ class ProductAnalyticsServiceIntegrationTest {
                     .sortBy(TopSellerRequest.SortBy.UNITS).limit(10)
                     .build();
 
-            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request);
+            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request.getStartDate(),
+                    request.getEndDate(),
+                    request.getLimit(),
+                    request.getSortBy());
 
             // Find all products with 5 units
             List<TopSellerResponse> productsWithFiveUnits = results.stream()
@@ -605,11 +640,15 @@ class ProductAnalyticsServiceIntegrationTest {
 
             // If service handles swapped dates, this may return empty result
             // or throw an exception
-            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request);
+            List<TopSellerResponse> results = productAnalyticsService.getTopSellers(request.getStartDate(),
+                    request.getEndDate(),
+                    request.getLimit(),
+                    request.getSortBy());
             // Should return empty list if swapped dates are handled
             assertThat(results).isEmpty();
             // If exception is expected, you may need to adjust this test
-            // assertThrows(IllegalArgumentException.class, () -> productAnalyticsService.getTopSellers(request));
+            // assertThrows(IllegalArgumentException.class, () ->
+            // productAnalyticsService.getTopSellers(request));
         }
     }
 }

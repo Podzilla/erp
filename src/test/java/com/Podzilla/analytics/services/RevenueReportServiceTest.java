@@ -17,11 +17,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.Podzilla.analytics.api.dtos.RevenueByCategoryResponse;
-import com.Podzilla.analytics.api.dtos.RevenueSummaryRequest;
-import com.Podzilla.analytics.api.dtos.RevenueSummaryResponse;
-import com.Podzilla.analytics.api.projections.RevenueByCategoryProjection;
-import com.Podzilla.analytics.api.projections.RevenueSummaryProjection;
+import com.Podzilla.analytics.api.dtos.revenue.RevenueByCategoryResponse;
+import com.Podzilla.analytics.api.dtos.revenue.RevenueSummaryRequest;
+import com.Podzilla.analytics.api.dtos.revenue.RevenueSummaryResponse;
+import com.Podzilla.analytics.api.projections.revenue.RevenueByCategoryProjection;
+import com.Podzilla.analytics.api.projections.revenue.RevenueSummaryProjection;
 import com.Podzilla.analytics.repositories.OrderRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,7 +57,8 @@ class RevenueReportServiceTest {
             .thenReturn(projections);
 
         // Act
-        List<RevenueSummaryResponse> result = revenueReportService.getRevenueSummary(request);
+        List<RevenueSummaryResponse> result = revenueReportService.getRevenueSummary(request.getStartDate(),
+                request.getEndDate(), request.getPeriod().name());
 
         // Assert
         assertEquals(2, result.size());
@@ -82,7 +83,8 @@ class RevenueReportServiceTest {
             .thenReturn(Collections.emptyList());
 
         // Act
-        List<RevenueSummaryResponse> result = revenueReportService.getRevenueSummary(request);
+        List<RevenueSummaryResponse> result = revenueReportService.getRevenueSummary(request.getStartDate(),
+                request.getEndDate(), request.getPeriod().name());
 
         // Assert
         assertTrue(result.isEmpty());
@@ -103,7 +105,8 @@ class RevenueReportServiceTest {
             .thenReturn(Collections.emptyList());
 
         // Act
-        List<RevenueSummaryResponse> result = revenueReportService.getRevenueSummary(request);
+        List<RevenueSummaryResponse> result = revenueReportService.getRevenueSummary(request.getStartDate(),
+                request.getEndDate(), request.getPeriod().name());
 
         // Assert
         assertTrue(result.isEmpty());

@@ -8,12 +8,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.Podzilla.analytics.api.dtos.TopSellerRequest;
-import com.Podzilla.analytics.api.dtos.TopSellerRequest.SortBy; // Import SortBy enum
-import com.Podzilla.analytics.api.dtos.TopSellerResponse;
-import com.Podzilla.analytics.api.projections.TopSellingProductProjection;
-import com.Podzilla.analytics.repositories.ProductRepository; // Import ProductRepository
-
+import com.Podzilla.analytics.api.dtos.product.TopSellerRequest.SortBy;
+import com.Podzilla.analytics.api.projections.product.TopSellingProductProjection;
+import com.Podzilla.analytics.api.dtos.product.TopSellerResponse;
+import com.Podzilla.analytics.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -22,30 +20,35 @@ public class ProductAnalyticsService {
 
     private final ProductRepository productRepository;
 
-    private static final int DAYS_TO_INCLUDE_END_DATE = 1; // Magic number replacement
-    private static final int SUBLIST_START_INDEX = 0; // Magic number replacement
+    private static final int DAYS_TO_INCLUDE_END_DATE = 1;
+    private static final int SUBLIST_START_INDEX = 0;
 
     /**
-     * Gets top selling products by revenue or units for a date range.
+     * Retrieves the top-selling products within a specified date range.
      *
-     * @param request The request DTO containing date range, limit, and sort
-     * criteria. // Removed trailing space
-     * @return A list of top seller response dtos.
+     * @param startDate the start date of the range
+     * @param endDate   the end date of the range
+     * @param limit     the maximum number of results to return
+     * @param sortBy    the sorting criteria (units sold or revenue)
+     * @return a list of top-selling products
      */
-    public List<TopSellerResponse> getTopSellers(final TopSellerRequest request) { // Removed space before )
+    public List<TopSellerResponse> getTopSellers(
+            final LocalDate startDate,
+            final LocalDate endDate,
+            final Integer limit,
+            final SortBy sortBy) {
 
-        final LocalDate startDate = request.getStartDate();
-        final LocalDate endDate = request.getEndDate();
-        final Integer limit = request.getLimit();
-        final SortBy sortBy = request.getSortBy();
-        final String sortByString = sortBy != null ? sortBy.name() : SortBy.REVENUE.name();
+        final String sortByString = sortBy != null ? sortBy.name()
+                : SortBy.REVENUE.name();
 
         final LocalDateTime startDateTime = startDate.atStartOfDay();
-        final LocalDateTime endDateTime = endDate.plusDays(DAYS_TO_INCLUDE_END_DATE).atStartOfDay(); // Used constant
+        final LocalDateTime endDateTime = endDate
+                .plusDays(DAYS_TO_INCLUDE_END_DATE).atStartOfDay();
 
-        final List<TopSellingProductProjection> queryResults =
-                productRepository.findTopSellers(startDateTime, endDateTime, // Added space after comma
-                        limit, sortByString); // Added space after comma, removed space before )
+        final List<TopSellingProductProjection> queryResults = productRepository
+                .findTopSellers(startDateTime,
+                        endDateTime,
+                        limit, sortByString);
 
         List<TopSellerResponse> topSellersList = new ArrayList<>();
 

@@ -18,9 +18,9 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.Podzilla.analytics.api.dtos.TopSellerRequest;
-import com.Podzilla.analytics.api.dtos.TopSellerResponse;
-import com.Podzilla.analytics.api.projections.TopSellingProductProjection;
+import com.Podzilla.analytics.api.dtos.product.TopSellerRequest;
+import com.Podzilla.analytics.api.dtos.product.TopSellerResponse;
+import com.Podzilla.analytics.api.projections.product.TopSellingProductProjection;
 import com.Podzilla.analytics.repositories.ProductRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -72,7 +72,7 @@ class ProductAnalyticsServiceTest {
         .thenReturn(projections);
 
         // Act
-        List<TopSellerResponse> result = productAnalyticsService.getTopSellers(request);
+        List<TopSellerResponse> result = productAnalyticsService.getTopSellers(request.getStartDate(), request.getEndDate(), request.getLimit(), request.getSortBy());
 
         // Log the result to help with debugging
         result.forEach(item -> System.out.println("Product ID: " + item.getProductId() + " Revenue: " + item.getValue()));
@@ -122,7 +122,7 @@ class ProductAnalyticsServiceTest {
         .thenReturn(projections);
 
         // Act
-        List<TopSellerResponse> result = productAnalyticsService.getTopSellers(request);
+        List<TopSellerResponse> result = productAnalyticsService.getTopSellers(request.getStartDate(), request.getEndDate(), request.getLimit(), request.getSortBy());
 
         // Assert (Ensure the order is correct as per units)
         assertEquals(2, result.size());
@@ -153,17 +153,12 @@ class ProductAnalyticsServiceTest {
                 .sortBy(TopSellerRequest.SortBy.REVENUE)
                 .build();
 
-        // Convert LocalDate from request to LocalDateTime for repository call
-        LocalDateTime startDate = requestStartDate.atStartOfDay();
-        LocalDateTime endDate = requestEndDate.plusDays(1).atStartOfDay();
-
-
         // Use any() matchers for LocalDateTime parameters
         when(productRepository.findTopSellers(any(LocalDateTime.class), any(LocalDateTime.class), any(), any()))
             .thenReturn(Collections.emptyList());
 
         // Act
-        List<TopSellerResponse> result = productAnalyticsService.getTopSellers(request);
+        List<TopSellerResponse> result = productAnalyticsService.getTopSellers(request.getStartDate(), request.getEndDate(), request.getLimit(), request.getSortBy());
 
         // Assert
         assertTrue(result.isEmpty());
@@ -196,7 +191,7 @@ class ProductAnalyticsServiceTest {
         .thenReturn(Collections.emptyList());
 
         // Act
-        List<TopSellerResponse> result = productAnalyticsService.getTopSellers(request);
+        List<TopSellerResponse> result = productAnalyticsService.getTopSellers(request.getStartDate(), request.getEndDate(), request.getLimit(), request.getSortBy());
 
         // Assert
         assertTrue(result.isEmpty());

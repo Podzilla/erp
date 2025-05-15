@@ -1,4 +1,4 @@
-package com.Podzilla.analytics.api.dtos;
+package com.Podzilla.analytics.api.dtos.revenue;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,10 +15,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @AllArgsConstructor
 @Builder
 public class RevenueSummaryResponse {
-    @Schema(description = "Start date of the period for the revenue summary", example = "2023-01-01")
+    @Schema(description = "Start date of the period for the revenue summary",
+     example = "2023-01-01")
     private LocalDate periodStartDate;
 
-    @Schema(description = "Total revenue for the specified period", example = "12345.67")
+    @Schema(description = "Total revenue for the specified period",
+     example = "12345.67")
     private BigDecimal totalRevenue;
 }
 

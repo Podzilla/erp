@@ -8,13 +8,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.Podzilla.analytics.api.projections.RevenueByCategoryProjection;
-import com.Podzilla.analytics.api.projections.RevenueSummaryProjection;
 import com.Podzilla.analytics.api.projections.fulfillment.FulfillmentTimeProjection;
 import com.Podzilla.analytics.api.projections.order.OrderFailureRateProjection;
 import com.Podzilla.analytics.api.projections.order.OrderFailureReasonsProjection;
 import com.Podzilla.analytics.api.projections.order.OrderRegionProjection;
 import com.Podzilla.analytics.api.projections.order.OrderStatusProjection;
+import com.Podzilla.analytics.api.projections.revenue.RevenueByCategoryProjection;
+import com.Podzilla.analytics.api.projections.revenue.RevenueSummaryProjection;
 import com.Podzilla.analytics.models.Order;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
@@ -24,8 +24,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             + "o.shipped_timestamp)) as averageDuration "
             + "FROM orders o "
             + "WHERE o.order_placed_timestamp BETWEEN :startDate AND :endDate "
-            + "AND o.shipped_timestamp IS NOT NULL",
-            nativeQuery = true)
+            + "AND o.shipped_timestamp IS NOT NULL", nativeQuery = true)
     FulfillmentTimeProjection findPlaceToShipTimeOverall(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
@@ -36,13 +35,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             + "FROM orders o "
             + "WHERE o.order_placed_timestamp BETWEEN :startDate AND :endDate "
             + "AND o.shipped_timestamp IS NOT NULL "
-            + "GROUP BY o.region_id",
-            nativeQuery = true)
+            + "GROUP BY o.region_id", nativeQuery = true)
     List<FulfillmentTimeProjection> findPlaceToShipTimeByRegion(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
-
-    // --- Ship to Deliver Time Projections ---
 
     @Query(value = "SELECT 'OVERALL' as groupByValue, "
             + "AVG(TIMESTAMPDIFF(SECOND, o.shipped_timestamp, "
@@ -50,8 +46,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             + "FROM orders o "
             + "WHERE o.shipped_timestamp BETWEEN :startDate AND :endDate "
             + "AND o.delivered_timestamp IS NOT NULL "
-            + "AND o.status = 'COMPLETED'",
-            nativeQuery = true)
+            + "AND o.status = 'COMPLETED'", nativeQuery = true)
     FulfillmentTimeProjection findShipToDeliverTimeOverall(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
@@ -63,8 +58,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             + "WHERE o.shipped_timestamp BETWEEN :startDate AND :endDate "
             + "AND o.delivered_timestamp IS NOT NULL "
             + "AND o.status = 'COMPLETED' "
-            + "GROUP BY o.region_id",
-            nativeQuery = true)
+            + "GROUP BY o.region_id", nativeQuery = true)
     List<FulfillmentTimeProjection> findShipToDeliverTimeByRegion(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
@@ -76,8 +70,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             + "WHERE o.shipped_timestamp BETWEEN :startDate AND :endDate "
             + "AND o.delivered_timestamp IS NOT NULL "
             + "AND o.status = 'COMPLETED' "
-            + "GROUP BY o.courier_id",
-            nativeQuery = true)
+            + "GROUP BY o.courier_id", nativeQuery = true)
     List<FulfillmentTimeProjection> findShipToDeliverTimeByCourier(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
@@ -87,11 +80,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             + "r.country as country, "
             + "count(o.id) as orderCount, "
             + "avg(o.total_amount) as averageOrderValue "
-            + "FROM orders o " // Corrected FROM keyword case
-            + "INNER JOIN regions r on o.region_id = r.id " // Corrected INNER JOIN keyword case
-            + "WHERE o.final_status_timestamp BETWEEN :startDate AND :endDate " // Corrected WHERE keyword case
-            + "GROUP BY o.region_id, r.city, r.country " // Corrected GROUP BY keyword case
-            + "ORDER BY orderCount desc, averageOrderValue desc", // Corrected ORDER BY keyword case
+            + "FROM orders o "
+            + "INNER JOIN regions r on o.region_id = r.id "
+            + "WHERE o.final_status_timestamp BETWEEN :startDate AND :endDate "
+            + "GROUP BY o.region_id, r.city, r.country "
+            + "ORDER BY orderCount desc, averageOrderValue desc",
             nativeQuery = true)
     List<OrderRegionProjection> findOrdersByRegion(
             @Param("startDate") LocalDateTime startDate,
@@ -99,10 +92,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query(value = "SELECT o.status as status, "
             + "count(o.id) as count "
-            + "FROM orders o " // Corrected FROM keyword case
-            + "WHERE o.final_status_timestamp BETWEEN :startDate AND :endDate " // Corrected WHERE keyword case
-            + "GROUP BY o.status " // Corrected GROUP BY keyword case
-            + "ORDER BY count desc", // Corrected ORDER BY keyword case
+            + "FROM orders o "
+            + "WHERE o.final_status_timestamp BETWEEN :startDate AND :endDate "
+            + "GROUP BY o.status "
+            + "ORDER BY count desc",
             nativeQuery = true)
     List<OrderStatusProjection> findOrderStatusCounts(
             @Param("startDate") LocalDateTime startDate,
@@ -110,35 +103,36 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query(value = "SELECT o.failure_reason as reason, "
             + "count(o.id) as count "
-            + "FROM orders o " // Corrected FROM keyword case
-            + "WHERE o.final_status_timestamp BETWEEN :startDate AND :endDate " // Corrected WHERE keyword case
-            + "AND o.status = 'FAILED' " // Corrected AND keyword case
-            + "GROUP BY o.failure_reason " // Corrected GROUP BY keyword case
-            + "ORDER BY count desc", // Corrected ORDER BY keyword case
+            + "FROM orders o "
+            + "WHERE o.final_status_timestamp BETWEEN :startDate AND :endDate "
+            + "AND o.status = 'FAILED' "
+            + "GROUP BY o.failure_reason "
+            + "ORDER BY count desc",
             nativeQuery = true)
     List<OrderFailureReasonsProjection> findFailureReasons(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Query(value =
-            "SELECT (SUM(CASE WHEN o.status = 'FAILED' THEN 1 ELSE 0 END)" // Corrected SUM and CASE keyword case
-                    + " / (count(*)*1.0) ) as failureRate " // Corrected count keyword case
-                    + "FROM orders o " // Corrected FROM keyword case
-                    + "WHERE o.final_status_timestamp BETWEEN :startDate AND :endDate", // Corrected WHERE keyword case
-            nativeQuery = true)
+    @Query(value = "SELECT(SUM(CASE WHEN o.status = 'FAILED' THEN 1 ELSE 0 END)"
+            + " / (count(*)*1.0) ) as failureRate "
+            + "FROM orders o "
+            + "WHERE o.final_status_timestamp BETWEEN :startDate"
+            + " AND :endDate", nativeQuery = true)
     OrderFailureRateProjection calculateFailureRate(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-            @Query(value = "SELECT "
+    @Query(value = "SELECT "
             + "t.period, "
             + "SUM(t.total_amount) as totalRevenue "
             + "FROM ( "
             + "SELECT "
             + "CASE :reportPeriod "
             + "WHEN 'DAILY' THEN CAST(o.order_placed_timestamp AS DATE) "
-            + "WHEN 'WEEKLY' THEN date_trunc('week', o.order_placed_timestamp)::date "
-            + "WHEN 'MONTHLY' THEN date_trunc('month', o.order_placed_timestamp)::date "
+            + "WHEN 'WEEKLY' THEN"
+            + " date_trunc('week', o.order_placed_timestamp)::date "
+            + "WHEN 'MONTHLY' THEN"
+            + " date_trunc('month', o.order_placed_timestamp)::date "
             + "END as period, "
             + "o.total_amount "
             + "FROM orders o "
@@ -147,29 +141,25 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             + "AND o.status IN ('COMPLETED') "
             + ") t "
             + "GROUP BY t.period "
-            + "ORDER BY t.period",
-        nativeQuery = true)
+            + "ORDER BY t.period", nativeQuery = true)
     List<RevenueSummaryProjection> findRevenueSummaryByPeriod(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
-            @Param("reportPeriod") String reportPeriod
-    );
+            @Param("reportPeriod") String reportPeriod);
 
     @Query(value = "SELECT "
-    + "p.category, "
-    + "SUM(sli.quantity * sli.price_per_unit) as totalRevenue "
-    + "FROM orders o "
-    + "JOIN sales_line_items sli ON o.id = sli.order_id "
-    + "JOIN products p ON sli.product_id = p.id "
-    + "WHERE o.order_placed_timestamp >= :startDate "
-    + "AND o.order_placed_timestamp < :endDate "
-    + "AND o.status IN ('COMPLETED') "
-    + "GROUP BY p.category "
-    + "ORDER BY SUM(sli.quantity * sli.price_per_unit) DESC",
-nativeQuery = true)
-
+            + "p.category, "
+            + "SUM(sli.quantity * sli.price_per_unit) as totalRevenue "
+            + "FROM orders o "
+            + "JOIN sales_line_items sli ON o.id = sli.order_id "
+            + "JOIN products p ON sli.product_id = p.id "
+            + "WHERE o.order_placed_timestamp >= :startDate "
+            + "AND o.order_placed_timestamp < :endDate "
+            + "AND o.status IN ('COMPLETED') "
+            + "GROUP BY p.category "
+            + "ORDER BY SUM(sli.quantity * sli.price_per_unit) DESC",
+            nativeQuery = true)
     List<RevenueByCategoryProjection> findRevenueByCategory(
             @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate
-    );
+            @Param("endDate") LocalDate endDate);
 }

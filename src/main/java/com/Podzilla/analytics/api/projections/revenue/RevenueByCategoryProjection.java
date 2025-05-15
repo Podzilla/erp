@@ -1,4 +1,4 @@
-package com.Podzilla.analytics.api.projections;
+package com.Podzilla.analytics.api.projections.revenue;
 
 
 import java.math.BigDecimal;

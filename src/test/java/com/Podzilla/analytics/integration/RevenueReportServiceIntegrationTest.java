@@ -1,8 +1,8 @@
 package com.Podzilla.analytics.integration;
 
-import com.Podzilla.analytics.api.dtos.RevenueByCategoryResponse;
-import com.Podzilla.analytics.api.dtos.RevenueSummaryRequest;
-import com.Podzilla.analytics.api.dtos.RevenueSummaryResponse;
+import com.Podzilla.analytics.api.dtos.revenue.RevenueByCategoryResponse;
+import com.Podzilla.analytics.api.dtos.revenue.RevenueSummaryRequest;
+import com.Podzilla.analytics.api.dtos.revenue.RevenueSummaryResponse;
 import com.Podzilla.analytics.models.Courier;
 import com.Podzilla.analytics.models.Customer;
 import com.Podzilla.analytics.models.Order;
@@ -145,7 +145,9 @@ public class RevenueReportServiceIntegrationTest {
                 .period(RevenueSummaryRequest.Period.DAILY)
                 .build();
 
-        List<RevenueSummaryResponse> summary = revenueReportService.getRevenueSummary(request);
+        List<RevenueSummaryResponse> summary = revenueReportService.getRevenueSummary(request.getStartDate(),
+                request.getEndDate(),
+                request.getPeriod().name());
 
         assertThat(summary).isNotEmpty();
         assertThat(summary.get(0).getTotalRevenue()).isEqualByComparingTo("100.00");

@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.Podzilla.analytics.api.dtos.TopSellerRequest;
-import com.Podzilla.analytics.api.dtos.TopSellerResponse;
+import com.Podzilla.analytics.api.dtos.product.TopSellerRequest;
+import com.Podzilla.analytics.api.dtos.product.TopSellerResponse;
 import com.Podzilla.analytics.services.ProductAnalyticsService;
 
 import jakarta.validation.Valid;
@@ -25,10 +25,13 @@ public class ProductReportController {
 
     @GetMapping("/top-sellers")
     public ResponseEntity<List<TopSellerResponse>> getTopSellers(
-            @Valid @ModelAttribute final TopSellerRequest requestDTO
-    ) {
+            @Valid @ModelAttribute final TopSellerRequest requestDTO) {
 
-        List<TopSellerResponse> topSellersList = productAnalyticsService.getTopSellers(requestDTO);
+        List<TopSellerResponse> topSellersList = productAnalyticsService
+                .getTopSellers(requestDTO.getStartDate(),
+                        requestDTO.getEndDate(),
+                        requestDTO.getLimit(),
+                        requestDTO.getSortBy());
 
         return ResponseEntity.ok(topSellersList);
     }
