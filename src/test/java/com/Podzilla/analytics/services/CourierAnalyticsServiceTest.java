@@ -4,7 +4,7 @@ import com.Podzilla.analytics.api.dtos.courier.CourierAverageRatingResponse;
 import com.Podzilla.analytics.api.dtos.courier.CourierDeliveryCountResponse;
 import com.Podzilla.analytics.api.dtos.courier.CourierPerformanceReportResponse;
 import com.Podzilla.analytics.api.dtos.courier.CourierSuccessRateResponse;
-import com.Podzilla.analytics.api.projections.CourierPerformanceProjection;
+import com.Podzilla.analytics.api.projections.courier.CourierPerformanceProjection;
 import com.Podzilla.analytics.repositories.CourierRepository;
 
 import org.junit.jupiter.api.BeforeEach;

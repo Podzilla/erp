@@ -165,7 +165,7 @@ public class CourierAnalyticsControllerTest {
         LocalDate startDate = LocalDate.now().minusDays(4);
         LocalDate endDate = LocalDate.now().minusDays(2);
 
-        mockMvc.perform(get("/couriers/delivery-counts")
+        mockMvc.perform(get("/courier-analytics/delivery-counts")
                 .param("startDate", startDate.format(
                         ISO_LOCAL_DATE))
                 .param("endDate", endDate.format(
@@ -183,7 +183,7 @@ public class CourierAnalyticsControllerTest {
         LocalDate startDate = LocalDate.now().plusDays(1);
         LocalDate endDate = LocalDate.now().plusDays(2);
 
-        mockMvc.perform(get("/couriers/delivery-counts")
+        mockMvc.perform(get("/courier-analytics/delivery-counts")
                 .param("startDate", startDate.format(ISO_LOCAL_DATE))
                 .param("endDate", endDate.format(ISO_LOCAL_DATE)))
                 .andDo(MockMvcResultHandlers.print())
@@ -201,7 +201,7 @@ public class CourierAnalyticsControllerTest {
         LocalDateTime startDate = LocalDateTime.now().minusDays(1);
         LocalDateTime endDate = LocalDateTime.now().minusDays(3);
 
-        mockMvc.perform(get("/couriers/delivery-counts")
+        mockMvc.perform(get("/courier-analytics/delivery-counts")
                 .param("startDate", startDate.format(
                         ISO_LOCAL_DATE))
                 .param("endDate", endDate.format(
@@ -216,7 +216,7 @@ public class CourierAnalyticsControllerTest {
         LocalDateTime startDate = LocalDateTime.now().minusDays(4);
         LocalDateTime endDate = LocalDateTime.now().minusDays(2);
 
-        mockMvc.perform(get("/couriers/success-rate")
+        mockMvc.perform(get("/courier-analytics/success-rate")
                 .param("startDate", startDate.format(
                         ISO_LOCAL_DATE))
                 .param("endDate", endDate.format(
@@ -235,7 +235,7 @@ public class CourierAnalyticsControllerTest {
             throws Exception {
         LocalDateTime startDate = LocalDateTime.now().minusDays(4);
         LocalDateTime endDate = LocalDateTime.now();
-        mockMvc.perform(get("/couriers/average-rating")
+        mockMvc.perform(get("/courier-analytics/average-rating")
                 .param("startDate", startDate.format(
                         ISO_LOCAL_DATE))
                 .param("endDate", endDate.format(
@@ -256,7 +256,7 @@ public class CourierAnalyticsControllerTest {
         LocalDateTime startDate = LocalDateTime.now().minusDays(4);
         LocalDateTime endDate = LocalDateTime.now().minusDays(2);
 
-        mockMvc.perform(get("/couriers/average-rating")
+        mockMvc.perform(get("/courier-analytics/average-rating")
                 .param("startDate", startDate.format(ISO_LOCAL_DATE))
                 .param("endDate", endDate.format(ISO_LOCAL_DATE)))
                 .andDo(MockMvcResultHandlers.print())
@@ -273,7 +273,7 @@ public class CourierAnalyticsControllerTest {
             throws Exception {
         LocalDateTime startDate = LocalDateTime.now().minusDays(4);
         LocalDateTime endDate = LocalDateTime.now();
-        mockMvc.perform(get("/couriers/performance-report")
+        mockMvc.perform(get("/courier-analytics/performance-report")
                 .param("startDate", startDate.format(
                         ISO_LOCAL_DATE))
                 .param("endDate", endDate.format(
@@ -300,7 +300,7 @@ public class CourierAnalyticsControllerTest {
         LocalDateTime startDate = LocalDateTime.now().minusDays(4);
         LocalDateTime endDate = LocalDateTime.now().minusDays(2);
 
-        mockMvc.perform(get("/couriers/performance-report")
+        mockMvc.perform(get("/courier-analytics/performance-report")
                 .param("startDate", startDate.format(ISO_LOCAL_DATE))
                 .param("endDate", endDate.format(ISO_LOCAL_DATE)))
                 .andDo(MockMvcResultHandlers.print())
