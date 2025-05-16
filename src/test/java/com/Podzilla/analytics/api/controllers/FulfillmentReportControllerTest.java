@@ -1,11 +1,8 @@
 package com.Podzilla.analytics.api.controllers;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,10 +13,14 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentPlaceToShipRequest.PlaceToShipGroupBy;
 import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentShipToDeliverRequest.ShipToDeliverGroupBy;
@@ -28,11 +29,11 @@ import com.Podzilla.analytics.services.FulfillmentAnalyticsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-@WebMvcTest(FulfillmentReportController.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class FulfillmentReportControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    private TestRestTemplate restTemplate;
 
     @MockBean
     private FulfillmentAnalyticsService mockService;
@@ -81,161 +82,242 @@ public class FulfillmentReportControllerTest {
     }
 
     @Test
-    public void testGetPlaceToShipTime_Overall() throws Exception {
+    public void testGetPlaceToShipTime_Overall() {
         // Configure mock service
         when(mockService.getPlaceToShipTimeResponse(
                 startDate, endDate, PlaceToShipGroupBy.OVERALL))
                 .thenReturn(overallTimeResponses);
 
-        // Execute and verify
-        mockMvc.perform(get("/fulfillment/place-to-ship-time")
-                .param("startDate", startDate.toString())
-                .param("endDate", endDate.toString())
-                .param("groupBy", PlaceToShipGroupBy.OVERALL.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].groupByValue").value("OVERALL"))
-                .andExpect(jsonPath("$[0].averageDuration").value(24.5));
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment/place-to-ship-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .queryParam("groupBy", PlaceToShipGroupBy.OVERALL.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().size()).isEqualTo(1);
+        assertThat(response.getBody().get(0).getGroupByValue()).isEqualTo("OVERALL");
+        assertThat(response.getBody().get(0).getAverageDuration()).isEqualTo(BigDecimal.valueOf(24.5));
     }
 
     @Test
-    public void testGetPlaceToShipTime_ByRegion() throws Exception {
+    public void testGetPlaceToShipTime_ByRegion() {
         // Configure mock service
         when(mockService.getPlaceToShipTimeResponse(
                 startDate, endDate, PlaceToShipGroupBy.REGION))
                 .thenReturn(regionTimeResponses);
 
-        // Execute and verify
-        mockMvc.perform(get("/fulfillment/place-to-ship-time")
-                .param("startDate", startDate.toString())
-                .param("endDate", endDate.toString())
-                .param("groupBy", PlaceToShipGroupBy.REGION.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].groupByValue").value("RegionID_1"))
-                .andExpect(jsonPath("$[1].groupByValue").value("RegionID_2"));
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment/place-to-ship-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .queryParam("groupBy", PlaceToShipGroupBy.REGION.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().size()).isEqualTo(2);
+        assertThat(response.getBody().get(0).getGroupByValue()).isEqualTo("RegionID_1");
+        assertThat(response.getBody().get(1).getGroupByValue()).isEqualTo("RegionID_2");
     }
 
     @Test
-    public void testGetShipToDeliverTime_Overall() throws Exception {
+    public void testGetShipToDeliverTime_Overall() {
         // Configure mock service
         when(mockService.getShipToDeliverTimeResponse(
                 startDate, endDate, ShipToDeliverGroupBy.OVERALL))
                 .thenReturn(overallTimeResponses);
 
-        // Execute and verify
-        mockMvc.perform(get("/fulfillment/ship-to-deliver-time")
-                .param("startDate", startDate.toString())
-                .param("endDate", endDate.toString())
-                .param("groupBy", ShipToDeliverGroupBy.OVERALL.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].groupByValue").value("OVERALL"));
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment/ship-to-deliver-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .queryParam("groupBy", ShipToDeliverGroupBy.OVERALL.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().get(0).getGroupByValue()).isEqualTo("OVERALL");
     }
 
     @Test
-    public void testGetShipToDeliverTime_ByRegion() throws Exception {
+    public void testGetShipToDeliverTime_ByRegion() {
         // Configure mock service
         when(mockService.getShipToDeliverTimeResponse(
                 startDate, endDate, ShipToDeliverGroupBy.REGION))
                 .thenReturn(regionTimeResponses);
 
-        // Execute and verify
-        mockMvc.perform(get("/fulfillment/ship-to-deliver-time")
-                .param("startDate", startDate.toString())
-                .param("endDate", endDate.toString())
-                .param("groupBy", ShipToDeliverGroupBy.REGION.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].groupByValue").value("RegionID_1"))
-                .andExpect(jsonPath("$[1].groupByValue").value("RegionID_2"));
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment/ship-to-deliver-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .queryParam("groupBy", ShipToDeliverGroupBy.REGION.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().get(0).getGroupByValue()).isEqualTo("RegionID_1");
+        assertThat(response.getBody().get(1).getGroupByValue()).isEqualTo("RegionID_2");
     }
 
     @Test
-    public void testGetShipToDeliverTime_ByCourier() throws Exception {
+    public void testGetShipToDeliverTime_ByCourier() {
         // Configure mock service
         when(mockService.getShipToDeliverTimeResponse(
                 startDate, endDate, ShipToDeliverGroupBy.COURIER))
                 .thenReturn(courierTimeResponses);
 
-        // Execute and verify
-        mockMvc.perform(get("/fulfillment/ship-to-deliver-time")
-                .param("startDate", startDate.toString())
-                .param("endDate", endDate.toString())
-                .param("groupBy", ShipToDeliverGroupBy.COURIER.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].groupByValue").value("CourierID_1"))
-                .andExpect(jsonPath("$[1].groupByValue").value("CourierID_2"));
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment/ship-to-deliver-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .queryParam("groupBy", ShipToDeliverGroupBy.COURIER.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().get(0).getGroupByValue()).isEqualTo("CourierID_1");
+        assertThat(response.getBody().get(1).getGroupByValue()).isEqualTo("CourierID_2");
     }
 
     // Edge case tests
 
     @Test
-    public void testGetPlaceToShipTime_EmptyResponse() throws Exception {
+    public void testGetPlaceToShipTime_EmptyResponse() {
         // Configure mock service to return empty list
         when(mockService.getPlaceToShipTimeResponse(
                 startDate, endDate, PlaceToShipGroupBy.OVERALL))
                 .thenReturn(Collections.emptyList());
 
-        // Execute and verify
-        mockMvc.perform(get("/fulfillment/place-to-ship-time")
-                .param("startDate", startDate.toString())
-                .param("endDate", endDate.toString())
-                .param("groupBy", PlaceToShipGroupBy.OVERALL.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$").isEmpty());
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment/place-to-ship-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .queryParam("groupBy", PlaceToShipGroupBy.OVERALL.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody()).isEmpty();
     }
 
     @Test
-    public void testGetShipToDeliverTime_EmptyResponse() throws Exception {
+    public void testGetShipToDeliverTime_EmptyResponse() {
         // Configure mock service to return empty list
         when(mockService.getShipToDeliverTimeResponse(
                 startDate, endDate, ShipToDeliverGroupBy.OVERALL))
                 .thenReturn(Collections.emptyList());
 
-        // Execute and verify
-        mockMvc.perform(get("/fulfillment/ship-to-deliver-time")
-                .param("startDate", startDate.toString())
-                .param("endDate", endDate.toString())
-                .param("groupBy", ShipToDeliverGroupBy.OVERALL.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$").isEmpty());
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment/ship-to-deliver-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .queryParam("groupBy", ShipToDeliverGroupBy.OVERALL.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody()).isEmpty();
     }
 
     @Test
-    public void testGetPlaceToShipTime_InvalidGroupBy() throws Exception {
-        // Execute with missing required parameter - should return bad request
-        mockMvc.perform(get("/fulfillment/place-to-ship-time")
-                .param("startDate", startDate.toString())
-                .param("endDate", endDate.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+    public void testGetPlaceToShipTime_InvalidGroupBy() {
+        // Build URL without groupBy param
+        String url = UriComponentsBuilder.fromPath("/fulfillment/place-to-ship-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                String.class);
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test
-    public void testGetShipToDeliverTime_InvalidGroupBy() throws Exception {
-        // Execute with missing required parameter - should return bad request
-        mockMvc.perform(get("/fulfillment/ship-to-deliver-time")
-                .param("startDate", startDate.toString())
-                .param("endDate", endDate.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+    public void testGetShipToDeliverTime_InvalidGroupBy() {
+        // Build URL without groupBy param
+        String url = UriComponentsBuilder.fromPath("/fulfillment/ship-to-deliver-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                String.class);
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test
-    public void testGetPlaceToShipTime_SameDayRange() throws Exception {
+    public void testGetPlaceToShipTime_SameDayRange() {
         // Test same start and end date
         LocalDate sameDate = LocalDate.of(2024, 1, 1);
 
@@ -244,19 +326,28 @@ public class FulfillmentReportControllerTest {
                 sameDate, sameDate, PlaceToShipGroupBy.OVERALL))
                 .thenReturn(overallTimeResponses);
 
-        // Execute and verify
-        mockMvc.perform(get("/fulfillment/place-to-ship-time")
-                .param("startDate", sameDate.toString())
-                .param("endDate", sameDate.toString())
-                .param("groupBy", PlaceToShipGroupBy.OVERALL.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].groupByValue").value("OVERALL"));
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment/place-to-ship-time")
+                .queryParam("startDate", sameDate.toString())
+                .queryParam("endDate", sameDate.toString())
+                .queryParam("groupBy", PlaceToShipGroupBy.OVERALL.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().get(0).getGroupByValue()).isEqualTo("OVERALL");
     }
 
     @Test
-    public void testGetShipToDeliverTime_SameDayRange() throws Exception {
+    public void testGetShipToDeliverTime_SameDayRange() {
         // Test same start and end date
         LocalDate sameDate = LocalDate.of(2024, 1, 1);
 
@@ -265,19 +356,28 @@ public class FulfillmentReportControllerTest {
                 sameDate, sameDate, ShipToDeliverGroupBy.OVERALL))
                 .thenReturn(overallTimeResponses);
 
-        // Execute and verify
-        mockMvc.perform(get("/fulfillment/ship-to-deliver-time")
-                .param("startDate", sameDate.toString())
-                .param("endDate", sameDate.toString())
-                .param("groupBy", ShipToDeliverGroupBy.OVERALL.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].groupByValue").value("OVERALL"));
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment/ship-to-deliver-time")
+                .queryParam("startDate", sameDate.toString())
+                .queryParam("endDate", sameDate.toString())
+                .queryParam("groupBy", ShipToDeliverGroupBy.OVERALL.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().get(0).getGroupByValue()).isEqualTo("OVERALL");
     }
 
     @Test
-    public void testGetPlaceToShipTime_FutureDates() throws Exception {
+    public void testGetPlaceToShipTime_FutureDates() {
         // Test future dates
         LocalDate futureStart = LocalDate.now().plusDays(1);
         LocalDate futureEnd = LocalDate.now().plusDays(30);
@@ -287,31 +387,48 @@ public class FulfillmentReportControllerTest {
                 futureStart, futureEnd, PlaceToShipGroupBy.OVERALL))
                 .thenReturn(Collections.emptyList());
 
-        // Execute and verify
-        mockMvc.perform(get("/fulfillment/place-to-ship-time")
-                .param("startDate", futureStart.toString())
-                .param("endDate", futureEnd.toString())
-                .param("groupBy", PlaceToShipGroupBy.OVERALL.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$").isEmpty());
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment/place-to-ship-time")
+                .queryParam("startDate", futureStart.toString())
+                .queryParam("endDate", futureEnd.toString())
+                .queryParam("groupBy", PlaceToShipGroupBy.OVERALL.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody()).isEmpty();
     }
 
     @Test
-    public void testGetShipToDeliverTime_ServiceException() throws Exception {
+    public void testGetShipToDeliverTime_ServiceException() {
         // Configure mock service to throw exception
         when(mockService.getShipToDeliverTimeResponse(
                 any(), any(), any()))
                 .thenThrow(new RuntimeException("Service error"));
 
-        // Execute and verify - controller should handle exception with 500 status
-        mockMvc.perform(get("/fulfillment/ship-to-deliver-time")
-                .param("startDate", startDate.toString())
-                .param("endDate", endDate.toString())
-                .param("groupBy", ShipToDeliverGroupBy.OVERALL.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError());
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment/ship-to-deliver-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .queryParam("groupBy", ShipToDeliverGroupBy.OVERALL.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                String.class);
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

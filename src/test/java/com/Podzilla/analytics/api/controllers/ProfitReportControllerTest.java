@@ -1,11 +1,8 @@
 package com.Podzilla.analytics.api.controllers;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,21 +13,25 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.Podzilla.analytics.api.dtos.profit.ProfitByCategory;
 import com.Podzilla.analytics.services.ProfitAnalyticsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-@WebMvcTest(ProfitReportController.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ProfitReportControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    private TestRestTemplate restTemplate;
 
     @MockBean
     private ProfitAnalyticsService mockService;
@@ -67,86 +68,140 @@ public class ProfitReportControllerTest {
     }
 
     @Test
-    public void testGetProfitByCategory_Success() throws Exception {
+    public void testGetProfitByCategory_Success() {
         // Configure mock service
         when(mockService.getProfitByCategory(startDate, endDate))
                 .thenReturn(profitData);
 
-        // Execute and verify
-        mockMvc.perform(get("/profit/by-category")
-                .param("startDate", startDate.toString())
-                .param("endDate", endDate.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].category").value("Electronics"))
-                .andExpect(jsonPath("$[0].totalRevenue").value(10000.50))
-                .andExpect(jsonPath("$[0].grossProfit").value(2500.25))
-                .andExpect(jsonPath("$[1].category").value("Clothing"))
-                .andExpect(jsonPath("$[1].grossProfitMargin").value(45.45));
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/profit/by-category")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<List<ProfitByCategory>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<ProfitByCategory>>() {});
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().size()).isEqualTo(2);
+        assertThat(response.getBody().get(0).getCategory()).isEqualTo("Electronics");
+        assertThat(response.getBody().get(0).getTotalRevenue()).isEqualTo(BigDecimal.valueOf(10000.50));
+        assertThat(response.getBody().get(0).getGrossProfit()).isEqualTo(BigDecimal.valueOf(2500.25));
+        assertThat(response.getBody().get(1).getCategory()).isEqualTo("Clothing");
+        assertThat(response.getBody().get(1).getGrossProfitMargin()).isEqualTo(BigDecimal.valueOf(45.45));
     }
 
     @Test
-    public void testGetProfitByCategory_EmptyResult() throws Exception {
+    public void testGetProfitByCategory_EmptyResult() {
         // Configure mock service to return empty list
         when(mockService.getProfitByCategory(startDate, endDate))
                 .thenReturn(Collections.emptyList());
 
-        // Execute and verify
-        mockMvc.perform(get("/profit/by-category")
-                .param("startDate", startDate.toString())
-                .param("endDate", endDate.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$").isEmpty());
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/profit/by-category")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<List<ProfitByCategory>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<ProfitByCategory>>() {});
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody()).isEmpty();
     }
 
     @Test
-    public void testGetProfitByCategory_MissingStartDate() throws Exception {
-        // Execute with missing required parameter - should return bad request
-        mockMvc.perform(get("/profit/by-category")
-                .param("endDate", endDate.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+    public void testGetProfitByCategory_MissingStartDate() {
+        // Build URL with missing required parameter
+        String url = UriComponentsBuilder.fromPath("/profit/by-category")
+                .queryParam("endDate", endDate.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                String.class);
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test
-    public void testGetProfitByCategory_MissingEndDate() throws Exception {
-        // Execute with missing required parameter - should return bad request
-        mockMvc.perform(get("/profit/by-category")
-                .param("startDate", startDate.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+    public void testGetProfitByCategory_MissingEndDate() {
+        // Build URL with missing required parameter
+        String url = UriComponentsBuilder.fromPath("/profit/by-category")
+                .queryParam("startDate", startDate.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                String.class);
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test
-    public void testGetProfitByCategory_InvalidDateFormat() throws Exception {
-        // Execute with invalid date format - should return bad request
-        mockMvc.perform(get("/profit/by-category")
-                .param("startDate", "2024-01-01")
-                .param("endDate", "invalid-date")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+    public void testGetProfitByCategory_InvalidDateFormat() {
+        // Build URL with invalid date format
+        String url = UriComponentsBuilder.fromPath("/profit/by-category")
+                .queryParam("startDate", "2024-01-01")
+                .queryParam("endDate", "invalid-date")
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                String.class);
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test
-    public void testGetProfitByCategory_StartDateAfterEndDate() throws Exception {
+    public void testGetProfitByCategory_StartDateAfterEndDate() {
         // Set up dates where start is after end
         LocalDate invalidStart = LocalDate.of(2024, 2, 1);
         LocalDate invalidEnd = LocalDate.of(2024, 1, 1);
 
-        // Execute with invalid date range - depends on how controller/validation handles this
-        mockMvc.perform(get("/profit/by-category")
-                .param("startDate", invalidStart.toString())
-                .param("endDate", invalidEnd.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+        // Build URL with invalid date range
+        String url = UriComponentsBuilder.fromPath("/profit/by-category")
+                .queryParam("startDate", invalidStart.toString())
+                .queryParam("endDate", invalidEnd.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                String.class);
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test
-    public void testGetProfitByCategory_FutureDateRange() throws Exception {
+    public void testGetProfitByCategory_FutureDateRange() {
         // Set up future dates
         LocalDate futureStart = LocalDate.now().plusDays(1);
         LocalDate futureEnd = LocalDate.now().plusDays(30);
@@ -155,19 +210,27 @@ public class ProfitReportControllerTest {
         when(mockService.getProfitByCategory(futureStart, futureEnd))
                 .thenReturn(Collections.emptyList());
 
-        // Execute and verify
-        mockMvc.perform(get("/profit/by-category")
-                .param("startDate", futureStart.toString())
-                .param("endDate", futureEnd.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$").isEmpty());
+        // Build URL with future date range
+        String url = UriComponentsBuilder.fromPath("/profit/by-category")
+                .queryParam("startDate", futureStart.toString())
+                .queryParam("endDate", futureEnd.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<List<ProfitByCategory>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<ProfitByCategory>>() {});
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody()).isEmpty();
     }
 
     @Test
-    public void testGetProfitByCategory_SameDayRange() throws Exception {
+    public void testGetProfitByCategory_SameDayRange() {
         // Test same start and end date
         LocalDate sameDate = LocalDate.of(2024, 1, 1);
 
@@ -175,27 +238,45 @@ public class ProfitReportControllerTest {
         when(mockService.getProfitByCategory(sameDate, sameDate))
                 .thenReturn(profitData);
 
-        // Execute and verify
-        mockMvc.perform(get("/profit/by-category")
-                .param("startDate", sameDate.toString())
-                .param("endDate", sameDate.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].category").value("Electronics"));
+        // Build URL with same day for start and end
+        String url = UriComponentsBuilder.fromPath("/profit/by-category")
+                .queryParam("startDate", sameDate.toString())
+                .queryParam("endDate", sameDate.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<List<ProfitByCategory>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<ProfitByCategory>>() {});
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().get(0).getCategory()).isEqualTo("Electronics");
     }
 
     @Test
-    public void testGetProfitByCategory_ServiceException() throws Exception {
+    public void testGetProfitByCategory_ServiceException() {
         // Configure mock service to throw exception
         when(mockService.getProfitByCategory(any(), any()))
                 .thenThrow(new RuntimeException("Service error"));
 
-        // Execute and verify - controller should handle exception with 500 status
-        mockMvc.perform(get("/profit/by-category")
-                .param("startDate", startDate.toString())
-                .param("endDate", endDate.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError());
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/profit/by-category")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .toUriString();
+
+        // Execute request
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                String.class);
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 } 
