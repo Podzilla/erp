@@ -53,7 +53,7 @@ public class CourierAnalyticsService {
                         .courierId(data.getCourierId())
                         .courierName(data.getCourierName())
                         .successRate(
-                                MetricCalculator.calculatePercentage(
+                                MetricCalculator.calculateRate(
                                         data.getCompletedCount(),
                                         data.getDeliveryCount()))
                         .build())
@@ -81,7 +81,7 @@ public class CourierAnalyticsService {
                         .courierName(data.getCourierName())
                         .deliveryCount(data.getDeliveryCount())
                         .successRate(
-                                MetricCalculator.calculatePercentage(
+                                MetricCalculator.calculateRate(
                                         data.getCompletedCount(),
                                         data.getDeliveryCount()))
                         .averageRating(data.getAverageRating())
