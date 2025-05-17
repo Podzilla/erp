@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 
 @Component
@@ -131,15 +132,21 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     private List<Region> seedRegions() {
         Region region1 = regionRepository.save(
-                Region.builder().city("Metropolis").state("NY")
+                Region.builder()
+                        .id(UUID.randomUUID())
+                        .city("Metropolis").state("NY")
                         .country("USA").postalCode("10001")
                         .build());
         Region region2 = regionRepository.save(
-                Region.builder().city("Gotham").state("NJ")
+                Region.builder()
+                        .id(UUID.randomUUID())
+                        .city("Gotham").state("NJ")
                         .country("USA").postalCode("07001")
                         .build());
         Region region3 = regionRepository.save(
-                Region.builder().city("Star City").state("CA")
+                Region.builder()
+                        .id(UUID.randomUUID())
+                        .city("Star City").state("CA")
                         .country("USA").postalCode("90210")
                         .build());
         return Arrays.asList(region1, region2, region3);
@@ -147,18 +154,22 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     private List<Product> seedProducts() {
         Product prod1 = productRepository.save(Product.builder()
+                .id(UUID.randomUUID())
                 .name("Podzilla Pro").category("Electronics")
                 .cost(PRICE_PROD1)
                 .lowStockThreshold(LOW_STOCK_PROD1).build());
         Product prod2 = productRepository.save(Product.builder()
+                .id(UUID.randomUUID())
                 .name("Podzilla Mini").category("Electronics")
                 .cost(PRICE_PROD2)
                 .lowStockThreshold(LOW_STOCK_PROD2).build());
         Product prod3 = productRepository.save(Product.builder()
+                .id(UUID.randomUUID())
                 .name("Charging Case").category("Accessories")
                 .cost(PRICE_PROD3)
                 .lowStockThreshold(LOW_STOCK_PROD3).build());
         Product prod4 = productRepository.save(Product.builder()
+                .id(UUID.randomUUID())
                 .name("Podzilla Cover").category("Accessories")
                 .cost(PRICE_PROD4)
                 .lowStockThreshold(LOW_STOCK_PROD4).build());
@@ -167,24 +178,36 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     private List<Courier> seedCouriers() {
         Courier courier1 = courierRepository.save(
-                Courier.builder().name("Speedy Delivery Inc.")
+                Courier.builder()
+                        .id(UUID.randomUUID())
+                        .name("Speedy Delivery Inc.")
                         .status(Courier.CourierStatus.ACTIVE).build());
         Courier courier2 = courierRepository.save(
-                Courier.builder().name("Reliable Couriers Co.")
+                Courier.builder()
+                        .id(UUID.randomUUID())
+                        .name("Reliable Couriers Co.")
                         .status(Courier.CourierStatus.ACTIVE).build());
         Courier courier3 = courierRepository.save(
-                Courier.builder().name("Overnight Express")
+                Courier.builder()
+                        .id(UUID.randomUUID())
+                        .name("Overnight Express")
                         .status(Courier.CourierStatus.INACTIVE).build());
         return Arrays.asList(courier1, courier2, courier3);
     }
 
     private List<Customer> seedCustomers() {
         Customer cust1 = customerRepository.save(
-                Customer.builder().name("Alice Smith").build());
+                Customer.builder()
+                        .id(UUID.randomUUID())
+                        .name("Alice Smith").build());
         Customer cust2 = customerRepository.save(
-                Customer.builder().name("Bob Johnson").build());
+                Customer.builder()
+                        .id(UUID.randomUUID())
+                        .name("Bob Johnson").build());
         Customer cust3 = customerRepository.save(
-                Customer.builder().name("Charlie Brown").build());
+                Customer.builder()
+                        .id(UUID.randomUUID())
+                        .name("Charlie Brown").build());
         return Arrays.asList(cust1, cust2, cust3);
     }
 
@@ -199,6 +222,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         LocalDateTime placed1 = today.minusDays(ORDER_1_DAYS_PRIOR)
                 .atTime(ORDER_1_HOUR, ORDER_1_MINUTE);
         Order order1 = Order.builder()
+                .id(UUID.randomUUID())
                 .customer(customers.get(0)).courier(couriers.get(0))
                 .region(regions.get(0))
                 .status(Order.OrderStatus.COMPLETED)
@@ -213,9 +237,11 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .courierRating(RATING_GOOD)
                 .build();
         SalesLineItem itemFirstOrderFirst = SalesLineItem.builder()
+                .id(UUID.randomUUID())
                 .order(order1).product(products.get(0)).quantity(1)
                 .pricePerUnit(PRICE_PROD1).build();
         SalesLineItem itemFirstOrderSecond = SalesLineItem.builder()
+                .id(UUID.randomUUID())
                 .order(order1).product(products.get(2)).quantity(2)
                 .pricePerUnit(PRICE_PROD3).build();
         order1.setSalesLineItems(Arrays.asList(itemFirstOrderFirst,
@@ -234,6 +260,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         LocalDateTime placed2 = today.minusDays(ORDER_2_DAYS_PRIOR)
                 .atTime(ORDER_2_HOUR, ORDER_2_MINUTE);
         Order order2 = Order.builder()
+                .id(UUID.randomUUID())
                 .customer(customers.get(1)).courier(couriers.get(1))
                 .region(regions.get(1))
                 .status(Order.OrderStatus.SHIPPED)
@@ -245,6 +272,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .courierRating(null).failureReason(null)
                 .build();
         SalesLineItem itemSecondOrderFirst = SalesLineItem.builder()
+                .id(UUID.randomUUID())
                 .order(order2).product(products.get(1)).quantity(1)
                 .pricePerUnit(PRICE_PROD2).build();
         order2.setSalesLineItems(List.of(itemSecondOrderFirst));
@@ -259,6 +287,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         LocalDateTime placed3 = today.minusDays(ORDER_3_DAYS_PRIOR)
                 .atTime(ORDER_3_HOUR, ORDER_3_MINUTE);
         Order order3 = Order.builder()
+                .id(UUID.randomUUID())
                 .customer(customers.get(0)).courier(couriers.get(0))
                 .region(regions.get(2))
                 .status(Order.OrderStatus.FAILED)
@@ -272,6 +301,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .courierRating(RATING_POOR)
                 .build();
         SalesLineItem itemThirdOrderFirst = SalesLineItem.builder()
+                .id(UUID.randomUUID())
                 .order(order3).product(products.get(INDEX_THREE)).quantity(1)
                 .pricePerUnit(PRICE_PROD4).build();
         order3.setSalesLineItems(List.of(itemThirdOrderFirst));
@@ -285,6 +315,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         LocalDateTime placed4 = today.minusDays(ORDER_4_DAYS_PRIOR)
                 .atTime(ORDER_4_HOUR, ORDER_4_MINUTE);
         Order order4 = Order.builder()
+                .id(UUID.randomUUID())
                 .customer(customers.get(2)).courier(couriers.get(1))
                 .region(regions.get(0))
                 .status(Order.OrderStatus.COMPLETED)
@@ -297,9 +328,11 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .courierRating(RATING_EXCELLENT)
                 .build();
         SalesLineItem itemFourthOrderFirst = SalesLineItem.builder()
+                .id(UUID.randomUUID())
                 .order(order4).product(products.get(0)).quantity(1)
                 .pricePerUnit(PRICE_PROD1).build();
         SalesLineItem itemFourthOrderSecond = SalesLineItem.builder()
+                .id(UUID.randomUUID())
                 .order(order4).product(products.get(INDEX_THREE)).quantity(1)
                 .pricePerUnit(PRICE_PROD4).build();
         order4.setSalesLineItems(Arrays.asList(itemFourthOrderFirst,
@@ -331,6 +364,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             final Product product, final int range, final int quantity) {
         inventorySnapshotRepository.save(
                 InventorySnapshot.builder()
+                        .id(UUID.randomUUID())
                         .product(product)
                         .quantity(random.nextInt(range)
                                 + product.getLowStockThreshold())
@@ -339,6 +373,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                         .build());
         inventorySnapshotRepository.save(
                 InventorySnapshot.builder()
+                        .id(UUID.randomUUID())
                         .product(product)
                         .quantity(random.nextInt(quantity)
                                 + product.getLowStockThreshold())

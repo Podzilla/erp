@@ -20,8 +20,8 @@ import com.Podzilla.analytics.models.Order;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query(value = "SELECT 'OVERALL' as groupByValue, "
-            + "AVG(TIMESTAMPDIFF(SECOND, o.order_placed_timestamp, "
-            + "o.shipped_timestamp)) as averageDuration "
+             + "AVG(EXTRACT(EPOCH FROM (o.shipped_timestamp - "
+            + "o.order_placed_timestamp)) / 86400) as averageDuration "
             + "FROM orders o "
             + "WHERE o.order_placed_timestamp BETWEEN :startDate AND :endDate "
             + "AND o.shipped_timestamp IS NOT NULL", nativeQuery = true)
@@ -30,8 +30,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("endDate") LocalDateTime endDate);
 
     @Query(value = "SELECT CONCAT('RegionID_', o.region_id) as groupByValue, "
-            + "AVG(TIMESTAMPDIFF(SECOND, o.order_placed_timestamp, "
-            + "o.shipped_timestamp)) as averageDuration "
+            + "AVG(EXTRACT(EPOCH FROM (o.shipped_timestamp - "
+            + "o.order_placed_timestamp)) / 86400) as averageDuration "
             + "FROM orders o "
             + "WHERE o.order_placed_timestamp BETWEEN :startDate AND :endDate "
             + "AND o.shipped_timestamp IS NOT NULL "
@@ -41,8 +41,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("endDate") LocalDateTime endDate);
 
     @Query(value = "SELECT 'OVERALL' as groupByValue, "
-            + "AVG(TIMESTAMPDIFF(SECOND, o.shipped_timestamp, "
-            + "o.delivered_timestamp)) as averageDuration "
+            + "AVG(EXTRACT(EPOCH FROM (o.delivered_timestamp "
+            + "- o.shipped_timestamp)) / 86400) as averageDuration "
             + "FROM orders o "
             + "WHERE o.shipped_timestamp BETWEEN :startDate AND :endDate "
             + "AND o.delivered_timestamp IS NOT NULL "
@@ -52,8 +52,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("endDate") LocalDateTime endDate);
 
     @Query(value = "SELECT CONCAT('RegionID_', o.region_id) as groupByValue, "
-            + "AVG(TIMESTAMPDIFF(SECOND, o.shipped_timestamp, "
-            + "o.delivered_timestamp)) as averageDuration "
+            + "AVG(EXTRACT(EPOCH FROM (o.delivered_timestamp - "
+            + "o.shipped_timestamp)) / 86400) as averageDuration "
             + "FROM orders o "
             + "WHERE o.shipped_timestamp BETWEEN :startDate AND :endDate "
             + "AND o.delivered_timestamp IS NOT NULL "
@@ -64,8 +64,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("endDate") LocalDateTime endDate);
 
     @Query(value = "SELECT CONCAT('CourierID_', o.courier_id) as groupByValue, "
-            + "AVG(TIMESTAMPDIFF(SECOND, o.shipped_timestamp, "
-            + "o.delivered_timestamp)) as averageDuration "
+            + "AVG(EXTRACT(EPOCH FROM (o.delivered_timestamp - "
+            + "o.shipped_timestamp)) / 86400) as averageDuration "
             + "FROM orders o "
             + "WHERE o.shipped_timestamp BETWEEN :startDate AND :endDate "
             + "AND o.delivered_timestamp IS NOT NULL "

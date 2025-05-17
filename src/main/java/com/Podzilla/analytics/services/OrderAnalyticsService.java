@@ -33,12 +33,8 @@ public class OrderAnalyticsService {
             DatetimeFormatter.convertStartDateToDatetime(startDate);
         LocalDateTime endDateTime =
             DatetimeFormatter.convertEndDateToDatetime(endDate);
-            System.out.println("Start date a1a1: " + startDate);
-            System.out.println("End date b1b1: " + endDate);
         List<OrderRegionProjection> ordersByRegion =
             orderRepository.findOrdersByRegion(startDateTime, endDateTime);
-            System.out.println("Start date a2a2: " + startDate);
-            System.out.println("End date b2b2: " + endDate);
         return ordersByRegion.stream()
             .map(data -> OrderRegionResponse.builder()
                     .regionId(data.getRegionId())

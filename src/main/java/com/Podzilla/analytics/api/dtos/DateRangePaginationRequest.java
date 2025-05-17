@@ -1,8 +1,10 @@
 package com.Podzilla.analytics.api.dtos;
 
-import java.time.LocalDateTime;
-import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalDate;
+
 import com.Podzilla.analytics.validation.annotations.ValidDateRange;
+import com.Podzilla.analytics.validation.annotations.ValidPagination;
+
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -10,21 +12,21 @@ import lombok.Getter;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @ValidDateRange
+@ValidPagination
 @Getter
 @AllArgsConstructor
-public class DateRangePaginationRequest {
+public class DateRangePaginationRequest
+        implements IDateRangeRequest, IPaginationRequest {
 
     @NotNull(message = "startDate is required")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    @Schema(description = "Start date and time of the range "
-            + "(inclusive)", example = "2024-01-01T00:00:00", required = true)
-    private LocalDateTime startDate;
+    @Schema(description = "Start date of the range "
+            + "(inclusive)", example = "2024-01-01", required = true)
+    private LocalDate startDate;
 
     @NotNull(message = "endDate is required")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    @Schema(description = "End date and time of the range "
-            + "(inclusive)", example = "2024-01-31T23:59:59", required = true)
-    private LocalDateTime endDate;
+    @Schema(description = "End date of the range "
+            + "(inclusive)", example = "2024-01-31", required = true)
+    private LocalDate endDate;
 
     @Min(value = 0, message = "Page "
             + "number must be greater than or equal to 0")

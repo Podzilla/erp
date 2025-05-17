@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class CourierSuccessRateResponse {
 
     @Schema(description = "ID of the courier", example = "103")
-    private Long courierId;
+    private UUID courierId;
 
     @Schema(description = "Full name of the courier", example = "Fatima Ahmed")
     private String courierName;

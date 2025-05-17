@@ -24,13 +24,15 @@ public class CourierAnalyticsService {
 
     private List<CourierPerformanceProjection> getCourierPerformanceData(
             final LocalDate startDate,
-            final LocalDate endDate) {
+            final LocalDate endDate
+) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
 
         return courierRepository.findCourierPerformanceBetweenDates(
                 startDateTime,
-                endDateTime);
+                endDateTime
+        );
     }
 
     public List<CourierDeliveryCountResponse> getCourierDeliveryCounts(

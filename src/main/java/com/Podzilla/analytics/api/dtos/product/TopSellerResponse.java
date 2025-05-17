@@ -8,14 +8,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-
+import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 // @Builder
 public class TopSellerResponse {
-    @Schema(description = "Product ID", example = "101")
-    private Long productId;
+    @Schema(
+        description = "Product ID",
+        example = "550e8400-e29b-41d4-a716-446655440000"
+    )
+    private UUID productId;
     @Schema(description = "Product name", example = "Wireless Mouse")
     private String productName;
     @Schema(description = "Product category", example = "Electronics")
@@ -27,12 +30,12 @@ public class TopSellerResponse {
         return new Builder();
     }
     public static class Builder {
-        private Long productId;
+        private UUID productId;
         private String productName;
         private String category;
         private BigDecimal value;
 
-        public Builder productId(final Long productId) {
+        public Builder productId(final UUID productId) {
             this.productId = productId;
             return this;
         }

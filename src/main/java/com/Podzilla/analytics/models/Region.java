@@ -1,14 +1,13 @@
 package com.Podzilla.analytics.models;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 // import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.UUID;
 
 @Entity
 @Table(name = "regions")
@@ -18,8 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Region {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
     private String city;
     private String state;
     private String country;
@@ -30,7 +28,7 @@ public class Region {
     }
 
     public static class Builder {
-        private Long id;
+        private UUID id;
         private String city;
         private String state;
         private String country;
@@ -38,7 +36,7 @@ public class Region {
 
         public Builder() { }
 
-        public Builder id(final Long id) {
+        public Builder id(final UUID id) {
             this.id = id;
             return this;
         }

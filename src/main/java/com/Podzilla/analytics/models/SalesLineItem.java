@@ -2,8 +2,6 @@ package com.Podzilla.analytics.models;
 
 import java.math.BigDecimal;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -12,6 +10,7 @@ import lombok.AllArgsConstructor;
 // import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.UUID;
 
 @Entity
 @Table(name = "sales_line_items")
@@ -21,8 +20,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SalesLineItem {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     private int quantity;
     private BigDecimal pricePerUnit;
@@ -40,7 +38,7 @@ public class SalesLineItem {
     }
 
     public static class Builder {
-        private Long id;
+        private UUID id;
         private int quantity;
         private BigDecimal pricePerUnit;
         private Product product;
@@ -48,7 +46,7 @@ public class SalesLineItem {
 
         public Builder() { }
 
-        public Builder id(final Long id) {
+        public Builder id(final UUID id) {
             this.id = id;
             return this;
         }

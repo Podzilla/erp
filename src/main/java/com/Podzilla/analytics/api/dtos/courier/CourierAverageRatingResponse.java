@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 // import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.UUID;
 
 @Data
 // @Builder
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class CourierAverageRatingResponse {
 
     @Schema(description = "ID of the courier", example = "101")
-    private Long courierId;
+    private UUID courierId;
 
     @Schema(description = "Full name of the courier", example = "John Doe")
     private String courierName;
@@ -26,13 +27,13 @@ public class CourierAverageRatingResponse {
         return new Builder();
     }
     public static class Builder {
-        private Long courierId;
+        private UUID courierId;
         private String courierName;
         private BigDecimal averageRating;
 
         public Builder() { }
 
-        public Builder courierId(final Long courierId) {
+        public Builder courierId(final UUID courierId) {
             this.courierId = courierId;
             return this;
         }

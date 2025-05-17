@@ -1,8 +1,8 @@
 package com.Podzilla.analytics.api.projections.inventory;
 
-
+import java.util.UUID;
 public interface LowStockProductProjection {
-    Long getProductId();
+    UUID getProductId();
 
     String getProductName();
 

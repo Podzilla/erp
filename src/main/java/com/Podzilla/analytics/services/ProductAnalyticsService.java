@@ -36,7 +36,8 @@ public class ProductAnalyticsService {
             final LocalDate startDate,
             final LocalDate endDate,
             final Integer limit,
-            final SortBy sortBy) {
+            final SortBy sortBy
+) {
 
         final String sortByString = sortBy != null ? sortBy.name()
                 : SortBy.REVENUE.name();

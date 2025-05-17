@@ -37,7 +37,10 @@ public class RabbitTesterController {
 
     @GetMapping("/customer-registered-event")
     public void testCustomerRegisteredEvent() {
-        BaseEvent event = new CustomerRegisteredEvent("1", "ahmad");
+        BaseEvent event = new CustomerRegisteredEvent(
+            "27f7f5ca-6729-461e-882a-0c5123889bec",
+            "7amada"
+        );
         listener.handleUserEvents(event);
     }
 

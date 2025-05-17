@@ -39,7 +39,8 @@ public class FulfillmentReportController {
                 .getPlaceToShipTimeResponse(
                         req.getStartDate(),
                         req.getEndDate(),
-                        req.getGroupBy());
+                        req.getGroupBy()
+                );
         return ResponseEntity.ok(reportData);
     }
 

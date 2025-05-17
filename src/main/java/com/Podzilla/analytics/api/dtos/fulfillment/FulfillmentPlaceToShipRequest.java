@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.Podzilla.analytics.api.dtos.IDateRangeRequest;
 import com.Podzilla.analytics.validation.annotations.ValidDateRange;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @ValidDateRange
-public class FulfillmentPlaceToShipRequest {
+public class FulfillmentPlaceToShipRequest implements IDateRangeRequest {
 
     /**
      * Enum for grouping options in place-to-ship analytics.

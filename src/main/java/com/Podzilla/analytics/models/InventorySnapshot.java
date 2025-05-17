@@ -2,8 +2,6 @@ package com.Podzilla.analytics.models;
 
 import java.time.LocalDateTime;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -12,6 +10,7 @@ import lombok.AllArgsConstructor;
 // import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.UUID;
 
 @Entity
 @Table(name = "inventory_snapshots")
@@ -21,8 +20,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class InventorySnapshot {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     private LocalDateTime timestamp;
 
@@ -36,14 +34,14 @@ public class InventorySnapshot {
         return new Builder();
     }
     public static class Builder {
-        private Long id;
+        private UUID id;
         private LocalDateTime timestamp;
         private Product product;
         private int quantity;
 
         public Builder() { }
 
-        public Builder id(final Long id) {
+        public Builder id(final UUID id) {
             this.id = id;
             return this;
         }
