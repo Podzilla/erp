@@ -1,4 +1,4 @@
-package com.Podzilla.analytics.api.controllers;
+package com.Podzilla.analytics.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -89,7 +89,7 @@ public class FulfillmentReportControllerTest {
                 .thenReturn(overallTimeResponses);
 
         // Build URL with query parameters
-        String url = UriComponentsBuilder.fromPath("/fulfillment/place-to-ship-time")
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/place-to-ship-time")
                 .queryParam("startDate", startDate.toString())
                 .queryParam("endDate", endDate.toString())
                 .queryParam("groupBy", PlaceToShipGroupBy.OVERALL.toString())
@@ -118,7 +118,7 @@ public class FulfillmentReportControllerTest {
                 .thenReturn(regionTimeResponses);
 
         // Build URL with query parameters
-        String url = UriComponentsBuilder.fromPath("/fulfillment/place-to-ship-time")
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/place-to-ship-time")
                 .queryParam("startDate", startDate.toString())
                 .queryParam("endDate", endDate.toString())
                 .queryParam("groupBy", PlaceToShipGroupBy.REGION.toString())
@@ -147,7 +147,7 @@ public class FulfillmentReportControllerTest {
                 .thenReturn(overallTimeResponses);
 
         // Build URL with query parameters
-        String url = UriComponentsBuilder.fromPath("/fulfillment/ship-to-deliver-time")
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/ship-to-deliver-time")
                 .queryParam("startDate", startDate.toString())
                 .queryParam("endDate", endDate.toString())
                 .queryParam("groupBy", ShipToDeliverGroupBy.OVERALL.toString())
@@ -174,7 +174,7 @@ public class FulfillmentReportControllerTest {
                 .thenReturn(regionTimeResponses);
 
         // Build URL with query parameters
-        String url = UriComponentsBuilder.fromPath("/fulfillment/ship-to-deliver-time")
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/ship-to-deliver-time")
                 .queryParam("startDate", startDate.toString())
                 .queryParam("endDate", endDate.toString())
                 .queryParam("groupBy", ShipToDeliverGroupBy.REGION.toString())
@@ -202,7 +202,7 @@ public class FulfillmentReportControllerTest {
                 .thenReturn(courierTimeResponses);
 
         // Build URL with query parameters
-        String url = UriComponentsBuilder.fromPath("/fulfillment/ship-to-deliver-time")
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/ship-to-deliver-time")
                 .queryParam("startDate", startDate.toString())
                 .queryParam("endDate", endDate.toString())
                 .queryParam("groupBy", ShipToDeliverGroupBy.COURIER.toString())
@@ -232,7 +232,7 @@ public class FulfillmentReportControllerTest {
                 .thenReturn(Collections.emptyList());
 
         // Build URL with query parameters
-        String url = UriComponentsBuilder.fromPath("/fulfillment/place-to-ship-time")
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/place-to-ship-time")
                 .queryParam("startDate", startDate.toString())
                 .queryParam("endDate", endDate.toString())
                 .queryParam("groupBy", PlaceToShipGroupBy.OVERALL.toString())
@@ -259,7 +259,7 @@ public class FulfillmentReportControllerTest {
                 .thenReturn(Collections.emptyList());
 
         // Build URL with query parameters
-        String url = UriComponentsBuilder.fromPath("/fulfillment/ship-to-deliver-time")
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/ship-to-deliver-time")
                 .queryParam("startDate", startDate.toString())
                 .queryParam("endDate", endDate.toString())
                 .queryParam("groupBy", ShipToDeliverGroupBy.OVERALL.toString())
@@ -281,7 +281,7 @@ public class FulfillmentReportControllerTest {
     @Test
     public void testGetPlaceToShipTime_InvalidGroupBy() {
         // Build URL without groupBy param
-        String url = UriComponentsBuilder.fromPath("/fulfillment/place-to-ship-time")
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/place-to-ship-time")
                 .queryParam("startDate", startDate.toString())
                 .queryParam("endDate", endDate.toString())
                 .toUriString();
@@ -300,7 +300,7 @@ public class FulfillmentReportControllerTest {
     @Test
     public void testGetShipToDeliverTime_InvalidGroupBy() {
         // Build URL without groupBy param
-        String url = UriComponentsBuilder.fromPath("/fulfillment/ship-to-deliver-time")
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/ship-to-deliver-time")
                 .queryParam("startDate", startDate.toString())
                 .queryParam("endDate", endDate.toString())
                 .toUriString();
@@ -327,7 +327,7 @@ public class FulfillmentReportControllerTest {
                 .thenReturn(overallTimeResponses);
 
         // Build URL with query parameters
-        String url = UriComponentsBuilder.fromPath("/fulfillment/place-to-ship-time")
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/place-to-ship-time")
                 .queryParam("startDate", sameDate.toString())
                 .queryParam("endDate", sameDate.toString())
                 .queryParam("groupBy", PlaceToShipGroupBy.OVERALL.toString())
@@ -357,7 +357,7 @@ public class FulfillmentReportControllerTest {
                 .thenReturn(overallTimeResponses);
 
         // Build URL with query parameters
-        String url = UriComponentsBuilder.fromPath("/fulfillment/ship-to-deliver-time")
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/ship-to-deliver-time")
                 .queryParam("startDate", sameDate.toString())
                 .queryParam("endDate", sameDate.toString())
                 .queryParam("groupBy", ShipToDeliverGroupBy.OVERALL.toString())
@@ -388,7 +388,7 @@ public class FulfillmentReportControllerTest {
                 .thenReturn(Collections.emptyList());
 
         // Build URL with query parameters
-        String url = UriComponentsBuilder.fromPath("/fulfillment/place-to-ship-time")
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/place-to-ship-time")
                 .queryParam("startDate", futureStart.toString())
                 .queryParam("endDate", futureEnd.toString())
                 .queryParam("groupBy", PlaceToShipGroupBy.OVERALL.toString())
@@ -415,7 +415,7 @@ public class FulfillmentReportControllerTest {
                 .thenThrow(new RuntimeException("Service error"));
 
         // Build URL with query parameters
-        String url = UriComponentsBuilder.fromPath("/fulfillment/ship-to-deliver-time")
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/ship-to-deliver-time")
                 .queryParam("startDate", startDate.toString())
                 .queryParam("endDate", endDate.toString())
                 .queryParam("groupBy", ShipToDeliverGroupBy.OVERALL.toString())

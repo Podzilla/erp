@@ -1,4 +1,4 @@
-package com.Podzilla.analytics.api.controllers;
+package com.Podzilla.analytics.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -74,7 +74,7 @@ public class ProfitReportControllerTest {
                 .thenReturn(profitData);
 
         // Build URL with query parameters
-        String url = UriComponentsBuilder.fromPath("/profit/by-category")
+        String url = UriComponentsBuilder.fromPath("/profit-analytics/by-category")
                 .queryParam("startDate", startDate.toString())
                 .queryParam("endDate", endDate.toString())
                 .toUriString();
@@ -104,7 +104,7 @@ public class ProfitReportControllerTest {
                 .thenReturn(Collections.emptyList());
 
         // Build URL with query parameters
-        String url = UriComponentsBuilder.fromPath("/profit/by-category")
+        String url = UriComponentsBuilder.fromPath("/profit-analytics/by-category")
                 .queryParam("startDate", startDate.toString())
                 .queryParam("endDate", endDate.toString())
                 .toUriString();
@@ -125,7 +125,7 @@ public class ProfitReportControllerTest {
     @Test
     public void testGetProfitByCategory_MissingStartDate() {
         // Build URL with missing required parameter
-        String url = UriComponentsBuilder.fromPath("/profit/by-category")
+        String url = UriComponentsBuilder.fromPath("/profit-analytics/by-category")
                 .queryParam("endDate", endDate.toString())
                 .toUriString();
 
@@ -143,7 +143,7 @@ public class ProfitReportControllerTest {
     @Test
     public void testGetProfitByCategory_MissingEndDate() {
         // Build URL with missing required parameter
-        String url = UriComponentsBuilder.fromPath("/profit/by-category")
+        String url = UriComponentsBuilder.fromPath("/profit-analytics/by-category")
                 .queryParam("startDate", startDate.toString())
                 .toUriString();
 
@@ -161,7 +161,7 @@ public class ProfitReportControllerTest {
     @Test
     public void testGetProfitByCategory_InvalidDateFormat() {
         // Build URL with invalid date format
-        String url = UriComponentsBuilder.fromPath("/profit/by-category")
+        String url = UriComponentsBuilder.fromPath("/profit-analytics/by-category")
                 .queryParam("startDate", "2024-01-01")
                 .queryParam("endDate", "invalid-date")
                 .toUriString();
@@ -184,7 +184,7 @@ public class ProfitReportControllerTest {
         LocalDate invalidEnd = LocalDate.of(2024, 1, 1);
 
         // Build URL with invalid date range
-        String url = UriComponentsBuilder.fromPath("/profit/by-category")
+        String url = UriComponentsBuilder.fromPath("/profit-analytics/by-category")
                 .queryParam("startDate", invalidStart.toString())
                 .queryParam("endDate", invalidEnd.toString())
                 .toUriString();
@@ -211,7 +211,7 @@ public class ProfitReportControllerTest {
                 .thenReturn(Collections.emptyList());
 
         // Build URL with future date range
-        String url = UriComponentsBuilder.fromPath("/profit/by-category")
+        String url = UriComponentsBuilder.fromPath("/profit-analytics/by-category")
                 .queryParam("startDate", futureStart.toString())
                 .queryParam("endDate", futureEnd.toString())
                 .toUriString();
@@ -239,7 +239,7 @@ public class ProfitReportControllerTest {
                 .thenReturn(profitData);
 
         // Build URL with same day for start and end
-        String url = UriComponentsBuilder.fromPath("/profit/by-category")
+        String url = UriComponentsBuilder.fromPath("/profit-analytics/by-category")
                 .queryParam("startDate", sameDate.toString())
                 .queryParam("endDate", sameDate.toString())
                 .toUriString();
@@ -264,7 +264,7 @@ public class ProfitReportControllerTest {
                 .thenThrow(new RuntimeException("Service error"));
 
         // Build URL with query parameters
-        String url = UriComponentsBuilder.fromPath("/profit/by-category")
+        String url = UriComponentsBuilder.fromPath("/profit-analytics/by-category")
                 .queryParam("startDate", startDate.toString())
                 .queryParam("endDate", endDate.toString())
                 .toUriString();

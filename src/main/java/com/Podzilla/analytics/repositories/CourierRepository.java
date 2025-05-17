@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.Podzilla.analytics.api.projections.CourierPerformanceProjection;
+import com.Podzilla.analytics.api.projections.courier.CourierPerformanceProjection;
 import com.Podzilla.analytics.models.Courier;
 
 public interface CourierRepository extends JpaRepository<Courier, Long> {
@@ -23,7 +23,6 @@ public interface CourierRepository extends JpaRepository<Courier, Long> {
             + "LEFT JOIN orders o "
             + "ON c.id = o.courier_id "
             + "AND o.final_status_timestamp BETWEEN :startDate AND :endDate "
-            + "AND o.status IN ('COMPLETED', 'FAILED') "
             + "GROUP BY c.id, c.name "
             + "ORDER BY courierId", nativeQuery = true)
     List<CourierPerformanceProjection> findCourierPerformanceBetweenDates(
