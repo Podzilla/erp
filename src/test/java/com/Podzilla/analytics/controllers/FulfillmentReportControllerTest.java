@@ -1,10 +1,7 @@
 package com.Podzilla.analytics.controllers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -15,22 +12,33 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import com.Podzilla.analytics.api.controllers.FulfillmentReportController;
-import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentPlaceToShipRequest;
-import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentShipToDeliverRequest;
+import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentPlaceToShipRequest.PlaceToShipGroupBy;
 import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentShipToDeliverRequest.ShipToDeliverGroupBy;
 import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentTimeResponse;
-import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentPlaceToShipRequest.PlaceToShipGroupBy;
 import com.Podzilla.analytics.services.FulfillmentAnalyticsService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class FulfillmentReportControllerTest {
 
-    private FulfillmentReportController controller;
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @MockBean
     private FulfillmentAnalyticsService mockService;
 
+    private ObjectMapper objectMapper;
     private LocalDate startDate;
     private LocalDate endDate;
     private List<FulfillmentTimeResponse> overallTimeResponses;
@@ -39,8 +47,8 @@ public class FulfillmentReportControllerTest {
 
     @BeforeEach
     public void setup() {
-        mockService = mock(FulfillmentAnalyticsService.class);
-        controller = new FulfillmentReportController(mockService);
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
 
         startDate = LocalDate.of(2024, 1, 1);
         endDate = LocalDate.of(2024, 1, 31);
@@ -80,18 +88,26 @@ public class FulfillmentReportControllerTest {
                 startDate, endDate, PlaceToShipGroupBy.OVERALL))
                 .thenReturn(overallTimeResponses);
 
-        // Create request
-        FulfillmentPlaceToShipRequest request = new FulfillmentPlaceToShipRequest(
-                startDate, endDate, PlaceToShipGroupBy.OVERALL);
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/place-to-ship-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .queryParam("groupBy", PlaceToShipGroupBy.OVERALL.toString())
+                .toUriString();
 
-        // Execute the method
-        ResponseEntity<List<FulfillmentTimeResponse>> response = controller.getPlaceToShipTime(request);
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
 
-        // Verify response
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(overallTimeResponses, response.getBody());
-        assertEquals(PlaceToShipGroupBy.OVERALL.toString(), response.getBody().get(0).getGroupByValue().toString());
-        assertEquals(BigDecimal.valueOf(24.5), response.getBody().get(0).getAverageDuration());
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().size()).isEqualTo(1);
+        assertThat(response.getBody().get(0).getGroupByValue()).isEqualTo("OVERALL");
+        assertThat(response.getBody().get(0).getAverageDuration()).isEqualTo(BigDecimal.valueOf(24.5));
     }
 
     @Test
@@ -101,18 +117,26 @@ public class FulfillmentReportControllerTest {
                 startDate, endDate, PlaceToShipGroupBy.REGION))
                 .thenReturn(regionTimeResponses);
 
-        // Create request
-        FulfillmentPlaceToShipRequest request = new FulfillmentPlaceToShipRequest(
-                startDate, endDate, PlaceToShipGroupBy.REGION);
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/place-to-ship-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .queryParam("groupBy", PlaceToShipGroupBy.REGION.toString())
+                .toUriString();
 
-        // Execute the method
-        ResponseEntity<List<FulfillmentTimeResponse>> response = controller.getPlaceToShipTime(request);
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
 
-        // Verify response
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(regionTimeResponses, response.getBody());
-        assertEquals("RegionID_1", response.getBody().get(0).getGroupByValue());
-        assertEquals("RegionID_2", response.getBody().get(1).getGroupByValue());
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().size()).isEqualTo(2);
+        assertThat(response.getBody().get(0).getGroupByValue()).isEqualTo("RegionID_1");
+        assertThat(response.getBody().get(1).getGroupByValue()).isEqualTo("RegionID_2");
     }
 
     @Test
@@ -122,17 +146,24 @@ public class FulfillmentReportControllerTest {
                 startDate, endDate, ShipToDeliverGroupBy.OVERALL))
                 .thenReturn(overallTimeResponses);
 
-        // Create request
-        FulfillmentShipToDeliverRequest request = new FulfillmentShipToDeliverRequest(
-                startDate, endDate, ShipToDeliverGroupBy.OVERALL);
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/ship-to-deliver-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .queryParam("groupBy", ShipToDeliverGroupBy.OVERALL.toString())
+                .toUriString();
 
-        // Execute the method
-        ResponseEntity<List<FulfillmentTimeResponse>> response = controller.getShipToDeliverTime(request);
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
 
-        // Verify response
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(overallTimeResponses, response.getBody());
-        assertEquals(ShipToDeliverGroupBy.OVERALL.toString(), response.getBody().get(0).getGroupByValue().toString());
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().get(0).getGroupByValue()).isEqualTo("OVERALL");
     }
 
     @Test
@@ -142,18 +173,25 @@ public class FulfillmentReportControllerTest {
                 startDate, endDate, ShipToDeliverGroupBy.REGION))
                 .thenReturn(regionTimeResponses);
 
-        // Create request
-        FulfillmentShipToDeliverRequest request = new FulfillmentShipToDeliverRequest(
-                startDate, endDate, ShipToDeliverGroupBy.REGION);
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/ship-to-deliver-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .queryParam("groupBy", ShipToDeliverGroupBy.REGION.toString())
+                .toUriString();
 
-        // Execute the method
-        ResponseEntity<List<FulfillmentTimeResponse>> response = controller.getShipToDeliverTime(request);
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
 
-        // Verify response
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(regionTimeResponses, response.getBody());
-        assertEquals("RegionID_1", response.getBody().get(0).getGroupByValue());
-        assertEquals("RegionID_2", response.getBody().get(1).getGroupByValue());
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().get(0).getGroupByValue()).isEqualTo("RegionID_1");
+        assertThat(response.getBody().get(1).getGroupByValue()).isEqualTo("RegionID_2");
     }
 
     @Test
@@ -163,18 +201,25 @@ public class FulfillmentReportControllerTest {
                 startDate, endDate, ShipToDeliverGroupBy.COURIER))
                 .thenReturn(courierTimeResponses);
 
-        // Create request
-        FulfillmentShipToDeliverRequest request = new FulfillmentShipToDeliverRequest(
-                startDate, endDate, ShipToDeliverGroupBy.COURIER);
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/ship-to-deliver-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .queryParam("groupBy", ShipToDeliverGroupBy.COURIER.toString())
+                .toUriString();
 
-        // Execute the method
-        ResponseEntity<List<FulfillmentTimeResponse>> response = controller.getShipToDeliverTime(request);
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
 
-        // Verify response
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(courierTimeResponses, response.getBody());
-        assertEquals("CourierID_1", response.getBody().get(0).getGroupByValue());
-        assertEquals("CourierID_2", response.getBody().get(1).getGroupByValue());
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().get(0).getGroupByValue()).isEqualTo("CourierID_1");
+        assertThat(response.getBody().get(1).getGroupByValue()).isEqualTo("CourierID_2");
     }
 
     // Edge case tests
@@ -186,17 +231,24 @@ public class FulfillmentReportControllerTest {
                 startDate, endDate, PlaceToShipGroupBy.OVERALL))
                 .thenReturn(Collections.emptyList());
 
-        // Create request
-        FulfillmentPlaceToShipRequest request = new FulfillmentPlaceToShipRequest(
-                startDate, endDate, PlaceToShipGroupBy.OVERALL);
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/place-to-ship-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .queryParam("groupBy", PlaceToShipGroupBy.OVERALL.toString())
+                .toUriString();
 
-        // Execute the method
-        ResponseEntity<List<FulfillmentTimeResponse>> response = controller.getPlaceToShipTime(request);
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
 
-        // Verify response
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().isEmpty());
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody()).isEmpty();
     }
 
     @Test
@@ -206,47 +258,63 @@ public class FulfillmentReportControllerTest {
                 startDate, endDate, ShipToDeliverGroupBy.OVERALL))
                 .thenReturn(Collections.emptyList());
 
-        // Create request
-        FulfillmentShipToDeliverRequest request = new FulfillmentShipToDeliverRequest(
-                startDate, endDate, ShipToDeliverGroupBy.OVERALL);
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/ship-to-deliver-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .queryParam("groupBy", ShipToDeliverGroupBy.OVERALL.toString())
+                .toUriString();
 
-        // Execute the method
-        ResponseEntity<List<FulfillmentTimeResponse>> response = controller.getShipToDeliverTime(request);
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
 
-        // Verify response
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().isEmpty());
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody()).isEmpty();
     }
 
-    // @Test
-    // public void testGetPlaceToShipTime_InvalidGroupBy() {
-    // // Create request with invalid groupBy
-    // FulfillmentPlaceToShipRequest request = new FulfillmentPlaceToShipRequest(
-    // startDate, endDate, null);
+    @Test
+    public void testGetPlaceToShipTime_InvalidGroupBy() {
+        // Build URL without groupBy param
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/place-to-ship-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .toUriString();
 
-    // // Execute the method - should return bad request due to validation error
-    // ResponseEntity<List<FulfillmentTimeResponse>> response =
-    // controller.getPlaceToShipTime(request);
+        // Execute request
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                String.class);
 
-    // // Verify response
-    // assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    // }
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
 
-    // @Test
-    // public void testGetShipToDeliverTime_InvalidGroupBy() {
-    // // Create request with invalid groupBy
-    // FulfillmentShipToDeliverRequest request = new
-    // FulfillmentShipToDeliverRequest(
-    // startDate, endDate, null);
+    @Test
+    public void testGetShipToDeliverTime_InvalidGroupBy() {
+        // Build URL without groupBy param
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/ship-to-deliver-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .toUriString();
 
-    // // Execute the method - should return bad request due to validation error
-    // ResponseEntity<List<FulfillmentTimeResponse>> response =
-    // controller.getShipToDeliverTime(request);
+        // Execute request
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                String.class);
 
-    // // Verify response
-    // assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    // }
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
 
     @Test
     public void testGetPlaceToShipTime_SameDayRange() {
@@ -258,16 +326,24 @@ public class FulfillmentReportControllerTest {
                 sameDate, sameDate, PlaceToShipGroupBy.OVERALL))
                 .thenReturn(overallTimeResponses);
 
-        // Create request with same start and end date
-        FulfillmentPlaceToShipRequest request = new FulfillmentPlaceToShipRequest(
-                sameDate, sameDate, PlaceToShipGroupBy.OVERALL);
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/place-to-ship-time")
+                .queryParam("startDate", sameDate.toString())
+                .queryParam("endDate", sameDate.toString())
+                .queryParam("groupBy", PlaceToShipGroupBy.OVERALL.toString())
+                .toUriString();
 
-        // Execute the method
-        ResponseEntity<List<FulfillmentTimeResponse>> response = controller.getPlaceToShipTime(request);
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
 
-        // Verify response
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(overallTimeResponses, response.getBody());
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().get(0).getGroupByValue()).isEqualTo("OVERALL");
     }
 
     @Test
@@ -280,16 +356,24 @@ public class FulfillmentReportControllerTest {
                 sameDate, sameDate, ShipToDeliverGroupBy.OVERALL))
                 .thenReturn(overallTimeResponses);
 
-        // Create request with same start and end date
-        FulfillmentShipToDeliverRequest request = new FulfillmentShipToDeliverRequest(
-                sameDate, sameDate, ShipToDeliverGroupBy.OVERALL);
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/ship-to-deliver-time")
+                .queryParam("startDate", sameDate.toString())
+                .queryParam("endDate", sameDate.toString())
+                .queryParam("groupBy", ShipToDeliverGroupBy.OVERALL.toString())
+                .toUriString();
 
-        // Execute the method
-        ResponseEntity<List<FulfillmentTimeResponse>> response = controller.getShipToDeliverTime(request);
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
 
-        // Verify response
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(overallTimeResponses, response.getBody());
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().get(0).getGroupByValue()).isEqualTo("OVERALL");
     }
 
     @Test
@@ -303,17 +387,24 @@ public class FulfillmentReportControllerTest {
                 futureStart, futureEnd, PlaceToShipGroupBy.OVERALL))
                 .thenReturn(Collections.emptyList());
 
-        // Create request with future dates
-        FulfillmentPlaceToShipRequest request = new FulfillmentPlaceToShipRequest(
-                futureStart, futureEnd, PlaceToShipGroupBy.OVERALL);
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/place-to-ship-time")
+                .queryParam("startDate", futureStart.toString())
+                .queryParam("endDate", futureEnd.toString())
+                .queryParam("groupBy", PlaceToShipGroupBy.OVERALL.toString())
+                .toUriString();
 
-        // Execute the method
-        ResponseEntity<List<FulfillmentTimeResponse>> response = controller.getPlaceToShipTime(request);
+        // Execute request
+        ResponseEntity<List<FulfillmentTimeResponse>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<FulfillmentTimeResponse>>() {});
 
-        // Verify response
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().isEmpty());
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody()).isEmpty();
     }
 
     @Test
@@ -323,17 +414,21 @@ public class FulfillmentReportControllerTest {
                 any(), any(), any()))
                 .thenThrow(new RuntimeException("Service error"));
 
-        // Create request
-        FulfillmentShipToDeliverRequest request = new FulfillmentShipToDeliverRequest(
-                startDate, endDate, ShipToDeliverGroupBy.OVERALL);
+        // Build URL with query parameters
+        String url = UriComponentsBuilder.fromPath("/fulfillment-analytics/ship-to-deliver-time")
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
+                .queryParam("groupBy", ShipToDeliverGroupBy.OVERALL.toString())
+                .toUriString();
 
-        // Execute the method - controller should handle exception
-        // Note: Actual behavior depends on how controller handles exceptions
-        // This might need adjustment based on actual implementation
-        try {
-            controller.getShipToDeliverTime(request);
-        } catch (RuntimeException e) {
-            assertEquals("Service error", e.getMessage());
-        }
+        // Execute request
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                String.class);
+
+        // Verify
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
