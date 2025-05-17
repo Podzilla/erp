@@ -8,14 +8,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+// import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "couriers")
 @Data
-@Builder
+// @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Courier {
@@ -31,5 +31,35 @@ public class Courier {
         ACTIVE,
         INACTIVE,
         SUSPENDED
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private Long id;
+        private String name;
+        private CourierStatus status;
+
+        public Builder() { }
+        public Builder id(final Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder name(final String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder status(final CourierStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        public Courier build() {
+            return new Courier(id, name, status);
+        }
     }
 }
