@@ -2,6 +2,7 @@ package com.Podzilla.analytics.models;
 
 import java.time.LocalDateTime;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class InventorySnapshot {
     @Id
+    @GeneratedValue(generator = "uuid")
     private UUID id;
 
     private LocalDateTime timestamp;

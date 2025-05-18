@@ -237,11 +237,9 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .courierRating(RATING_GOOD)
                 .build();
         SalesLineItem itemFirstOrderFirst = SalesLineItem.builder()
-                .id(UUID.randomUUID())
                 .order(order1).product(products.get(0)).quantity(1)
                 .pricePerUnit(PRICE_PROD1).build();
         SalesLineItem itemFirstOrderSecond = SalesLineItem.builder()
-                .id(UUID.randomUUID())
                 .order(order1).product(products.get(2)).quantity(2)
                 .pricePerUnit(PRICE_PROD3).build();
         order1.setSalesLineItems(Arrays.asList(itemFirstOrderFirst,
@@ -272,7 +270,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .courierRating(null).failureReason(null)
                 .build();
         SalesLineItem itemSecondOrderFirst = SalesLineItem.builder()
-                .id(UUID.randomUUID())
                 .order(order2).product(products.get(1)).quantity(1)
                 .pricePerUnit(PRICE_PROD2).build();
         order2.setSalesLineItems(List.of(itemSecondOrderFirst));
@@ -301,7 +298,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .courierRating(RATING_POOR)
                 .build();
         SalesLineItem itemThirdOrderFirst = SalesLineItem.builder()
-                .id(UUID.randomUUID())
                 .order(order3).product(products.get(INDEX_THREE)).quantity(1)
                 .pricePerUnit(PRICE_PROD4).build();
         order3.setSalesLineItems(List.of(itemThirdOrderFirst));
@@ -328,11 +324,9 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .courierRating(RATING_EXCELLENT)
                 .build();
         SalesLineItem itemFourthOrderFirst = SalesLineItem.builder()
-                .id(UUID.randomUUID())
                 .order(order4).product(products.get(0)).quantity(1)
                 .pricePerUnit(PRICE_PROD1).build();
         SalesLineItem itemFourthOrderSecond = SalesLineItem.builder()
-                .id(UUID.randomUUID())
                 .order(order4).product(products.get(INDEX_THREE)).quantity(1)
                 .pricePerUnit(PRICE_PROD4).build();
         order4.setSalesLineItems(Arrays.asList(itemFourthOrderFirst,
@@ -364,7 +358,6 @@ public class DatabaseSeeder implements CommandLineRunner {
             final Product product, final int range, final int quantity) {
         inventorySnapshotRepository.save(
                 InventorySnapshot.builder()
-                        .id(UUID.randomUUID())
                         .product(product)
                         .quantity(random.nextInt(range)
                                 + product.getLowStockThreshold())
@@ -373,7 +366,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                         .build());
         inventorySnapshotRepository.save(
                 InventorySnapshot.builder()
-                        .id(UUID.randomUUID())
                         .product(product)
                         .quantity(random.nextInt(quantity)
                                 + product.getLowStockThreshold())
