@@ -9,9 +9,10 @@ import com.Podzilla.analytics.api.projections.profit.ProfitByCategoryProjection;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public interface SalesLineItemRepository
- extends JpaRepository<SalesLineItem, Long> {
+ extends JpaRepository<SalesLineItem, UUID> {
     @Query("SELECT sli.product.category as category, "
            + "SUM(sli.quantity * sli.pricePerUnit) as totalRevenue, "
            + "SUM(sli.quantity * sli.product.cost) as totalCost "

@@ -12,6 +12,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.UUID;
 
+import jakarta.persistence.GeneratedValue;
+
 @Entity
 @Table(name = "inventory_snapshots")
 @Data
@@ -20,6 +22,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class InventorySnapshot {
     @Id
+    @GeneratedValue(generator = "uuid")
     private UUID id;
 
     private LocalDateTime timestamp;

@@ -11,10 +11,11 @@ import org.springframework.stereotype.Repository;
 import com.Podzilla.analytics.api.projections.inventory.InventoryValueByCategoryProjection;
 import com.Podzilla.analytics.api.projections.inventory.LowStockProductProjection;
 import com.Podzilla.analytics.models.InventorySnapshot;
+import java.util.UUID;
 
 @Repository
 public interface InventorySnapshotRepository
-                extends JpaRepository<InventorySnapshot, Long> {
+                extends JpaRepository<InventorySnapshot, UUID> {
 
         @Query(value = "SELECT p.category as category, "
                         + "SUM(s.quantity * p.cost) as totalStockValue "

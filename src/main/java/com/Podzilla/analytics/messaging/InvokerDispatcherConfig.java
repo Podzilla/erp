@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.Podzilla.analytics.messaging.invokers.user.CourierRegisteredInvoker;
+import com.Podzilla.analytics.messaging.invokers.user.CustomerRegisteredInvoker;
 import com.Podzilla.analytics.messaging.invokers.order.OrderAssignedToCourierInvoker;
 import com.Podzilla.analytics.messaging.invokers.order.OrderDeliveryFailedInvoker;
 import com.Podzilla.analytics.messaging.invokers.order.OrderPlacedInvoker;
@@ -53,12 +54,12 @@ public class InvokerDispatcherConfig {
     ) {
         dispatcher.registerInvoker(
             CourierRegisteredEvent.class,
-            new CourierRegisteredInvoker()
+            invokerFactory.createInvoker(CourierRegisteredInvoker.class)
         );
 
         dispatcher.registerInvoker(
             CustomerRegisteredEvent.class,
-            invokerFactory.createRegisterCustomerInvoker()
+            invokerFactory.createInvoker(CustomerRegisteredInvoker.class)
         );
     }
 
@@ -67,27 +68,27 @@ public class InvokerDispatcherConfig {
     ) {
         dispatcher.registerInvoker(
             OrderAssignedToCourierEvent.class,
-            new OrderAssignedToCourierInvoker()
+            invokerFactory.createInvoker(OrderAssignedToCourierInvoker.class)
         );
         dispatcher.registerInvoker(
             OrderCancelledEvent.class,
-            new OrderCancelledInvoker()
+            invokerFactory.createInvoker(OrderCancelledInvoker.class)
         );
         dispatcher.registerInvoker(
             OrderDeliveredEvent.class,
-            new OrderDeliveredInvoker()
+            invokerFactory.createInvoker(OrderDeliveredInvoker.class)
         );
         dispatcher.registerInvoker(
             OrderDeliveryFailedEvent.class,
-            new OrderDeliveryFailedInvoker()
+            invokerFactory.createInvoker(OrderDeliveryFailedInvoker.class)
         );
         dispatcher.registerInvoker(
             OrderOutForDeliveryEvent.class,
-            new OrderOutForDeliveryInvoker()
+            invokerFactory.createInvoker(OrderOutForDeliveryInvoker.class)
         );
         dispatcher.registerInvoker(
             OrderPlacedEvent.class,
-            new OrderPlacedInvoker()
+            invokerFactory.createInvoker(OrderPlacedInvoker.class)
         );
     }
 
@@ -96,11 +97,11 @@ public class InvokerDispatcherConfig {
     ) {
         dispatcher.registerInvoker(
             InventoryUpdatedEvent.class,
-            new InventoryUpdatedInvoker()
+            invokerFactory.createInvoker(InventoryUpdatedInvoker.class)
         );
         dispatcher.registerInvoker(
             ProductCreatedEvent.class,
-            new ProductCreatedInvoker()
+            invokerFactory.createInvoker(ProductCreatedInvoker.class)
         );
     }
 

@@ -9,8 +9,8 @@ import org.springframework.data.repository.query.Param;
 
 import com.Podzilla.analytics.api.projections.product.TopSellingProductProjection;
 import com.Podzilla.analytics.models.Product;
-
-public interface ProductRepository extends JpaRepository<Product, Long> {
+import java.util.UUID;
+public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     // Query to find top-selling products by revenue or units
     @Query(value = "SELECT "

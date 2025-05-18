@@ -16,8 +16,9 @@ import com.Podzilla.analytics.api.projections.order.OrderStatusProjection;
 import com.Podzilla.analytics.api.projections.revenue.RevenueByCategoryProjection;
 import com.Podzilla.analytics.api.projections.revenue.RevenueSummaryProjection;
 import com.Podzilla.analytics.models.Order;
+import java.util.UUID;
 
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface OrderRepository extends JpaRepository<Order, UUID> {
 
     @Query(value = "SELECT 'OVERALL' as groupByValue, "
              + "AVG(EXTRACT(EPOCH FROM (o.shipped_timestamp - "
