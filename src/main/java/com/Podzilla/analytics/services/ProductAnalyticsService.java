@@ -13,6 +13,9 @@ import com.Podzilla.analytics.api.projections.product.TopSellingProductProjectio
 import com.Podzilla.analytics.api.dtos.product.TopSellerResponse;
 import com.Podzilla.analytics.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import com.Podzilla.analytics.models.Product;
+import com.Podzilla.analytics.util.StringToUUIDParser;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -36,7 +39,8 @@ public class ProductAnalyticsService {
             final LocalDate startDate,
             final LocalDate endDate,
             final Integer limit,
-            final SortBy sortBy) {
+            final SortBy sortBy
+) {
 
         final String sortByString = sortBy != null ? sortBy.name()
                 : SortBy.REVENUE.name();
@@ -71,5 +75,23 @@ public class ProductAnalyticsService {
         }
 
         return topSellersList;
+    }
+
+    public void saveProduct(
+            final String productId,
+            final String productName,
+            final String productCategory,
+            final BigDecimal productCost,
+            final Integer productLowStockThreshold
+    ) {
+        UUID id = StringToUUIDParser.parseStringToUUID(productId);
+        Product product = Product.builder()
+                .id(id)
+                .name(productName)
+                .category(productCategory)
+                .cost(productCost)
+                .lowStockThreshold(productLowStockThreshold)
+                .build();
+        productRepository.save(product);
     }
 }

@@ -1,9 +1,10 @@
 package com.Podzilla.analytics.api.projections.courier;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public interface CourierPerformanceProjection {
-    Long getCourierId();
+    UUID getCourierId();
 
     String getCourierName();
 

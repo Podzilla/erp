@@ -49,12 +49,11 @@ class RevenueReportServiceTest {
                 .build();
 
         List<RevenueSummaryProjection> projections = Arrays.asList(
-            summaryProjection(LocalDate.of(2025, 1, 1), new BigDecimal("1000.00")),
-            summaryProjection(LocalDate.of(2025, 2, 1), new BigDecimal("2000.00"))
-        );
+                summaryProjection(LocalDate.of(2025, 1, 1), new BigDecimal("1000.00")),
+                summaryProjection(LocalDate.of(2025, 2, 1), new BigDecimal("2000.00")));
 
         when(orderRepository.findRevenueSummaryByPeriod(eq(startDate), eq(endDate), eq("MONTHLY")))
-            .thenReturn(projections);
+                .thenReturn(projections);
 
         // Act
         List<RevenueSummaryResponse> result = revenueReportService.getRevenueSummary(request.getStartDate(),
@@ -80,7 +79,7 @@ class RevenueReportServiceTest {
                 .build();
 
         when(orderRepository.findRevenueSummaryByPeriod(any(), any(), any()))
-            .thenReturn(Collections.emptyList());
+                .thenReturn(Collections.emptyList());
 
         // Act
         List<RevenueSummaryResponse> result = revenueReportService.getRevenueSummary(request.getStartDate(),
@@ -102,7 +101,7 @@ class RevenueReportServiceTest {
                 .build();
 
         when(orderRepository.findRevenueSummaryByPeriod(any(), any(), any()))
-            .thenReturn(Collections.emptyList());
+                .thenReturn(Collections.emptyList());
 
         // Act
         List<RevenueSummaryResponse> result = revenueReportService.getRevenueSummary(request.getStartDate(),
@@ -116,13 +115,13 @@ class RevenueReportServiceTest {
     void getRevenueByCategory_WithValidData_ShouldReturnCorrectCategories() {
         // Arrange
         LocalDate startDate = LocalDate.of(2025, 1, 1);
-        LocalDate endDate = LocalDate.of(2025, 12, 31);        List<RevenueByCategoryProjection> projections = Arrays.asList(
-            categoryProjection("Books", new BigDecimal("3000.00")),
-            categoryProjection("Electronics", new BigDecimal("5000.00"))
-        );
+        LocalDate endDate = LocalDate.of(2025, 12, 31);
+        List<RevenueByCategoryProjection> projections = Arrays.asList(
+                categoryProjection("Books", new BigDecimal("3000.00")),
+                categoryProjection("Electronics", new BigDecimal("5000.00")));
 
         when(orderRepository.findRevenueByCategory(eq(startDate), eq(endDate)))
-            .thenReturn(projections);// Act
+                .thenReturn(projections);// Act
         List<RevenueByCategoryResponse> result = revenueReportService.getRevenueByCategory(startDate, endDate);
 
         // Assert
@@ -140,7 +139,7 @@ class RevenueReportServiceTest {
         LocalDate endDate = LocalDate.of(2025, 12, 31);
 
         when(orderRepository.findRevenueByCategory(any(), any()))
-            .thenReturn(Collections.emptyList());
+                .thenReturn(Collections.emptyList());
 
         // Act
         List<RevenueByCategoryResponse> result = revenueReportService.getRevenueByCategory(startDate, endDate);
@@ -156,20 +155,20 @@ class RevenueReportServiceTest {
         LocalDate endDate = LocalDate.of(2025, 12, 31);
 
         List<RevenueByCategoryProjection> projections = Arrays.asList(
-            new RevenueByCategoryProjection() {
-                @Override
-                public String getCategory() {
-                    return "Electronics";
-                }
-                @Override
-                public BigDecimal getTotalRevenue() {
-                    return null;
-                }
-            }
-        );
+                new RevenueByCategoryProjection() {
+                    @Override
+                    public String getCategory() {
+                        return "Electronics";
+                    }
+
+                    @Override
+                    public BigDecimal getTotalRevenue() {
+                        return null;
+                    }
+                });
 
         when(orderRepository.findRevenueByCategory(eq(startDate), eq(endDate)))
-            .thenReturn(projections);
+                .thenReturn(projections);
 
         // Act
         List<RevenueByCategoryResponse> result = revenueReportService.getRevenueByCategory(startDate, endDate);
@@ -187,7 +186,7 @@ class RevenueReportServiceTest {
         LocalDate endDate = LocalDate.of(2025, 1, 1);
 
         when(orderRepository.findRevenueByCategory(any(), any()))
-            .thenReturn(Collections.emptyList());
+                .thenReturn(Collections.emptyList());
 
         // Act
         List<RevenueByCategoryResponse> result = revenueReportService.getRevenueByCategory(startDate, endDate);
@@ -195,17 +194,28 @@ class RevenueReportServiceTest {
         // Assert
         assertTrue(result.isEmpty());
     }
+
     private RevenueSummaryProjection summaryProjection(LocalDate date, BigDecimal revenue) {
-    return new RevenueSummaryProjection() {
-        public LocalDate getPeriod() { return date; }
-        public BigDecimal getTotalRevenue() { return revenue; }
-    };
-}
+        return new RevenueSummaryProjection() {
+            public LocalDate getPeriod() {
+                return date;
+            }
+
+            public BigDecimal getTotalRevenue() {
+                return revenue;
+            }
+        };
+    }
 
     private RevenueByCategoryProjection categoryProjection(String category, BigDecimal revenue) {
         return new RevenueByCategoryProjection() {
-            public String getCategory() { return category; }
-            public BigDecimal getTotalRevenue() { return revenue; }
+            public String getCategory() {
+                return category;
+            }
+
+            public BigDecimal getTotalRevenue() {
+                return revenue;
+            }
         };
     }
 }

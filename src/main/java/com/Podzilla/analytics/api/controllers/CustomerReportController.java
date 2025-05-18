@@ -34,6 +34,7 @@ public class CustomerReportController {
                 request.getStartDate(),
                 request.getEndDate(),
                 request.getPage(),
-                request.getSize());
+                request.getSize()
+        );
     }
 }

@@ -31,7 +31,8 @@ public class InventoryReportController {
                     + "the total value of inventory "
                     + "grouped by product categories")
     @GetMapping("/value/by-category")
-    public List<InventoryValueByCategoryResponse> getInventoryValueByCategor() {
+    public List<InventoryValueByCategoryResponse>
+        getInventoryValueByCategory() {
         return inventoryAnalyticsService.getInventoryValueByCategory();
     }
 

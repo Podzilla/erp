@@ -230,18 +230,19 @@ public class ProfitReportControllerTest {
     }
 
     @Test
-    public void testGetProfitByCategory_SameDayRange() {
-        // Test same start and end date
-        LocalDate sameDate = LocalDate.of(2024, 1, 1);
+    public void testGetProfitByCategory_ConsecutiveDayRange() {
+        // Test consecutive dates (1 day range)
+        LocalDate startDate = LocalDate.of(2024, 1, 1);
+        LocalDate endDate = LocalDate.of(2024, 1, 2);
 
         // Configure mock service
-        when(mockService.getProfitByCategory(sameDate, sameDate))
+        when(mockService.getProfitByCategory(startDate, endDate))
                 .thenReturn(profitData);
 
-        // Build URL with same day for start and end
+        // Build URL with consecutive days for start and end
         String url = UriComponentsBuilder.fromPath("/profit-analytics/by-category")
-                .queryParam("startDate", sameDate.toString())
-                .queryParam("endDate", sameDate.toString())
+                .queryParam("startDate", startDate.toString())
+                .queryParam("endDate", endDate.toString())
                 .toUriString();
 
         // Execute request

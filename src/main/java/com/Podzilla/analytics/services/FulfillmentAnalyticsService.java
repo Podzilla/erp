@@ -4,12 +4,9 @@ import org.springframework.stereotype.Service;
 import com.Podzilla.analytics.repositories.OrderRepository;
 import com.Podzilla.analytics.util.DatetimeFormatter;
 import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentTimeResponse;
-import com.Podzilla.analytics.api.dtos.fulfillment
-.FulfillmentPlaceToShipRequest.PlaceToShipGroupBy;
-import com.Podzilla.analytics.api.dtos.fulfillment
-.FulfillmentShipToDeliverRequest.ShipToDeliverGroupBy;
-import com.Podzilla.analytics.api.projections.fulfillment
-.FulfillmentTimeProjection;
+import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentPlaceToShipRequest.PlaceToShipGroupBy;
+import com.Podzilla.analytics.api.dtos.fulfillment.FulfillmentShipToDeliverRequest.ShipToDeliverGroupBy;
+import com.Podzilla.analytics.api.projections.fulfillment.FulfillmentTimeProjection;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;

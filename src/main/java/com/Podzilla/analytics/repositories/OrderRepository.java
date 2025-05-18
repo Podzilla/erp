@@ -16,149 +16,153 @@ import com.Podzilla.analytics.api.projections.order.OrderStatusProjection;
 import com.Podzilla.analytics.api.projections.revenue.RevenueByCategoryProjection;
 import com.Podzilla.analytics.api.projections.revenue.RevenueSummaryProjection;
 import com.Podzilla.analytics.models.Order;
+import java.util.UUID;
 
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface OrderRepository extends JpaRepository<Order, UUID> {
 
-    @Query(value = "SELECT 'OVERALL' as groupByValue, "
-            + "AVG(TIMESTAMPDIFF(SECOND, o.order_placed_timestamp, "
-            + "o.shipped_timestamp)) as averageDuration "
-            + "FROM orders o "
-            + "WHERE o.order_placed_timestamp BETWEEN :startDate AND :endDate "
-            + "AND o.shipped_timestamp IS NOT NULL", nativeQuery = true)
+    @Query("SELECT 'OVERALL' AS groupByValue, "
+            + "AVG( (EXTRACT(EPOCH FROM o.shippedTimestamp) - "
+            + "EXTRACT(EPOCH FROM o.orderPlacedTimestamp)) / 3600) "
+            + "AS averageDuration "
+            + "FROM Order o "
+            + "WHERE o.orderPlacedTimestamp BETWEEN :startDate AND :endDate "
+            + "AND o.shippedTimestamp IS NOT NULL")
     FulfillmentTimeProjection findPlaceToShipTimeOverall(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Query(value = "SELECT CONCAT('RegionID_', o.region_id) as groupByValue, "
-            + "AVG(TIMESTAMPDIFF(SECOND, o.order_placed_timestamp, "
-            + "o.shipped_timestamp)) as averageDuration "
-            + "FROM orders o "
-            + "WHERE o.order_placed_timestamp BETWEEN :startDate AND :endDate "
-            + "AND o.shipped_timestamp IS NOT NULL "
-            + "GROUP BY o.region_id", nativeQuery = true)
+    @Query("SELECT CONCAT('RegionID_', r.id) AS groupByValue, "
+            + "AVG( (EXTRACT(EPOCH FROM o.shippedTimestamp) - "
+            + "EXTRACT(EPOCH FROM o.orderPlacedTimestamp)) / 3600) "
+            + "AS averageDuration "
+            + "FROM Order o "
+            + "JOIN o.region r "
+            + "WHERE o.orderPlacedTimestamp BETWEEN :startDate AND :endDate "
+            + "AND o.shippedTimestamp IS NOT NULL "
+            + "GROUP BY r.id")
     List<FulfillmentTimeProjection> findPlaceToShipTimeByRegion(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Query(value = "SELECT 'OVERALL' as groupByValue, "
-            + "AVG(TIMESTAMPDIFF(SECOND, o.shipped_timestamp, "
-            + "o.delivered_timestamp)) as averageDuration "
-            + "FROM orders o "
-            + "WHERE o.shipped_timestamp BETWEEN :startDate AND :endDate "
-            + "AND o.delivered_timestamp IS NOT NULL "
-            + "AND o.status = 'COMPLETED'", nativeQuery = true)
+    @Query("SELECT 'OVERALL' AS groupByValue, "
+            + "AVG( (EXTRACT(EPOCH FROM o.deliveredTimestamp) - "
+            + "EXTRACT(EPOCH FROM o.shippedTimestamp)) / 3600) "
+            + "AS averageDuration "
+            + "FROM Order o "
+            + "WHERE o.shippedTimestamp BETWEEN :startDate AND :endDate "
+            + "AND o.deliveredTimestamp IS NOT NULL "
+            + "AND o.status = 'DELIVERED'")
     FulfillmentTimeProjection findShipToDeliverTimeOverall(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Query(value = "SELECT CONCAT('RegionID_', o.region_id) as groupByValue, "
-            + "AVG(TIMESTAMPDIFF(SECOND, o.shipped_timestamp, "
-            + "o.delivered_timestamp)) as averageDuration "
-            + "FROM orders o "
-            + "WHERE o.shipped_timestamp BETWEEN :startDate AND :endDate "
-            + "AND o.delivered_timestamp IS NOT NULL "
-            + "AND o.status = 'COMPLETED' "
-            + "GROUP BY o.region_id", nativeQuery = true)
+    @Query("SELECT CONCAT('RegionID_', r.id) AS groupByValue, "
+            + "AVG( (EXTRACT(EPOCH FROM o.deliveredTimestamp) - "
+            + "EXTRACT(EPOCH FROM o.shippedTimestamp)) / 3600) "
+            + "AS averageDuration "
+            + "FROM Order o "
+            + "JOIN o.region r "
+            + "WHERE o.shippedTimestamp BETWEEN :startDate AND :endDate "
+            + "AND o.deliveredTimestamp IS NOT NULL "
+            + "AND o.status = 'DELIVERED' "
+            + "GROUP BY r.id")
     List<FulfillmentTimeProjection> findShipToDeliverTimeByRegion(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Query(value = "SELECT CONCAT('CourierID_', o.courier_id) as groupByValue, "
-            + "AVG(TIMESTAMPDIFF(SECOND, o.shipped_timestamp, "
-            + "o.delivered_timestamp)) as averageDuration "
-            + "FROM orders o "
-            + "WHERE o.shipped_timestamp BETWEEN :startDate AND :endDate "
-            + "AND o.delivered_timestamp IS NOT NULL "
-            + "AND o.status = 'COMPLETED' "
-            + "GROUP BY o.courier_id", nativeQuery = true)
+    @Query("SELECT CONCAT('CourierID_', c.id) AS groupByValue, "
+            + "AVG( (EXTRACT(EPOCH FROM o.deliveredTimestamp) - "
+            + "EXTRACT(EPOCH FROM o.shippedTimestamp)) / 3600) "
+            + "AS averageDuration "
+            + "FROM Order o "
+            + "JOIN o.courier c "
+            + "WHERE o.shippedTimestamp BETWEEN :startDate AND :endDate "
+            + "AND o.deliveredTimestamp IS NOT NULL "
+            + "AND o.status = 'DELIVERED' "
+            + "GROUP BY c.id")
     List<FulfillmentTimeProjection> findShipToDeliverTimeByCourier(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Query(value = "SELECT o.region_id as regionId, "
-            + "r.city as city, "
-            + "r.country as country, "
-            + "count(o.id) as orderCount, "
-            + "avg(o.total_amount) as averageOrderValue "
-            + "FROM orders o "
-            + "INNER JOIN regions r on o.region_id = r.id "
-            + "WHERE o.final_status_timestamp BETWEEN :startDate AND :endDate "
-            + "GROUP BY o.region_id, r.city, r.country "
-            + "ORDER BY orderCount desc, averageOrderValue desc",
-            nativeQuery = true)
+    @Query("SELECT r.id AS regionId, "
+            + "r.city AS city, "
+            + "r.country AS country, "
+            + "COUNT(o) AS orderCount, "
+            + "AVG(o.totalAmount) AS averageOrderValue "
+            + "FROM Order o "
+            + "JOIN o.region r "
+            + "WHERE o.finalStatusTimestamp BETWEEN :startDate AND :endDate "
+            + "AND o.status = 'DELIVERED' "
+            + "GROUP BY r.id, r.city, r.country "
+            + "ORDER BY orderCount DESC, averageOrderValue DESC")
     List<OrderRegionProjection> findOrdersByRegion(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Query(value = "SELECT o.status as status, "
-            + "count(o.id) as count "
-            + "FROM orders o "
-            + "WHERE o.final_status_timestamp BETWEEN :startDate AND :endDate "
+    @Query("SELECT o.status AS status, "
+            + "COUNT(o) AS count "
+            + "FROM Order o "
+            + "WHERE o.finalStatusTimestamp BETWEEN :startDate AND :endDate "
             + "GROUP BY o.status "
-            + "ORDER BY count desc",
-            nativeQuery = true)
+            + "ORDER BY count DESC")
     List<OrderStatusProjection> findOrderStatusCounts(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Query(value = "SELECT o.failure_reason as reason, "
-            + "count(o.id) as count "
-            + "FROM orders o "
-            + "WHERE o.final_status_timestamp BETWEEN :startDate AND :endDate "
-            + "AND o.status = 'FAILED' "
-            + "GROUP BY o.failure_reason "
-            + "ORDER BY count desc",
-            nativeQuery = true)
+    @Query("SELECT o.failureReason AS reason, "
+            + "COUNT(o) AS count "
+            + "FROM Order o "
+            + "WHERE o.finalStatusTimestamp BETWEEN :startDate AND :endDate "
+            + "AND o.status IN ('DELIVERY_FAILED', 'CANCELLED') "
+            + "GROUP BY o.failureReason "
+            + "ORDER BY count DESC")
     List<OrderFailureReasonsProjection> findFailureReasons(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Query(value = "SELECT(SUM(CASE WHEN o.status = 'FAILED' THEN 1 ELSE 0 END)"
-            + " / (count(*)*1.0) ) as failureRate "
-            + "FROM orders o "
-            + "WHERE o.final_status_timestamp BETWEEN :startDate"
-            + " AND :endDate", nativeQuery = true)
+    @Query("SELECT (SUM(CASE WHEN o.status = 'DELIVERY_FAILED' "
+            + "THEN 1 ELSE 0 END) * 1.0 "
+            + "/ COUNT(o)) AS failureRate "
+            + "FROM Order o "
+            + "WHERE o.finalStatusTimestamp BETWEEN :startDate AND :endDate")
     OrderFailureRateProjection calculateFailureRate(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Query(value = "SELECT "
-            + "t.period, "
-            + "SUM(t.total_amount) as totalRevenue "
+    @Query("SELECT period AS period, "
+            + "SUM(rev) AS totalRevenue "
             + "FROM ( "
-            + "SELECT "
-            + "CASE :reportPeriod "
-            + "WHEN 'DAILY' THEN CAST(o.order_placed_timestamp AS DATE) "
-            + "WHEN 'WEEKLY' THEN"
-            + " date_trunc('week', o.order_placed_timestamp)::date "
-            + "WHEN 'MONTHLY' THEN"
-            + " date_trunc('month', o.order_placed_timestamp)::date "
-            + "END as period, "
-            + "o.total_amount "
-            + "FROM orders o "
-            + "WHERE o.order_placed_timestamp >= :startDate "
-            + "AND o.order_placed_timestamp < :endDate "
-            + "AND o.status IN ('COMPLETED') "
-            + ") t "
-            + "GROUP BY t.period "
-            + "ORDER BY t.period", nativeQuery = true)
+            + "     SELECT CASE "
+            + "     WHEN :reportPeriod = 'DAILY' "
+            + "     THEN CAST(o.orderPlacedTimestamp AS date) "
+            + "     WHEN :reportPeriod = 'WEEKLY' "
+            + "     THEN FUNCTION('DATE_TRUNC','week',o.orderPlacedTimestamp) "
+            + "     WHEN :reportPeriod = 'MONTHLY' "
+            + "     THEN FUNCTION('DATE_TRUNC','month',o.orderPlacedTimestamp) "
+            + "     END AS period, "
+            + "     o.totalAmount AS rev "
+            + "FROM Order o "
+            + "WHERE o.finalStatusTimestamp >= :startDate "
+            + "AND o.finalStatusTimestamp <  :endDate "
+            + "AND o.status = 'DELIVERED' "
+            + ") x "
+            + "GROUP BY period "
+            + "ORDER BY totalRevenue DESC")
     List<RevenueSummaryProjection> findRevenueSummaryByPeriod(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("reportPeriod") String reportPeriod);
 
-    @Query(value = "SELECT "
-            + "p.category, "
-            + "SUM(sli.quantity * sli.price_per_unit) as totalRevenue "
-            + "FROM orders o "
-            + "JOIN sales_line_items sli ON o.id = sli.order_id "
-            + "JOIN products p ON sli.product_id = p.id "
-            + "WHERE o.order_placed_timestamp >= :startDate "
-            + "AND o.order_placed_timestamp < :endDate "
-            + "AND o.status IN ('COMPLETED') "
+    @Query("SELECT p.category AS category, "
+            + "SUM(oi.quantity * oi.pricePerUnit) AS totalRevenue "
+            + "FROM OrderItem oi "
+            + "JOIN oi.order o "
+            + "JOIN oi.product p "
+            + "WHERE o.finalStatusTimestamp >= :startDate "
+            + "AND o.finalStatusTimestamp <  :endDate "
+            + "AND o.status = 'DELIVERED' "
             + "GROUP BY p.category "
-            + "ORDER BY SUM(sli.quantity * sli.price_per_unit) DESC",
-            nativeQuery = true)
+            + "ORDER BY totalRevenue DESC")
     List<RevenueByCategoryProjection> findRevenueByCategory(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);

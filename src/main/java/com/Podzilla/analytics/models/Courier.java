@@ -1,35 +1,59 @@
 package com.Podzilla.analytics.models;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "couriers")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Courier {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    private CourierStatus status;
+    @OneToMany(mappedBy = "courier", cascade = CascadeType.ALL)
+    private List<Order> orders;
 
-    public enum CourierStatus {
-        ACTIVE,
-        INACTIVE,
-        SUSPENDED
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private UUID id;
+        private String name;
+        private List<Order> orders;
+
+        public Builder() {
+        }
+
+        public Builder id(final UUID id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder name(final String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder orders(final List<Order> orders) {
+            this.orders = orders;
+            return this;
+        }
+
+        public Courier build() {
+            return new Courier(id, name, orders);
+        }
     }
 }

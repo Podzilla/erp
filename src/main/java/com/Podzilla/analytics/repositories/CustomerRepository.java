@@ -11,20 +11,21 @@ import com.Podzilla.analytics.api.projections.customer.CustomersTopSpendersProje
 import com.Podzilla.analytics.models.Customer;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Repository
-public interface CustomerRepository extends JpaRepository<Customer, Long> {
+public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
-        @Query(value = "SELECT c.id as customerId, c.name as customerName, "
-                        + "SUM(o.total_amount) as totalSpending "
-                        + "FROM customers c "
-                        + "JOIN orders o ON c.id = o.customer_id "
-                        + "WHERE o.order_placed_timestamp "
-                        + "BETWEEN :startDate AND :endDate "
-                        + "GROUP BY c.id, c.name "
-                        + "ORDER BY totalSpending DESC", nativeQuery = true)
-        Page<CustomersTopSpendersProjection> findTopSpenders(
-                        @Param("startDate") LocalDateTime startDate,
-                        @Param("endDate") LocalDateTime endDate,
-                        Pageable pageable);
+    @Query("SELECT c.id AS customerId, c.name AS customerName, "
+            + "COALESCE(SUM(o.totalAmount), 0) AS totalSpending "
+            + "FROM Customer c "
+            + "LEFT JOIN c.orders o "
+            + "WITH o.finalStatusTimestamp BETWEEN :startDate AND :endDate "
+            + "AND o.status = 'DELIVERED' "
+            + "GROUP BY c.id, c.name "
+            + "ORDER BY totalSpending DESC")
+    Page<CustomersTopSpendersProjection> findTopSpenders(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            Pageable pageable);
 }

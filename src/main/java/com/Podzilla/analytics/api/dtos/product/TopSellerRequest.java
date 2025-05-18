@@ -5,7 +5,9 @@ import java.time.LocalDate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
+
 import com.Podzilla.analytics.validation.annotations.ValidDateRange;
+import com.Podzilla.analytics.api.dtos.IDateRangeRequest;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Positive;
@@ -19,7 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TopSellerRequest {
+public class TopSellerRequest implements IDateRangeRequest {
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @Schema(description = "Start date for the report (inclusive)",

@@ -2,11 +2,15 @@ package com.Podzilla.analytics.api.dtos;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import com.Podzilla.analytics.validation.annotations.ValidPagination;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
+@ValidPagination
 @Getter
 @AllArgsConstructor
-public class PaginationRequest {
+public class PaginationRequest implements IPaginationRequest {
 
     @Min(value = 0, message = "Page number "
             + "must be greater than or equal to 0")

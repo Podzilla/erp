@@ -5,13 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomersTopSpendersResponse {
-    private Long customerId;
+    private UUID customerId;
     private String customerName;
     private BigDecimal totalSpending;
 }

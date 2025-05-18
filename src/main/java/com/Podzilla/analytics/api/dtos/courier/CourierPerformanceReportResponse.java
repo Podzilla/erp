@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-
+import java.util.UUID;
 @Data
 @Builder
 @NoArgsConstructor
@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class CourierPerformanceReportResponse {
 
     @Schema(description = "ID of the courier", example = "105")
-    private Long courierId;
+    private UUID courierId;
 
     @Schema(description = "Full name of the courier", example = "Ali Hassan")
     private String courierName;

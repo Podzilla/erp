@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 import jakarta.persistence.EntityManager;
 
@@ -69,8 +70,11 @@ public class CourierAnalyticsControllerTest {
         entityManager.flush();
         entityManager.clear();
 
-        customer1 = customerRepository.save(Customer.builder().name("John Doe").build());
+        customer1 = customerRepository.save(Customer.builder()
+                .id(UUID.randomUUID())
+                .name("John Doe").build());
         region1 = regionRepository.save(Region.builder()
+                // .id(UUID.randomUUID())
                 .city("Sample City")
                 .state("Sample State")
                 .country("Sample Country")
@@ -78,19 +82,20 @@ public class CourierAnalyticsControllerTest {
                 .build());
 
         courierJane = courierRepository.save(Courier.builder()
+                .id(UUID.randomUUID())
                 .name("Jane Smith")
-                .status(Courier.CourierStatus.ACTIVE)
                 .build());
 
         courierJohn = courierRepository.save(Courier.builder()
+                .id(UUID.randomUUID())
                 .name("John Doe")
-                .status(Courier.CourierStatus.ACTIVE)
                 .build());
 
         orderRepository.save(Order.builder()
+                .id(UUID.randomUUID())
                 .totalAmount(new BigDecimal("50.00"))
                 .finalStatusTimestamp(LocalDateTime.now().minusDays(3))
-                .status(Order.OrderStatus.COMPLETED)
+                .status(Order.OrderStatus.DELIVERED)
                 .numberOfItems(1)
                 .courierRating(new BigDecimal("4.0"))
                 .customer(customer1)
@@ -99,9 +104,10 @@ public class CourierAnalyticsControllerTest {
                 .build());
 
         orderRepository.save(Order.builder()
+                .id(UUID.randomUUID())
                 .totalAmount(new BigDecimal("75.00"))
                 .finalStatusTimestamp(LocalDateTime.now().minusDays(3))
-                .status(Order.OrderStatus.COMPLETED)
+                .status(Order.OrderStatus.DELIVERED)
                 .numberOfItems(1)
                 .courierRating(new BigDecimal("4.0"))
                 .customer(customer1)
@@ -110,9 +116,10 @@ public class CourierAnalyticsControllerTest {
                 .build());
 
         orderRepository.save(Order.builder()
+                .id(UUID.randomUUID())
                 .totalAmount(new BigDecimal("120.00"))
                 .finalStatusTimestamp(LocalDateTime.now().minusDays(1))
-                .status(Order.OrderStatus.COMPLETED)
+                .status(Order.OrderStatus.DELIVERED)
                 .numberOfItems(2)
                 .courierRating(new BigDecimal("5.0"))
                 .customer(customer1)
@@ -121,9 +128,10 @@ public class CourierAnalyticsControllerTest {
                 .build());
 
         orderRepository.save(Order.builder()
+                .id(UUID.randomUUID())
                 .totalAmount(new BigDecimal("30.00"))
                 .finalStatusTimestamp(LocalDateTime.now().minusDays(2))
-                .status(Order.OrderStatus.FAILED)
+                .status(Order.OrderStatus.DELIVERY_FAILED)
                 .numberOfItems(1)
                 .courierRating(null)
                 .customer(customer1)
@@ -131,10 +139,11 @@ public class CourierAnalyticsControllerTest {
                 .region(region1)
                 .build());
 
-        orderRepository.save(Order.builder()
+        orderRepository.save(Order.builder()    
+                .id(UUID.randomUUID())
                 .totalAmount(new BigDecimal("90.00"))
                 .finalStatusTimestamp(LocalDateTime.now().minusDays(2))
-                .status(Order.OrderStatus.COMPLETED)
+                .status(Order.OrderStatus.DELIVERED)
                 .numberOfItems(1)
                 .courierRating(new BigDecimal("3.0"))
                 .customer(customer1)

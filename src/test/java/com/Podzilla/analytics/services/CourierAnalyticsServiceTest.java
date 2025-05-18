@@ -22,6 +22,7 @@ import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,7 +51,7 @@ public class CourierAnalyticsServiceTest {
     }
 
     private CourierPerformanceProjection createMockProjection(
-            Long courierId, String courierName, Long deliveryCount, Long completedCount, BigDecimal averageRating) {
+            UUID courierId, String courierName, Long deliveryCount, Long completedCount, BigDecimal averageRating) {
         CourierPerformanceProjection mockProjection = Mockito.mock(CourierPerformanceProjection.class);
         Mockito.lenient().when(mockProjection.getCourierId()).thenReturn(courierId);
         Mockito.lenient().when(mockProjection.getCourierName()).thenReturn(courierName);
@@ -63,10 +64,12 @@ public class CourierAnalyticsServiceTest {
     @Test
     void getCourierDeliveryCounts_shouldReturnCorrectCountsForMultipleCouriers() {
         // Arrange
+        UUID courierId1 = UUID.randomUUID();
+        UUID courierId2 = UUID.randomUUID();
         CourierPerformanceProjection janeData = createMockProjection(
-                1L, "Jane", 10L, 8L, new BigDecimal("4.5"));
+                courierId1, "Jane", 10L, 8L, new BigDecimal("4.5"));
         CourierPerformanceProjection johnData = createMockProjection(
-                2L, "John", 5L, 5L, new BigDecimal("4.0"));
+                courierId2, "John", 5L, 5L, new BigDecimal("4.0"));
 
         when(courierRepository.findCourierPerformanceBetweenDates(
                 any(LocalDateTime.class), any(LocalDateTime.class)))
@@ -84,14 +87,14 @@ public class CourierAnalyticsServiceTest {
                 .filter(r -> r.getCourierName().equals("Jane"))
                 .findFirst().orElse(null);
         assertNotNull(janeResponse);
-        assertEquals(1L, janeResponse.getCourierId());
+        assertEquals(courierId1, janeResponse.getCourierId());
         assertEquals(10, janeResponse.getDeliveryCount());
 
         CourierDeliveryCountResponse johnResponse = result.stream()
                 .filter(r -> r.getCourierName().equals("John"))
                 .findFirst().orElse(null);
         assertNotNull(johnResponse);
-        assertEquals(2L, johnResponse.getCourierId());
+        assertEquals(courierId2, johnResponse.getCourierId());
         assertEquals(5, johnResponse.getDeliveryCount());
 
         // Verify repository method was called with correct LocalDateTime arguments
@@ -122,14 +125,17 @@ public class CourierAnalyticsServiceTest {
     void getCourierSuccessRate_shouldReturnCorrectRates() {
         // Arrange
         // Jane: 8 completed out of 10 deliveries = 80%
+        UUID courierId1 = UUID.randomUUID();
+        UUID courierId2 = UUID.randomUUID();
+        UUID courierId3 = UUID.randomUUID();
         CourierPerformanceProjection janeData = createMockProjection(
-                1L, "Jane", 10L, 8L, new BigDecimal("4.5"));
+                courierId1, "Jane", 10L, 8L, new BigDecimal("4.5"));
         // John: 5 completed out of 5 deliveries = 100%
         CourierPerformanceProjection johnData = createMockProjection(
-                2L, "John", 5L, 5L, new BigDecimal("4.0"));
+                courierId2, "John", 5L, 5L, new BigDecimal("4.0"));
         // Peter: 0 completed out of 2 deliveries = 0%
         CourierPerformanceProjection peterData = createMockProjection(
-                3L, "Peter", 2L, 0L, new BigDecimal("3.0"));
+                courierId3, "Peter", 2L, 0L, new BigDecimal("3.0"));
 
         when(courierRepository.findCourierPerformanceBetweenDates(
                 any(LocalDateTime.class), any(LocalDateTime.class)))
@@ -147,21 +153,21 @@ public class CourierAnalyticsServiceTest {
                 .filter(r -> r.getCourierName().equals("Jane"))
                 .findFirst().orElse(null);
         assertNotNull(janeResponse);
-        assertEquals(1L, janeResponse.getCourierId());
+        assertEquals(courierId1, janeResponse.getCourierId());
         assertTrue(janeResponse.getSuccessRate().compareTo(new BigDecimal("0.80")) == 0);
 
         CourierSuccessRateResponse johnResponse = result.stream()
                 .filter(r -> r.getCourierName().equals("John"))
                 .findFirst().orElse(null);
         assertNotNull(johnResponse);
-        assertEquals(2L, johnResponse.getCourierId());
+        assertEquals(courierId2, johnResponse.getCourierId());
         assertTrue(johnResponse.getSuccessRate().compareTo(new BigDecimal("1.00")) == 0);
 
         CourierSuccessRateResponse peterResponse = result.stream()
                 .filter(r -> r.getCourierName().equals("Peter"))
                 .findFirst().orElse(null);
         assertNotNull(peterResponse);
-        assertEquals(3L, peterResponse.getCourierId());
+        assertEquals(courierId3, peterResponse.getCourierId());
         assertTrue(peterResponse.getSuccessRate().compareTo(new BigDecimal("0.00")) == 0);
 
         Mockito.verify(courierRepository).findCourierPerformanceBetweenDates(
@@ -173,8 +179,9 @@ public class CourierAnalyticsServiceTest {
         // Arrange
         // Mark: 0 completed out of 0 deliveries. MetricCalculator should handle this
         // (e.g., return 0 or null)
+        UUID MarkId = UUID.randomUUID();
         CourierPerformanceProjection markData = createMockProjection(
-                4L, "Mark", 0L, 0L, new BigDecimal("0.0"));
+                MarkId, "Mark", 0L, 0L, new BigDecimal("0.0"));
 
         when(courierRepository.findCourierPerformanceBetweenDates(
                 any(LocalDateTime.class), any(LocalDateTime.class)))
@@ -188,7 +195,7 @@ public class CourierAnalyticsServiceTest {
         assertNotNull(result);
         assertEquals(1, result.size());
         CourierSuccessRateResponse markResponse = result.get(0);
-        assertEquals(4L, markResponse.getCourierId());
+        assertEquals(MarkId, markResponse.getCourierId());
         assertTrue(markResponse.getSuccessRate().compareTo(new BigDecimal("0.00")) == 0);
 
         Mockito.verify(courierRepository).findCourierPerformanceBetweenDates(
@@ -216,14 +223,17 @@ public class CourierAnalyticsServiceTest {
 
     @Test
     void getCourierAverageRating_shouldReturnCorrectAverageRatings() {
+        UUID courierId1 = UUID.randomUUID();
+        UUID courierId2 = UUID.randomUUID();
+        UUID courierId3 = UUID.randomUUID();
         // Arrange
         CourierPerformanceProjection janeData = createMockProjection(
-                1L, "Jane", 10L, 8L, new BigDecimal("4.5"));
+                courierId1, "Jane", 10L, 8L, new BigDecimal("4.5"));
         CourierPerformanceProjection johnData = createMockProjection(
-                2L, "John", 5L, 5L, new BigDecimal("4.0"));
+                courierId2, "John", 5L, 5L, new BigDecimal("4.0"));
         // Peter: No rating available or 0.0 rating (depends on projection and database)
         CourierPerformanceProjection peterData = createMockProjection(
-                3L, "Peter", 2L, 0L, null); // Assuming null for no rating
+                courierId3, "Peter", 2L, 0L, null); // Assuming null for no rating
 
         when(courierRepository.findCourierPerformanceBetweenDates(
                 any(LocalDateTime.class), any(LocalDateTime.class)))
@@ -241,14 +251,14 @@ public class CourierAnalyticsServiceTest {
                 .filter(r -> r.getCourierName().equals("Jane"))
                 .findFirst().orElse(null);
         assertNotNull(janeResponse);
-        assertEquals(1L, janeResponse.getCourierId());
+        assertEquals(courierId1, janeResponse.getCourierId());
         assertEquals(new BigDecimal("4.5"), janeResponse.getAverageRating());
 
         CourierAverageRatingResponse johnResponse = result.stream()
                 .filter(r -> r.getCourierName().equals("John"))
                 .findFirst().orElse(null);
         assertNotNull(johnResponse);
-        assertEquals(2L, johnResponse.getCourierId());
+        assertEquals(courierId2, johnResponse.getCourierId());
         assertEquals(new BigDecimal("4.0"), johnResponse.getAverageRating());
 
         CourierAverageRatingResponse peterResponse = result.stream()
@@ -256,7 +266,7 @@ public class CourierAnalyticsServiceTest {
                 .findFirst().orElse(null);
         assertNotNull(peterResponse);
         assertNull(peterResponse.getAverageRating());
-        
+
         Mockito.verify(courierRepository).findCourierPerformanceBetweenDates(
                 expectedStartDateTime, expectedEndDateTime);
     }
@@ -284,11 +294,13 @@ public class CourierAnalyticsServiceTest {
     void getCourierPerformanceReport_shouldReturnComprehensiveReport() {
         // Arrange
         // Jane: 8 completed out of 10 deliveries = 80%, Avg Rating 4.5
+        UUID courierId1 = UUID.randomUUID();
+        UUID courierId2 = UUID.randomUUID();
         CourierPerformanceProjection janeData = createMockProjection(
-                1L, "Jane", 10L, 8L, new BigDecimal("4.5"));
+                courierId1, "Jane", 10L, 8L, new BigDecimal("4.5"));
         // John: 5 completed out of 5 deliveries = 100%, Avg Rating 4.0
         CourierPerformanceProjection johnData = createMockProjection(
-                2L, "John", 5L, 5L, new BigDecimal("4.0"));
+                courierId2, "John", 5L, 5L, new BigDecimal("4.0"));
 
         when(courierRepository.findCourierPerformanceBetweenDates(
                 any(LocalDateTime.class), any(LocalDateTime.class)))
@@ -306,7 +318,7 @@ public class CourierAnalyticsServiceTest {
                 .filter(r -> r.getCourierName().equals("Jane"))
                 .findFirst().orElse(null);
         assertNotNull(janeResponse);
-        assertEquals(1L, janeResponse.getCourierId());
+        assertEquals(courierId1, janeResponse.getCourierId());
         assertEquals(10, janeResponse.getDeliveryCount());
         assertTrue(janeResponse.getSuccessRate().compareTo(new BigDecimal("0.80")) == 0);
         assertTrue(janeResponse.getAverageRating().compareTo(new BigDecimal("4.5")) == 0);
@@ -315,7 +327,7 @@ public class CourierAnalyticsServiceTest {
                 .filter(r -> r.getCourierName().equals("John"))
                 .findFirst().orElse(null);
         assertNotNull(johnResponse);
-        assertEquals(2L, johnResponse.getCourierId());
+        assertEquals(courierId2, johnResponse.getCourierId());
         assertEquals(5, johnResponse.getDeliveryCount());
         assertTrue(johnResponse.getSuccessRate().compareTo(new BigDecimal("1.00")) == 0);
         assertTrue(johnResponse.getAverageRating().compareTo(new BigDecimal("4.0")) == 0);

@@ -1,5 +1,7 @@
 package com.Podzilla.analytics.services;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,17 +16,32 @@ import com.Podzilla.analytics.api.projections.order.OrderFailureRateProjection;
 import com.Podzilla.analytics.api.projections.order.OrderFailureReasonsProjection;
 import com.Podzilla.analytics.api.projections.order.OrderRegionProjection;
 import com.Podzilla.analytics.api.projections.order.OrderStatusProjection;
+import com.Podzilla.analytics.repositories.CourierRepository;
+import com.Podzilla.analytics.repositories.CustomerRepository;
 import com.Podzilla.analytics.repositories.OrderRepository;
 import com.Podzilla.analytics.util.DatetimeFormatter;
+import com.Podzilla.analytics.models.Order;
+import com.Podzilla.analytics.models.Order.OrderStatus;
+import com.Podzilla.analytics.models.Region;
+import com.Podzilla.analytics.models.Customer;
+import com.Podzilla.analytics.models.Courier;
+import com.Podzilla.analytics.util.StringToUUIDParser;
+
+
 
 import lombok.RequiredArgsConstructor;
+import java.util.UUID;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class OrderAnalyticsService {
 
 
     private final OrderRepository orderRepository;
+    private final CustomerRepository customerRepository;
+    private final CourierRepository courierRepository;
+    private final OrderItemService orderItemService;
+
     public List<OrderRegionResponse> getOrdersByRegion(
         final LocalDate startDate,
         final LocalDate endDate
@@ -33,12 +50,8 @@ public class OrderAnalyticsService {
             DatetimeFormatter.convertStartDateToDatetime(startDate);
         LocalDateTime endDateTime =
             DatetimeFormatter.convertEndDateToDatetime(endDate);
-            System.out.println("Start date a1a1: " + startDate);
-            System.out.println("End date b1b1: " + endDate);
         List<OrderRegionProjection> ordersByRegion =
             orderRepository.findOrdersByRegion(startDateTime, endDateTime);
-            System.out.println("Start date a2a2: " + startDate);
-            System.out.println("End date b2b2: " + endDate);
         return ordersByRegion.stream()
             .map(data -> OrderRegionResponse.builder()
                     .regionId(data.getRegionId())
@@ -91,5 +104,164 @@ public class OrderAnalyticsService {
             .reasons(failureReasonsDTO)
             .failureRate(failureRate.getFailureRate())
             .build();
+    }
+
+    public Order saveOrder(
+        final String orderId,
+        final String customerId,
+        final List<com.podzilla.mq.events.OrderItem> items,
+        final Region region,
+        final BigDecimal totalAmount,
+        final Instant timeStamp
+    ) {
+        UUID orderUUID =
+            StringToUUIDParser.parseStringToUUID(orderId);
+        UUID customerUUID =
+            StringToUUIDParser.parseStringToUUID(customerId);
+        Customer customer =
+            customerRepository.findById(customerUUID)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        int numberOfItems = items.stream()
+            .mapToInt(com.podzilla.mq.events.OrderItem::getQuantity)
+            .sum();
+        LocalDateTime orderPlacedTimestamp =
+            DatetimeFormatter.convertIntsantToDateTime(timeStamp);
+        Order order = Order.builder()
+            .id(orderUUID)
+            .totalAmount(totalAmount)
+            .orderPlacedTimestamp(orderPlacedTimestamp)
+            .finalStatusTimestamp(orderPlacedTimestamp)
+            .region(region)
+            .customer(customer)
+            .numberOfItems(numberOfItems)
+            .status(OrderStatus.PLACED)
+            .build();
+        orderRepository.save(order);
+
+        List<com.Podzilla.analytics.models.OrderItem> orderItems =
+            items.stream()
+            .map(item -> orderItemService.saveOrderItem(
+                item.getQuantity(),
+                item.getPricePerUnit(),
+                item.getProductId(),
+                orderUUID.toString()
+            ))
+            .toList();
+        order.setOrderItems(orderItems);
+        return orderRepository.save(order);
+    }
+
+    public Order cancelOrder(
+        final String orderId,
+        final String reason,
+        final Instant timeStamp
+    ) {
+        UUID orderUUID =
+            StringToUUIDParser.parseStringToUUID(orderId);
+        LocalDateTime orderCancelledTimestamp =
+            DatetimeFormatter.convertIntsantToDateTime(timeStamp);
+        Order order =
+            orderRepository.findById(orderUUID)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        order.setStatus(OrderStatus.CANCELLED);
+        order.setFailureReason(reason);
+        order.setOrderCancelledTimestamp(orderCancelledTimestamp);
+        order.setFinalStatusTimestamp(orderCancelledTimestamp);
+        return orderRepository.save(order);
+    }
+
+    public void assignCourier(
+        final String orderId,
+        final String courierId
+    ) {
+        UUID orderUUID =
+            StringToUUIDParser.parseStringToUUID(orderId);
+        UUID courierUUID =
+            StringToUUIDParser.parseStringToUUID(courierId);
+        Order order =
+            orderRepository.findById(orderUUID)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        Courier courier =
+            courierRepository.findById(courierUUID)
+                .orElseThrow(() -> new RuntimeException("Courier not found"));
+        order.setCourier(courier);
+        orderRepository.save(order);
+    }
+    public void markOrderAsOutForDelivery(
+        final String orderId,
+        final Instant timeStamp
+    ) {
+        UUID orderUUID =
+            StringToUUIDParser.parseStringToUUID(orderId);
+        LocalDateTime orderOutForDeliveryTimestamp =
+            DatetimeFormatter.convertIntsantToDateTime(timeStamp);
+        Order order =
+            orderRepository.findById(orderUUID)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        order.setStatus(OrderStatus.SHIPPED);
+        order.setShippedTimestamp(orderOutForDeliveryTimestamp);
+        order.setFinalStatusTimestamp(orderOutForDeliveryTimestamp);
+        orderRepository.save(order);
+    }
+
+    public void markOrderAsDelivered(
+        final String orderId,
+        final BigDecimal courierRating,
+        final Instant timeStamp
+    ) {
+        UUID orderUUID =
+            StringToUUIDParser.parseStringToUUID(orderId);
+        LocalDateTime orderDeliveredTimestamp =
+            DatetimeFormatter.convertIntsantToDateTime(timeStamp);
+        Order order =
+            orderRepository.findById(orderUUID)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        order.setStatus(OrderStatus.DELIVERED);
+        order.setDeliveredTimestamp(orderDeliveredTimestamp);
+        order.setFinalStatusTimestamp(orderDeliveredTimestamp);
+        order.setCourierRating(courierRating);
+        orderRepository.save(order);
+    }
+
+    public void markOrderAsFailedToDeliver(
+        final String orderId,
+        final String reason,
+        final Instant timeStamp
+    ) {
+        UUID orderUUID =
+            StringToUUIDParser.parseStringToUUID(orderId);
+        LocalDateTime orderFailedToDeliverTimestamp =
+            DatetimeFormatter.convertIntsantToDateTime(timeStamp);
+        Order order =
+            orderRepository.findById(orderUUID)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        order.setStatus(OrderStatus.DELIVERY_FAILED);
+        order.setFailureReason(reason);
+        order.setOrderDeliveryFailedTimestamp(
+            orderFailedToDeliverTimestamp
+        );
+        order.setFinalStatusTimestamp(orderFailedToDeliverTimestamp);
+        orderRepository.save(order);
+    }
+
+    public void markOrderAsFailedToFulfill(
+        final String orderId,
+        final String reason,
+        final Instant timeStamp
+    ) {
+        UUID orderUUID =
+            StringToUUIDParser.parseStringToUUID(orderId);
+        LocalDateTime orderFulfillmentFailedTimestamp =
+            DatetimeFormatter.convertIntsantToDateTime(timeStamp);
+        Order order =
+            orderRepository.findById(orderUUID)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        order.setStatus(OrderStatus.FULFILLMENT_FAILED);
+        order.setFailureReason(reason);
+        order.setOrderFulfillmentFailedTimestamp(
+            orderFulfillmentFailedTimestamp
+        );
+        order.setFinalStatusTimestamp(orderFulfillmentFailedTimestamp);
+        orderRepository.save(order);
     }
 }

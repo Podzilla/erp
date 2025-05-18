@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.Podzilla.analytics.api.dtos.profit.ProfitByCategory;
 import com.Podzilla.analytics.api.projections.profit.ProfitByCategoryProjection;
-import com.Podzilla.analytics.repositories.SalesLineItemRepository;
+import com.Podzilla.analytics.repositories.OrderItemRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,14 +19,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class ProfitAnalyticsService {
-    private final SalesLineItemRepository salesLineItemRepository;
-    // Precision constant for percentage calculations
+    private final OrderItemRepository salesLineItemRepository;
     private static final int PERCENTAGE_PRECISION = 4;
 
     public List<ProfitByCategory> getProfitByCategory(
             final LocalDate startDate,
             final LocalDate endDate) {
-        // Convert LocalDate to LocalDateTime for start of day and end of day
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
 

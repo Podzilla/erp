@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @ValidDateRange
 @Getter
 @AllArgsConstructor
-public class DateRangeRequest {
+public class DateRangeRequest implements IDateRangeRequest {
 
     @NotNull(message = "startDate is required")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

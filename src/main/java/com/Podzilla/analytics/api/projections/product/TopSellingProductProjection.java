@@ -1,9 +1,10 @@
 package com.Podzilla.analytics.api.projections.product;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public interface TopSellingProductProjection {
-    Long getId();
+    UUID getId();
     String getName();
     String getCategory();
     BigDecimal getTotalRevenue();

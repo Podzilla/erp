@@ -9,37 +9,25 @@ import org.springframework.data.repository.query.Param;
 
 import com.Podzilla.analytics.api.projections.product.TopSellingProductProjection;
 import com.Podzilla.analytics.models.Product;
+import java.util.UUID;
+public interface ProductRepository extends JpaRepository<Product, UUID> {
 
-public interface ProductRepository extends JpaRepository<Product, Long> {
-
-    // Query to find top-selling products by revenue or units
-    @Query(value = "SELECT "
-    + "p.id, "
-    + "p.name, "
-    + "p.category, "
-    + "SUM(sli.quantity * sli.price_per_unit) AS total_revenue, "
-    + "SUM(sli.quantity) AS total_units "
-    + "FROM orders o "
-    + "JOIN sales_line_items sli ON o.id = sli.order_id "
-    + "JOIN products p ON sli.product_id = p.id "
-    + "WHERE o.final_status_timestamp >= :startDate "
-    + "AND o.final_status_timestamp < :endDate "
-    + "AND o.status = 'COMPLETED' "
-    + "GROUP BY p.id, p.name, p.category "
-    + "ORDER BY "
-    + "CASE :sortBy "
-    + "WHEN 'REVENUE' THEN SUM(sli.quantity * sli.price_per_unit) "
-    + "WHEN 'UNITS' THEN SUM(sli.quantity) "
-    + "ELSE SUM(sli.quantity * sli.price_per_unit) "
-    + "END DESC, "
-    + "CASE :sortBy "
-    + "WHEN 'REVENUE' THEN SUM(sli.quantity) "
-    + "WHEN 'UNITS' THEN SUM(sli.quantity * sli.price_per_unit) "
-    + "ELSE SUM(sli.quantity) "
-    + "END DESC "
-    + "LIMIT COALESCE(:limit , 10)",
-nativeQuery = true)
-
+    @Query("SELECT p.id AS id, "
+            + "p.name AS name, "
+            + "p.category AS category, "
+            + "SUM(oi.quantity * oi.pricePerUnit) AS totalRevenue, "
+            + "SUM(oi.quantity) AS totalUnits "
+            + "FROM OrderItem oi "
+            + "JOIN oi.order o "
+            + "JOIN oi.product p "
+            + "WHERE o.finalStatusTimestamp >= :startDate "
+            + "AND o.finalStatusTimestamp <  :endDate "
+            + "AND o.status = 'DELIVERED' "
+            + "GROUP BY p.id, p.name, p.category "
+            + "ORDER BY CASE WHEN :sortBy = 'REVENUE' "
+            + "THEN SUM(oi.quantity * oi.pricePerUnit) "
+            + "              WHEN :sortBy = 'UNITS'   THEN SUM(oi.quantity) "
+            + "              ELSE SUM(oi.quantity * oi.pricePerUnit) END DESC")
     List<TopSellingProductProjection> findTopSellers(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate,

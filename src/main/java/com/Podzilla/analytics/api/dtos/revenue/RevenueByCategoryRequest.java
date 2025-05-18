@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.Podzilla.analytics.validation.annotations.ValidDateRange;
+import com.Podzilla.analytics.api.dtos.IDateRangeRequest;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Schema(description = "Request parameters for fetching revenue by category")
-public class RevenueByCategoryRequest {
+public class RevenueByCategoryRequest implements IDateRangeRequest {
 
     @NotNull(message = "Start date is required")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
