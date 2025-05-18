@@ -2,13 +2,17 @@ package com.Podzilla.analytics.models;
 
 import java.math.BigDecimal;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.UUID;
+
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -23,6 +27,9 @@ public class Product {
     private BigDecimal cost;
     private int lowStockThreshold;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<OrderItem> orderItems;
+
     public static Builder builder() {
         return new Builder();
     }
@@ -33,8 +40,10 @@ public class Product {
         private String category;
         private BigDecimal cost;
         private int lowStockThreshold;
+        private List<OrderItem> orderItems;
 
-        public Builder() { }
+        public Builder() {
+        }
 
         public Builder id(final UUID id) {
             this.id = id;
@@ -61,8 +70,14 @@ public class Product {
             return this;
         }
 
+        public Builder orderItems(final List<OrderItem> orderItems) {
+            this.orderItems = orderItems;
+            return this;
+        }
+
         public Product build() {
-            return new Product(id, name, category, cost, lowStockThreshold);
+            return new Product(
+                    id, name, category, cost, lowStockThreshold, orderItems);
         }
     }
 }

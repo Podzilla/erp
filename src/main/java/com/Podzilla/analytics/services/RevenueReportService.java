@@ -1,6 +1,8 @@
 package com.Podzilla.analytics.services;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,9 +27,13 @@ public class RevenueReportService {
             final LocalDate endDate,
             final String periodString) {
 
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
         final List<RevenueSummaryProjection> revenueData = orderRepository
-                .findRevenueSummaryByPeriod(startDate,
-                        endDate, periodString);
+                .findRevenueSummaryByPeriod(
+                        startDateTime,
+                        endDateTime, periodString);
 
         final List<RevenueSummaryResponse> summaryList = new ArrayList<>();
 
@@ -55,9 +61,13 @@ public class RevenueReportService {
     public List<RevenueByCategoryResponse> getRevenueByCategory(
             final LocalDate startDate, final LocalDate endDate) {
 
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
         final List<RevenueByCategoryProjection> queryResults = orderRepository
-                .findRevenueByCategory(startDate,
-                        endDate);
+                .findRevenueByCategory(
+                        startDateTime,
+                        endDateTime);
 
         final List<RevenueByCategoryResponse> summaryList = new ArrayList<>();
 

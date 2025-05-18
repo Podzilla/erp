@@ -1,6 +1,5 @@
 package com.Podzilla.analytics.repositories;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -149,8 +148,8 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
             + "GROUP BY period "
             + "ORDER BY totalRevenue DESC")
     List<RevenueSummaryProjection> findRevenueSummaryByPeriod(
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
             @Param("reportPeriod") String reportPeriod);
 
     @Query("SELECT p.category AS category, "
@@ -164,6 +163,6 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
             + "GROUP BY p.category "
             + "ORDER BY totalRevenue DESC")
     List<RevenueByCategoryProjection> findRevenueByCategory(
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate);
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
 }
