@@ -41,6 +41,6 @@ public class FulfillmentPlaceToShipRequest implements IDateRangeRequest {
     @NotNull(message = "groupBy is required")
     @Schema(description = "How to group the results (OVERALL, REGION, COURIER "
             + "depending on endpoint)", example = "OVERALL", required = true)
-    private PlaceToShipGroupBy groupBy = PlaceToShipGroupBy.OVERALL;
+    private PlaceToShipGroupBy groupBy;
 
 }
