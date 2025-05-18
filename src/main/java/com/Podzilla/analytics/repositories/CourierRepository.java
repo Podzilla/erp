@@ -16,16 +16,15 @@ public interface CourierRepository extends JpaRepository<Courier, UUID> {
     @Query("SELECT c.id AS courierId, "
             + "c.name AS courierName, "
             + "COUNT(o.id) AS deliveryCount, "
-            + "SUM(CASE WHEN o.status = 'COMPLETED' THEN 1 ELSE 0 END) "
+            + "SUM(CASE WHEN o.status = 'DELIVERED' THEN 1 ELSE 0 END) "
             + "AS completedCount, "
-            + "AVG(CASE WHEN o.status = 'COMPLETED' THEN o.courierRating "
+            + "AVG(CASE WHEN o.status = 'DELIVERED' THEN o.courierRating "
             + "ELSE NULL END) AS averageRating "
             + "FROM Courier c "
             + "LEFT JOIN Order o "
             + "ON c.id = o.courier.id "
             + "AND o.finalStatusTimestamp BETWEEN :startDate AND :endDate "
-            + "GROUP BY c.id, c.name "
-            + "ORDER BY c.id")
+            + "GROUP BY c.id, c.name ")
     List<CourierPerformanceProjection> findCourierPerformanceBetweenDates(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);

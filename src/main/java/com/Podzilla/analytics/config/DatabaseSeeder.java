@@ -2,14 +2,14 @@ package com.Podzilla.analytics.config;
 
 import com.Podzilla.analytics.models.Courier;
 import com.Podzilla.analytics.models.Customer;
-import com.Podzilla.analytics.models.InventorySnapshot;
 import com.Podzilla.analytics.models.Order;
 import com.Podzilla.analytics.models.Product;
+import com.Podzilla.analytics.models.ProductSnapshot;
 import com.Podzilla.analytics.models.Region;
-import com.Podzilla.analytics.models.SalesLineItem;
+import com.Podzilla.analytics.models.OrderItem;
 import com.Podzilla.analytics.repositories.CourierRepository;
 import com.Podzilla.analytics.repositories.CustomerRepository;
-import com.Podzilla.analytics.repositories.InventorySnapshotRepository;
+import com.Podzilla.analytics.repositories.ProductSnapshotRepository;
 import com.Podzilla.analytics.repositories.OrderRepository;
 import com.Podzilla.analytics.repositories.ProductRepository;
 import com.Podzilla.analytics.repositories.RegionRepository;
@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-
 @Component
 @RequiredArgsConstructor
 public class DatabaseSeeder implements CommandLineRunner {
@@ -36,7 +35,7 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final ProductRepository productRepository;
     private final RegionRepository regionRepository;
     private final OrderRepository orderRepository;
-    private final InventorySnapshotRepository inventorySnapshotRepository;
+    private final ProductSnapshotRepository productSnapshotRepository;
 
     private final Random random = new Random();
     private static final int LOW_STOCK_PROD1 = 10;
@@ -123,9 +122,9 @@ public class DatabaseSeeder implements CommandLineRunner {
         System.out.println("Seeded Orders: " + orderRepository.count());
 
         System.out.println("Seeding Inventory Snapshots...");
-        seedInventorySnapshots(products);
-        System.out.println("Seeded Inventory Snapshots: "
-                + inventorySnapshotRepository.count());
+        seedProductSnapshots(products);
+        System.out.println("Seeded Product Snapshots: "
+                + productSnapshotRepository.count());
 
         System.out.println("Database seeding finished.");
     }
@@ -180,18 +179,15 @@ public class DatabaseSeeder implements CommandLineRunner {
         Courier courier1 = courierRepository.save(
                 Courier.builder()
                         .id(UUID.randomUUID())
-                        .name("Speedy Delivery Inc.")
-                        .status(Courier.CourierStatus.ACTIVE).build());
+                        .name("Speedy Delivery Inc.").build());
         Courier courier2 = courierRepository.save(
                 Courier.builder()
                         .id(UUID.randomUUID())
-                        .name("Reliable Couriers Co.")
-                        .status(Courier.CourierStatus.ACTIVE).build());
+                        .name("Reliable Couriers Co.").build());
         Courier courier3 = courierRepository.save(
                 Courier.builder()
                         .id(UUID.randomUUID())
-                        .name("Overnight Express")
-                        .status(Courier.CourierStatus.INACTIVE).build());
+                        .name("Overnight Express").build());
         return Arrays.asList(courier1, courier2, courier3);
     }
 
@@ -225,7 +221,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .id(UUID.randomUUID())
                 .customer(customers.get(0)).courier(couriers.get(0))
                 .region(regions.get(0))
-                .status(Order.OrderStatus.COMPLETED)
+                .status(Order.OrderStatus.DELIVERED)
                 .orderPlacedTimestamp(placed1)
                 .shippedTimestamp(placed1.plusHours(ORDER_1_SHIP_HOURS))
                 .deliveredTimestamp(placed1.plusDays(ORDER_1_DELIVER_DAYS)
@@ -236,13 +232,13 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .totalAmount(BigDecimal.ZERO)
                 .courierRating(RATING_GOOD)
                 .build();
-        SalesLineItem itemFirstOrderFirst = SalesLineItem.builder()
+        OrderItem itemFirstOrderFirst = OrderItem.builder()
                 .order(order1).product(products.get(0)).quantity(1)
                 .pricePerUnit(PRICE_PROD1).build();
-        SalesLineItem itemFirstOrderSecond = SalesLineItem.builder()
+        OrderItem itemFirstOrderSecond = OrderItem.builder()
                 .order(order1).product(products.get(2)).quantity(2)
                 .pricePerUnit(PRICE_PROD3).build();
-        order1.setSalesLineItems(Arrays.asList(itemFirstOrderFirst,
+        order1.setOrderItems(Arrays.asList(itemFirstOrderFirst,
                 itemFirstOrderSecond));
         order1.setNumberOfItems(itemFirstOrderFirst.getQuantity()
                 + itemFirstOrderSecond.getQuantity());
@@ -269,10 +265,10 @@ public class DatabaseSeeder implements CommandLineRunner {
                         .plusHours(ORDER_2_SHIP_HOURS))
                 .courierRating(null).failureReason(null)
                 .build();
-        SalesLineItem itemSecondOrderFirst = SalesLineItem.builder()
+        OrderItem itemSecondOrderFirst = OrderItem.builder()
                 .order(order2).product(products.get(1)).quantity(1)
                 .pricePerUnit(PRICE_PROD2).build();
-        order2.setSalesLineItems(List.of(itemSecondOrderFirst));
+        order2.setOrderItems(List.of(itemSecondOrderFirst));
         order2.setNumberOfItems(itemSecondOrderFirst.getQuantity());
         order2.setTotalAmount(
                 itemSecondOrderFirst.getPricePerUnit().multiply(
@@ -287,9 +283,9 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .id(UUID.randomUUID())
                 .customer(customers.get(0)).courier(couriers.get(0))
                 .region(regions.get(2))
-                .status(Order.OrderStatus.FAILED)
+                .status(Order.OrderStatus.DELIVERY_FAILED)
                 .orderPlacedTimestamp(placed3)
-                .status(Order.OrderStatus.FAILED)
+                .status(Order.OrderStatus.DELIVERY_FAILED)
                 .orderPlacedTimestamp(placed3)
                 .shippedTimestamp(placed3.plusHours(ORDER_3_SHIP_HOURS))
                 .deliveredTimestamp(null)
@@ -297,10 +293,10 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .failureReason("Delivery address incorrect")
                 .courierRating(RATING_POOR)
                 .build();
-        SalesLineItem itemThirdOrderFirst = SalesLineItem.builder()
+        OrderItem itemThirdOrderFirst = OrderItem.builder()
                 .order(order3).product(products.get(INDEX_THREE)).quantity(1)
                 .pricePerUnit(PRICE_PROD4).build();
-        order3.setSalesLineItems(List.of(itemThirdOrderFirst));
+        order3.setOrderItems(List.of(itemThirdOrderFirst));
         order3.setNumberOfItems(itemThirdOrderFirst.getQuantity());
         order3.setTotalAmount(
                 itemThirdOrderFirst.getPricePerUnit().multiply(
@@ -314,7 +310,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .id(UUID.randomUUID())
                 .customer(customers.get(2)).courier(couriers.get(1))
                 .region(regions.get(0))
-                .status(Order.OrderStatus.COMPLETED)
+                .status(Order.OrderStatus.DELIVERED)
                 .orderPlacedTimestamp(placed4)
                 .shippedTimestamp(placed4.plusHours(ORDER_4_SHIP_HOURS))
                 .deliveredTimestamp(placed4.plusHours(ORDER_4_DELIVER_HOURS))
@@ -323,13 +319,13 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .totalAmount(BigDecimal.ZERO)
                 .courierRating(RATING_EXCELLENT)
                 .build();
-        SalesLineItem itemFourthOrderFirst = SalesLineItem.builder()
+        OrderItem itemFourthOrderFirst = OrderItem.builder()
                 .order(order4).product(products.get(0)).quantity(1)
                 .pricePerUnit(PRICE_PROD1).build();
-        SalesLineItem itemFourthOrderSecond = SalesLineItem.builder()
+        OrderItem itemFourthOrderSecond = OrderItem.builder()
                 .order(order4).product(products.get(INDEX_THREE)).quantity(1)
                 .pricePerUnit(PRICE_PROD4).build();
-        order4.setSalesLineItems(Arrays.asList(itemFourthOrderFirst,
+        order4.setOrderItems(Arrays.asList(itemFourthOrderFirst,
                 itemFourthOrderSecond));
         order4.setNumberOfItems(
                 itemFourthOrderFirst.getQuantity() + itemFourthOrderSecond
@@ -343,29 +339,29 @@ public class DatabaseSeeder implements CommandLineRunner {
         orderRepository.save(order4);
     }
 
-    private void seedInventorySnapshots(final List<Product> products) {
-        seedInventorySnapshot(products.get(0), INVENTORY_RANGE_PROD1,
+    private void seedProductSnapshots(final List<Product> products) {
+        seedProductSnapshot(products.get(0), INVENTORY_RANGE_PROD1,
                 INVENTORY_QUANTITY_PROD1);
-        seedInventorySnapshot(products.get(1), INVENTORY_RANGE_PROD2,
+        seedProductSnapshot(products.get(1), INVENTORY_RANGE_PROD2,
                 INVENTORY_QUANTITY_PROD2);
-        seedInventorySnapshot(products.get(2), INVENTORY_RANGE_PROD3,
+        seedProductSnapshot(products.get(2), INVENTORY_RANGE_PROD3,
                 INVENTORY_QUANTITY_PROD3);
-        seedInventorySnapshot(products.get(INDEX_THREE), INVENTORY_RANGE_PROD4,
+        seedProductSnapshot(products.get(INDEX_THREE), INVENTORY_RANGE_PROD4,
                 INVENTORY_QUANTITY_PROD4);
     }
 
-    private void seedInventorySnapshot(
+    private void seedProductSnapshot(
             final Product product, final int range, final int quantity) {
-        inventorySnapshotRepository.save(
-                InventorySnapshot.builder()
+        productSnapshotRepository.save(
+                ProductSnapshot.builder()
                         .product(product)
                         .quantity(random.nextInt(range)
                                 + product.getLowStockThreshold())
                         .timestamp(LocalDateTime.now().minusDays(
                                 INVENTORY_SNAPSHOT_DAYS_PRIOR_1))
                         .build());
-        inventorySnapshotRepository.save(
-                InventorySnapshot.builder()
+        productSnapshotRepository.save(
+                ProductSnapshot.builder()
                         .product(product)
                         .quantity(random.nextInt(quantity)
                                 + product.getLowStockThreshold())

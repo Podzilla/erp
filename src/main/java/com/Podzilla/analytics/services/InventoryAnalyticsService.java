@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.Podzilla.analytics.api.dtos.inventory.InventoryValueByCategoryResponse;
 import com.Podzilla.analytics.api.dtos.inventory.LowStockProductResponse;
-import com.Podzilla.analytics.repositories.InventorySnapshotRepository;
+import com.Podzilla.analytics.repositories.ProductSnapshotRepository;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class InventoryAnalyticsService {
-    private final InventorySnapshotRepository inventoryRepo;
+    private final ProductSnapshotRepository inventoryRepo;
 
 public List<InventoryValueByCategoryResponse> getInventoryValueByCategory() {
 List<InventoryValueByCategoryResponse> invVByCy = inventoryRepo

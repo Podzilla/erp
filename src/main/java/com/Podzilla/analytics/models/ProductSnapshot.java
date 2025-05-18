@@ -1,6 +1,6 @@
 package com.Podzilla.analytics.models;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -8,43 +8,37 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-// import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Entity
-@Table(name = "sales_line_items")
+@Table(name = "product_snapshots")
 @Data
-// @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SalesLineItem {
+public class ProductSnapshot {
+
     @Id
     @GeneratedValue(generator = "uuid")
     private UUID id;
 
-    private int quantity;
-    private BigDecimal pricePerUnit;
+    private LocalDateTime timestamp;
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id", nullable = false)
-    private Order order;
+    private int quantity;
 
     public static Builder builder() {
         return new Builder();
     }
-
     public static class Builder {
         private UUID id;
-        private int quantity;
-        private BigDecimal pricePerUnit;
+        private LocalDateTime timestamp;
         private Product product;
-        private Order order;
+        private int quantity;
 
         public Builder() { }
 
@@ -53,13 +47,8 @@ public class SalesLineItem {
             return this;
         }
 
-        public Builder quantity(final int quantity) {
-            this.quantity = quantity;
-            return this;
-        }
-
-        public Builder pricePerUnit(final BigDecimal pricePerUnit) {
-            this.pricePerUnit = pricePerUnit;
+        public Builder timestamp(final LocalDateTime timestamp) {
+            this.timestamp = timestamp;
             return this;
         }
 
@@ -68,19 +57,14 @@ public class SalesLineItem {
             return this;
         }
 
-        public Builder order(final Order order) {
-            this.order = order;
+        public Builder quantity(final int quantity) {
+            this.quantity = quantity;
             return this;
         }
 
-        public SalesLineItem build() {
-            return new SalesLineItem(
-                id,
-                quantity,
-                pricePerUnit,
-                product,
-                order
-            );
+        public ProductSnapshot build() {
+            return new ProductSnapshot(id, timestamp, product, quantity);
         }
     }
+
 }
