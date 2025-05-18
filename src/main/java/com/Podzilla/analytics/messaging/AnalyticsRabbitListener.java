@@ -27,7 +27,6 @@ public class AnalyticsRabbitListener {
     //     queues = EventsConstants.ANALYTICS_ORDER_EVENT_QUEUE
     // )
     public void handleOrderEvents(final BaseEvent orderEvent) {
-        System.out.println("Received orderEvent henaaa");
         dispatcher.dispatch(orderEvent);
     }
 

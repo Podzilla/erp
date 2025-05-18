@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.Podzilla.analytics.messaging.commands.CommandFactory;
 import com.Podzilla.analytics.messaging.invokers.Invoker;
 import com.podzilla.mq.events.OrderDeliveryFailedEvent;
+import com.Podzilla.analytics.messaging.commands.order.MarkOrderAsFailedToDeliverCommand;
 
 public class OrderDeliveryFailedInvoker
     implements Invoker<OrderDeliveryFailedEvent> {
@@ -17,8 +18,13 @@ public class OrderDeliveryFailedInvoker
 
     @Override
     public void invoke(final OrderDeliveryFailedEvent event) {
-        // create a command and call its execute method
-        System.out.println("Order Delivery Failed Event Invoked: " + event);
+        MarkOrderAsFailedToDeliverCommand command =
+            commandFactory.createMarkOrderAsFailedToDeliverCommand(
+                event.getOrderId(),
+                event.getCourierId(),
+                event.getTimestamp()
+            );
+        command.execute();
     }
 
 }

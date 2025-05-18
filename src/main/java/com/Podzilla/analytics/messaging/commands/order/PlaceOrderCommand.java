@@ -25,7 +25,6 @@ public class PlaceOrderCommand implements Command {
 
     @Override
     public void execute() {
-        System.out.println("Executing PlaceOrderCommand henaaa");
         Region region = regionService.saveRegion(
             deliveryAddress.getCity(),
             deliveryAddress.getState(),

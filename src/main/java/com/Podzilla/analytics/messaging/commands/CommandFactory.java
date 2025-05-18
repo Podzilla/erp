@@ -13,7 +13,14 @@ import com.Podzilla.analytics.messaging.commands.user.RegisterCustomerCommand;
 import com.Podzilla.analytics.messaging.commands.user.RegisterCourierCommand;
 import com.Podzilla.analytics.messaging.commands.inventory.CreateProductCommand;
 import com.Podzilla.analytics.messaging.commands.inventory.UpdateInventoryCommand;
+import com.Podzilla.analytics.messaging.commands.inventory.MarkOrderAsFailedToFulfillCommand;
 import com.Podzilla.analytics.messaging.commands.order.PlaceOrderCommand;
+import com.Podzilla.analytics.messaging.commands.order.AssignCourierToOrderCommand;
+import com.Podzilla.analytics.messaging.commands.order.CancelOrderCommand;
+import com.Podzilla.analytics.messaging.commands.order.MarkOrderAsOutForDeliveryCommand;
+import com.Podzilla.analytics.messaging.commands.order.MarkOrderAsDeliveredCommand;
+import com.Podzilla.analytics.messaging.commands.order.MarkOrderAsFailedToDeliverCommand;
+
 
 import com.podzilla.mq.events.DeliveryAddress;
 
@@ -110,6 +117,83 @@ public class CommandFactory {
             .items(items)
             .deliveryAddress(deliveryAddress)
             .totalAmount(totalAmount)
+            .timestamp(timestamp)
+            .build();
+    }
+
+    public CancelOrderCommand createCancelOrderCommand(
+        final String orderId,
+        final String reason,
+        final Instant timestamp
+    ) {
+        return CancelOrderCommand.builder()
+            .orderAnalyticsService(orderAnalyticsService)
+            .orderId(orderId)
+            .reason(reason)
+            .timestamp(timestamp)
+            .build();
+    }
+
+    public AssignCourierToOrderCommand createAssignCourierToOrderCommand(
+        final String orderId,
+        final String courierId
+    ) {
+        return AssignCourierToOrderCommand.builder()
+            .orderAnalyticsService(orderAnalyticsService)
+            .orderId(orderId)
+            .courierId(courierId)
+            .build();
+    }
+
+    public MarkOrderAsOutForDeliveryCommand
+        createMarkOrderAsOutForDeliveryCommand(
+        final String orderId,
+        final Instant timestamp
+    ) {
+        return MarkOrderAsOutForDeliveryCommand.builder()
+            .orderAnalyticsService(orderAnalyticsService)
+            .orderId(orderId)
+            .timestamp(timestamp)
+            .build();
+    }
+
+    public MarkOrderAsDeliveredCommand createMarkOrderAsDeliveredCommand(
+        final String orderId,
+        final BigDecimal courierRating,
+        final Instant timestamp
+    ) {
+        return MarkOrderAsDeliveredCommand.builder()
+            .orderAnalyticsService(orderAnalyticsService)
+            .orderId(orderId)
+            .courierRating(courierRating)
+            .timestamp(timestamp)
+            .build();
+    }
+
+    public MarkOrderAsFailedToDeliverCommand
+        createMarkOrderAsFailedToDeliverCommand(
+        final String orderId,
+        final String reason,
+        final Instant timestamp
+    ) {
+        return MarkOrderAsFailedToDeliverCommand.builder()
+            .orderAnalyticsService(orderAnalyticsService)
+            .orderId(orderId)
+            .reason(reason)
+            .timestamp(timestamp)
+            .build();
+    }
+
+    public MarkOrderAsFailedToFulfillCommand
+        createMarkOrderAsFailedToFulfillCommand(
+        final String orderId,
+        final String reason,
+        final Instant timestamp
+    ) {
+        return MarkOrderAsFailedToFulfillCommand.builder()
+            .orderAnalyticsService(orderAnalyticsService)
+            .orderId(orderId)
+            .reason(reason)
             .timestamp(timestamp)
             .build();
     }

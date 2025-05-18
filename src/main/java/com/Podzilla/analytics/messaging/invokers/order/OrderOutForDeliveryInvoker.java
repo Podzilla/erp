@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.Podzilla.analytics.messaging.commands.CommandFactory;
 import com.Podzilla.analytics.messaging.invokers.Invoker;
 import com.podzilla.mq.events.OrderOutForDeliveryEvent;
+import com.Podzilla.analytics.messaging.commands.order.MarkOrderAsOutForDeliveryCommand;
 
 public class OrderOutForDeliveryInvoker
     implements Invoker<OrderOutForDeliveryEvent> {
@@ -17,7 +18,11 @@ public class OrderOutForDeliveryInvoker
 
     @Override
     public void invoke(final OrderOutForDeliveryEvent event) {
-        // create a command and call its execute method
-        System.out.println("Order Out For Delivery Event Invoked: " + event);
+        MarkOrderAsOutForDeliveryCommand command = commandFactory
+            .createMarkOrderAsOutForDeliveryCommand(
+                event.getOrderId(),
+                event.getTimestamp()
+            );
+        command.execute();
     }
 }

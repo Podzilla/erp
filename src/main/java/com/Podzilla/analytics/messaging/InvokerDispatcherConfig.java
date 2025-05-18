@@ -15,6 +15,7 @@ import com.Podzilla.analytics.messaging.invokers.order.OrderOutForDeliveryInvoke
 import com.Podzilla.analytics.messaging.invokers.InvokerFactory;
 import com.Podzilla.analytics.messaging.invokers.inventory.InventoryUpdatedInvoker;
 import com.Podzilla.analytics.messaging.invokers.inventory.ProductCreatedInvoker;
+import com.Podzilla.analytics.messaging.invokers.inventory.OrderFulfillmentFailedInvoker;
 
 import com.podzilla.mq.events.CourierRegisteredEvent;
 import com.podzilla.mq.events.CustomerRegisteredEvent;
@@ -26,6 +27,7 @@ import com.podzilla.mq.events.OrderDeliveredEvent;
 import com.podzilla.mq.events.OrderOutForDeliveryEvent;
 import com.podzilla.mq.events.InventoryUpdatedEvent;
 import com.podzilla.mq.events.ProductCreatedEvent;
+import com.podzilla.mq.events.WarehouseOrderFulfillmentFailedEvent;
 
 
 @Configuration
@@ -102,6 +104,11 @@ public class InvokerDispatcherConfig {
         dispatcher.registerInvoker(
             ProductCreatedEvent.class,
             invokerFactory.createInvoker(ProductCreatedInvoker.class)
+        );
+
+        dispatcher.registerInvoker(
+            WarehouseOrderFulfillmentFailedEvent.class,
+            invokerFactory.createInvoker(OrderFulfillmentFailedInvoker.class)
         );
     }
 
