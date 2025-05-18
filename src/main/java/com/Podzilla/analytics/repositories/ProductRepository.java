@@ -10,28 +10,38 @@ import org.springframework.data.repository.query.Param;
 import com.Podzilla.analytics.api.projections.product.TopSellingProductProjection;
 import com.Podzilla.analytics.models.Product;
 import java.util.UUID;
+
 public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     @Query("SELECT p.id AS id, "
             + "p.name AS name, "
             + "p.category AS category, "
-            + "SUM(oi.quantity * oi.pricePerUnit) AS totalRevenue, "
-            + "SUM(oi.quantity) AS totalUnits "
-            + "FROM OrderItem oi "
-            + "JOIN oi.order o "
-            + "JOIN oi.product p "
-            + "WHERE o.finalStatusTimestamp >= :startDate "
-            + "AND o.finalStatusTimestamp <  :endDate "
-            + "AND o.status = 'DELIVERED' "
+            + "COALESCE(SUM(CASE WHEN o.finalStatusTimestamp >= :startDate "
+            + "AND o.finalStatusTimestamp < :endDate "
+            + "AND o.status = 'DELIVERED' THEN oi.quantity * oi.pricePerUnit "
+            + "ELSE 0 END), 0) "
+            + "AS totalRevenue, "
+            + "COALESCE(SUM(CASE WHEN o.finalStatusTimestamp >= :startDate "
+            + "AND o.finalStatusTimestamp < :endDate "
+            + "AND o.status = 'DELIVERED' THEN oi.quantity ELSE 0 END), 0) "
+            + "AS totalUnits "
+            + "FROM Product p "
+            + "LEFT JOIN p.orderItems oi "
+            + "LEFT JOIN oi.order o "
             + "GROUP BY p.id, p.name, p.category "
             + "ORDER BY CASE WHEN :sortBy = 'REVENUE' "
-            + "THEN SUM(oi.quantity * oi.pricePerUnit) "
-            + "              WHEN :sortBy = 'UNITS'   THEN SUM(oi.quantity) "
-            + "              ELSE SUM(oi.quantity * oi.pricePerUnit) END DESC")
+            + "THEN COALESCE(SUM(CASE WHEN o.finalStatusTimestamp >= "
+            + ":startDate AND o.finalStatusTimestamp < :endDate "
+            + "AND o.status = 'DELIVERED' THEN oi.quantity * oi.pricePerUnit "
+            + "ELSE 0 END), 0) "
+            + "ELSE COALESCE(SUM(CASE WHEN o.finalStatusTimestamp >= "
+            + ":startDate AND o.finalStatusTimestamp < :endDate "
+            + "AND o.status = 'DELIVERED' THEN oi.quantity ELSE 0 END), 0) "
+            + "END DESC "
+            + "LIMIT :limit")
     List<TopSellingProductProjection> findTopSellers(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate,
             @Param("limit") Integer limit,
-            @Param("sortBy") String sortBy // Pass the enum name as a String
-    );
+            @Param("sortBy") String sortBy);
 }

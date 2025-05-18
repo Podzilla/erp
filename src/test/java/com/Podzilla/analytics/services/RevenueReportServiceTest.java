@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -52,7 +53,8 @@ class RevenueReportServiceTest {
                 summaryProjection(LocalDate.of(2025, 1, 1), new BigDecimal("1000.00")),
                 summaryProjection(LocalDate.of(2025, 2, 1), new BigDecimal("2000.00")));
 
-        when(orderRepository.findRevenueSummaryByPeriod(eq(startDate), eq(endDate), eq("MONTHLY")))
+        when(orderRepository.findRevenueSummaryByPeriod(eq(startDate.atStartOfDay()), eq(endDate.atTime(LocalTime.MAX)),
+                eq("MONTHLY")))
                 .thenReturn(projections);
 
         // Act
@@ -120,7 +122,8 @@ class RevenueReportServiceTest {
                 categoryProjection("Books", new BigDecimal("3000.00")),
                 categoryProjection("Electronics", new BigDecimal("5000.00")));
 
-        when(orderRepository.findRevenueByCategory(eq(startDate), eq(endDate)))
+        when(orderRepository.findRevenueByCategory(eq(startDate.atStartOfDay()), eq(endDate.atTime(
+                LocalTime.MAX))))
                 .thenReturn(projections);// Act
         List<RevenueByCategoryResponse> result = revenueReportService.getRevenueByCategory(startDate, endDate);
 
@@ -167,7 +170,8 @@ class RevenueReportServiceTest {
                     }
                 });
 
-        when(orderRepository.findRevenueByCategory(eq(startDate), eq(endDate)))
+        when(orderRepository.findRevenueByCategory(eq(startDate.atStartOfDay()), eq(endDate.atTime(
+                LocalTime.MAX))))
                 .thenReturn(projections);
 
         // Act
