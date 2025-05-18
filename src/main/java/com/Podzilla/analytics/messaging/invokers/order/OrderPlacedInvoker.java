@@ -18,7 +18,6 @@ public class OrderPlacedInvoker
 
     @Override
     public void invoke(final OrderPlacedEvent event) {
-        System.out.println("Invoking PlaceOrderInvoker henaaa");
         PlaceOrderCommand command = commandFactory
             .createPlaceOrderCommand(
                 event.getOrderId(),

@@ -14,18 +14,20 @@ import com.Podzilla.analytics.messaging.AnalyticsRabbitListener;
 import com.podzilla.mq.events.BaseEvent;
 import com.podzilla.mq.events.ConfirmationType;
 import com.podzilla.mq.events.ProductSnapshot;
+import com.podzilla.mq.events.WarehouseOrderFulfillmentFailedEvent;
 import com.podzilla.mq.events.CourierRegisteredEvent;
 import com.podzilla.mq.events.CustomerRegisteredEvent;
 import com.podzilla.mq.events.DeliveryAddress;
 import com.podzilla.mq.events.InventoryUpdatedEvent;
 import com.podzilla.mq.events.OrderAssignedToCourierEvent;
-// import com.podzilla.mq.events.OrderCancelledEvent;
+import com.podzilla.mq.events.OrderCancelledEvent;
 import com.podzilla.mq.events.OrderDeliveredEvent;
 import com.podzilla.mq.events.OrderDeliveryFailedEvent;
 import com.podzilla.mq.events.OrderOutForDeliveryEvent;
 import com.podzilla.mq.events.OrderPlacedEvent;
 import com.podzilla.mq.events.ProductCreatedEvent;
 
+import java.util.ArrayList;
 @RestController
 @RequestMapping("/rabbit-tester")
 public class RabbitTesterController {
@@ -51,40 +53,64 @@ public class RabbitTesterController {
     }
 
     @GetMapping("/order-assigned-to-courier-event")
-    public void testOrderAssignedToCourierEvent() {
+    public void testOrderAssignedToCourierEvent(
+        @RequestParam final String orderId,
+        @RequestParam final String courierId
+    ) {
         BaseEvent event = new OrderAssignedToCourierEvent(
-                "e715d122-2628-4c68-82bc-a3c4fc1eefd1", "2",
+                orderId,
+                courierId,
                 new BigDecimal("10.0"), 0.0, 0.0, "signature",
                 ConfirmationType.QR_CODE);
         listener.handleOrderEvents(event);
     }
 
-//     @GetMapping("/order-cancelled-event")
-//     public void testOrderCancelledEvent() {
-//         BaseEvent event = new OrderCancelledEvent(
-//                 "d7c897d1-b23d-46aa-bfb6-258b4b8dcbd4", "2", "some reason");
-//         listener.handleOrderEvents(event);
-//     }
+    @GetMapping("/order-cancelled-event")
+    public void testOrderCancelledEvent(
+                @RequestParam final String orderId
+    ) {
+        BaseEvent event = new OrderCancelledEvent(
+                orderId,
+                "2", // customerId (not used in the event)
+                "rabbit reason",
+                new ArrayList<>()
+        );
+        listener.handleOrderEvents(event);
+    }
 
     @GetMapping("/order-delivered-event")
-    public void testOrderDeliveredEvent() {
+    public void testOrderDeliveredEvent(
+        @RequestParam final String orderId
+    ) {
         BaseEvent event = new OrderDeliveredEvent(
-                "21063caa-4265-4286-8b16-6361b5bda83a", "2",
-                new BigDecimal("10.0"));
+                orderId, "2",
+                new BigDecimal("4.73"));
         listener.handleOrderEvents(event);
     }
 
     @GetMapping("/order-delivery-failed-event")
-    public void testOrderDeliveryFailedEvent() {
+    public void testOrderDeliveryFailedEvent(
+        @RequestParam final String orderId
+    ) {
         BaseEvent event = new OrderDeliveryFailedEvent(
-                "a0736362-6e37-46d7-95c6-4ad9092bf642", "2", "some reason");
+                orderId, "the rabit delivery failed reason", "2");
         listener.handleOrderEvents(event);
     }
 
     @GetMapping("/order-out-for-delivery-event")
-    public void testOrderOutForDeliveryEvent() {
+    public void testOrderOutForDeliveryEvent(
+        @RequestParam final String orderId
+    ) {
         BaseEvent event = new OrderOutForDeliveryEvent(
-                "55399710-a835-4f66-ba9d-1d299e40702b", "2");
+                orderId, "2");
+        listener.handleOrderEvents(event);
+    }
+    @GetMapping("/order-fulfillment-failed-event")
+    public void testOrderFailedToFulfill(
+        @RequestParam final String orderId
+    ) {
+        BaseEvent event = new WarehouseOrderFulfillmentFailedEvent(
+                orderId, "order fulfillment failed rabbit reason");
         listener.handleOrderEvents(event);
     }
 
