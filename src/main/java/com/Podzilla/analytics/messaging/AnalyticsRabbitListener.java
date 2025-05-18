@@ -1,9 +1,9 @@
 package com.Podzilla.analytics.messaging;
 
 // import org.springframework.amqp.rabbit.annotation.RabbitListener;
+// import com.podzilla.mq.EventsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 
-// import com.podzilla.mq.EventsConstants;
 import com.podzilla.mq.events.BaseEvent;
 
 import org.springframework.stereotype.Service;
