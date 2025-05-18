@@ -82,7 +82,7 @@
         <dependency>
             <groupId>com.github.Podzilla</groupId>
             <artifactId>podzilla-utils-lib</artifactId>
-            <version>v1.1.6</version>
+            <version>v1.1.11</version>
         </dependency>
 
         <!-- Validation API & Implementation -->

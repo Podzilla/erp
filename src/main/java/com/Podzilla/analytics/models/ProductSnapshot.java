@@ -3,6 +3,7 @@ package com.Podzilla.analytics.models;
 import java.time.LocalDateTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -20,7 +21,7 @@ import java.util.UUID;
 public class ProductSnapshot {
 
     @Id
-    @GeneratedValue(generator = "uuid")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     private LocalDateTime timestamp;
@@ -34,13 +35,15 @@ public class ProductSnapshot {
     public static Builder builder() {
         return new Builder();
     }
+
     public static class Builder {
         private UUID id;
         private LocalDateTime timestamp;
         private Product product;
         private int quantity;
 
-        public Builder() { }
+        public Builder() {
+        }
 
         public Builder id(final UUID id) {
             this.id = id;

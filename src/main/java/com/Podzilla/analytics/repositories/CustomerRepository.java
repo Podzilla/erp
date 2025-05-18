@@ -11,9 +11,10 @@ import com.Podzilla.analytics.api.projections.customer.CustomersTopSpendersProje
 import com.Podzilla.analytics.models.Customer;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Repository
-public interface CustomerRepository extends JpaRepository<Customer, Long> {
+public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
     @Query("SELECT c.id AS customerId, c.name AS customerName, "
             + "COALESCE(SUM(o.totalAmount), 0) AS totalSpending "
