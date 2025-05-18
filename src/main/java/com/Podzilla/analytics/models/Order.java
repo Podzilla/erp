@@ -31,6 +31,7 @@ public class Order {
     private BigDecimal totalAmount;
 
     private LocalDateTime orderPlacedTimestamp;
+    private LocalDateTime orderFulfillmentFailedTimestamp;
     private LocalDateTime orderCancelledTimestamp;
     private LocalDateTime shippedTimestamp;
     private LocalDateTime deliveredTimestamp;
@@ -51,7 +52,7 @@ public class Order {
     private Customer customer;
 
     @ManyToOne
-    @JoinColumn(name = "courier_id", nullable = false)
+    @JoinColumn(name = "courier_id", nullable = true)
     private Courier courier;
 
     @ManyToOne
@@ -63,6 +64,7 @@ public class Order {
 
     public enum OrderStatus {
         PLACED,
+        FULFILLMENT_FAILED,
         CANCELLED,
         SHIPPED,
         DELIVERED,
@@ -77,6 +79,7 @@ public class Order {
         private UUID id;
         private BigDecimal totalAmount;
         private LocalDateTime orderPlacedTimestamp;
+        private LocalDateTime orderFulfillmentFailedTimestamp;
         private LocalDateTime orderCancelledTimestamp;
         private LocalDateTime shippedTimestamp;
         private LocalDateTime deliveredTimestamp;
@@ -107,6 +110,13 @@ public class Order {
         public Builder orderPlacedTimestamp(
                 final LocalDateTime orderPlacedTimestamp) {
             this.orderPlacedTimestamp = orderPlacedTimestamp;
+            return this;
+        }
+
+        public Builder orderFulfillmentFailedTimestamp(
+                final LocalDateTime orderFulfillmentFailedTimestamp) {
+            this.orderFulfillmentFailedTimestamp =
+                orderFulfillmentFailedTimestamp;
             return this;
         }
 
@@ -185,6 +195,7 @@ public class Order {
                     id,
                     totalAmount,
                     orderPlacedTimestamp,
+                    orderFulfillmentFailedTimestamp,
                     orderCancelledTimestamp,
                     shippedTimestamp,
                     deliveredTimestamp,

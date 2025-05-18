@@ -1,7 +1,7 @@
 package com.Podzilla.analytics.api.controllers;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import com.podzilla.mq.events.CustomerRegisteredEvent;
 import com.podzilla.mq.events.DeliveryAddress;
 import com.podzilla.mq.events.InventoryUpdatedEvent;
 import com.podzilla.mq.events.OrderAssignedToCourierEvent;
-import com.podzilla.mq.events.OrderCancelledEvent;
+// import com.podzilla.mq.events.OrderCancelledEvent;
 import com.podzilla.mq.events.OrderDeliveredEvent;
 import com.podzilla.mq.events.OrderDeliveryFailedEvent;
 import com.podzilla.mq.events.OrderOutForDeliveryEvent;
@@ -29,6 +29,8 @@ import com.podzilla.mq.events.ProductCreatedEvent;
 @RestController
 @RequestMapping("/rabbit-tester")
 public class RabbitTesterController {
+
+    static final int QUANTITY = 5;
     @Autowired
     private AnalyticsRabbitListener listener;
 
@@ -57,12 +59,12 @@ public class RabbitTesterController {
         listener.handleOrderEvents(event);
     }
 
-    @GetMapping("/order-cancelled-event")
-    public void testOrderCancelledEvent() {
-        BaseEvent event = new OrderCancelledEvent(
-                "d7c897d1-b23d-46aa-bfb6-258b4b8dcbd4", "2", "some reason");
-        listener.handleOrderEvents(event);
-    }
+//     @GetMapping("/order-cancelled-event")
+//     public void testOrderCancelledEvent() {
+//         BaseEvent event = new OrderCancelledEvent(
+//                 "d7c897d1-b23d-46aa-bfb6-258b4b8dcbd4", "2", "some reason");
+//         listener.handleOrderEvents(event);
+//     }
 
     @GetMapping("/order-delivered-event")
     public void testOrderDeliveredEvent() {
@@ -87,18 +89,27 @@ public class RabbitTesterController {
     }
 
     @GetMapping("/order-placed-event")
-    public void testOrderPlacedEvent() {
+    public void testOrderPlacedEvent(
+        @RequestParam final String customerId,
+        @RequestParam final String productId1,
+        @RequestParam final String productId2
+) {
         BaseEvent event = new OrderPlacedEvent(
                 "a1aa7c7d-fe6a-491f-a2cc-b3b923340777",
-                "2",
-                new ArrayList<>(),
+                customerId,
+                Arrays.asList(
+                        new com.podzilla.mq.events.OrderItem(productId1,
+                                QUANTITY, new BigDecimal("8.5")),
+                        new com.podzilla.mq.events.OrderItem(productId2,
+                                QUANTITY, new BigDecimal("12.75"))
+                ),
                 new DeliveryAddress(
-                        "some street",
-                        "some city",
+                        "rabbit street",
+                        "rabbit city wallahy",
                         "some state",
                         "some country",
                         "some postal code"),
-                new BigDecimal("10.0"), 0.0, 0.0, "signature",
+                new BigDecimal("13290.0"), 0.0, 0.0, "signature",
                 ConfirmationType.QR_CODE);
         listener.handleOrderEvents(event);
     }

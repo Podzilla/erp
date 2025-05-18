@@ -132,19 +132,19 @@ public class DatabaseSeeder implements CommandLineRunner {
     private List<Region> seedRegions() {
         Region region1 = regionRepository.save(
                 Region.builder()
-                        .id(UUID.randomUUID())
+                        // .id(UUID.randomUUID())
                         .city("Metropolis").state("NY")
                         .country("USA").postalCode("10001")
                         .build());
         Region region2 = regionRepository.save(
                 Region.builder()
-                        .id(UUID.randomUUID())
+                        // .id(UUID.randomUUID())
                         .city("Gotham").state("NJ")
                         .country("USA").postalCode("07001")
                         .build());
         Region region3 = regionRepository.save(
                 Region.builder()
-                        .id(UUID.randomUUID())
+                        // .id(UUID.randomUUID())
                         .city("Star City").state("CA")
                         .country("USA").postalCode("90210")
                         .build());

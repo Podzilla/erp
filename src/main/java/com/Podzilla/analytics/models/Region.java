@@ -1,6 +1,8 @@
 package com.Podzilla.analytics.models;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -15,6 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Region {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String city;
     private String state;

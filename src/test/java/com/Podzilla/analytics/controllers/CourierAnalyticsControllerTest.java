@@ -74,7 +74,7 @@ public class CourierAnalyticsControllerTest {
                 .id(UUID.randomUUID())
                 .name("John Doe").build());
         region1 = regionRepository.save(Region.builder()
-                .id(UUID.randomUUID())
+                // .id(UUID.randomUUID())
                 .city("Sample City")
                 .state("Sample State")
                 .country("Sample Country")
