@@ -18,74 +18,81 @@ import com.Podzilla.analytics.repositories.OrderRepository;
 import com.Podzilla.analytics.util.DatetimeFormatter;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class OrderAnalyticsService {
 
-
     private final OrderRepository orderRepository;
+
     public List<OrderRegionResponse> getOrdersByRegion(
-        final LocalDate startDate,
-        final LocalDate endDate
-    ) {
-        LocalDateTime startDateTime =
-            DatetimeFormatter.convertStartDateToDatetime(startDate);
-        LocalDateTime endDateTime =
-            DatetimeFormatter.convertEndDateToDatetime(endDate);
-        List<OrderRegionProjection> ordersByRegion =
-            orderRepository.findOrdersByRegion(startDateTime, endDateTime);
+            final LocalDate startDate,
+            final LocalDate endDate) {
+        log.info("Getting orders by region between {} and {}",
+                startDate, endDate);
+        LocalDateTime startDateTime = DatetimeFormatter
+                .convertStartDateToDatetime(startDate);
+        LocalDateTime endDateTime = DatetimeFormatter
+                .convertEndDateToDatetime(endDate);
+        List<OrderRegionProjection> ordersByRegion = orderRepository
+                .findOrdersByRegion(startDateTime, endDateTime);
         return ordersByRegion.stream()
-            .map(data -> OrderRegionResponse.builder()
-                    .regionId(data.getRegionId())
-                    .city(data.getCity())
-                    .country(data.getCountry())
-                    .orderCount(data.getOrderCount())
-                    .averageOrderValue(data.getAverageOrderValue())
-                    .build())
-            .toList();
+                .map(data -> OrderRegionResponse.builder()
+                        .regionId(data.getRegionId())
+                        .city(data.getCity())
+                        .country(data.getCountry())
+                        .orderCount(data.getOrderCount())
+                        .averageOrderValue(data.getAverageOrderValue())
+                        .build())
+                .toList();
     }
 
     public List<OrderStatusResponse> getOrdersStatusCounts(
-        final LocalDate startDate,
-        final LocalDate endDate
-    ) {
-        LocalDateTime startDateTime =
-            DatetimeFormatter.convertStartDateToDatetime(startDate);
-        LocalDateTime endDateTime =
-            DatetimeFormatter.convertEndDateToDatetime(endDate);
-        List<OrderStatusProjection> orderStatusCounts =
-            orderRepository.findOrderStatusCounts(startDateTime, endDateTime);
+            final LocalDate startDate,
+            final LocalDate endDate) {
+        log.info("Getting order status counts between {} and {}",
+                startDate, endDate);
+        LocalDateTime startDateTime = DatetimeFormatter
+                .convertStartDateToDatetime(startDate);
+        LocalDateTime endDateTime = DatetimeFormatter
+                .convertEndDateToDatetime(endDate);
+        List<OrderStatusProjection> orderStatusCounts = orderRepository
+                .findOrderStatusCounts(startDateTime,
+                        endDateTime);
         return orderStatusCounts.stream()
-            .map(data -> OrderStatusResponse.builder()
-                    .status(data.getStatus())
-                    .count(data.getCount())
-                    .build())
-            .toList();
+                .map(data -> OrderStatusResponse.builder()
+                        .status(data.getStatus())
+                        .count(data.getCount())
+                        .build())
+                .toList();
     }
 
     public OrderFailureResponse getOrdersFailures(
-        final LocalDate startDate,
-        final LocalDate endDate
-    ) {
-        LocalDateTime startDateTime =
-            DatetimeFormatter.convertStartDateToDatetime(startDate);
-        LocalDateTime endDateTime =
-            DatetimeFormatter.convertEndDateToDatetime(endDate);
-        List<OrderFailureReasonsProjection> failureReasons =
-            orderRepository.findFailureReasons(startDateTime, endDateTime);
-        OrderFailureRateProjection failureRate =
-            orderRepository.calculateFailureRate(startDateTime, endDateTime);
-        List<OrderFailureReasonsResponse>
-            failureReasonsDTO = failureReasons.stream()
-            .map(data -> OrderFailureReasonsResponse.builder()
-                    .reason(data.getReason())
-                    .count(data.getCount())
-                    .build())
-            .toList();
+            final LocalDate startDate,
+            final LocalDate endDate) {
+        log.info("Getting order failures between {} and {}",
+                startDate, endDate);
+        LocalDateTime startDateTime = DatetimeFormatter
+                .convertStartDateToDatetime(startDate);
+        LocalDateTime endDateTime = DatetimeFormatter
+                .convertEndDateToDatetime(endDate);
+        List<OrderFailureReasonsProjection> failureReasons = orderRepository
+                .findFailureReasons(startDateTime,
+                        endDateTime);
+        OrderFailureRateProjection failureRate = orderRepository
+                .calculateFailureRate(startDateTime, endDateTime);
+        List<OrderFailureReasonsResponse> failureReasonsDTO = failureReasons
+                .stream()
+                .map(data -> OrderFailureReasonsResponse.builder()
+                        .reason(data.getReason())
+                        .count(data.getCount())
+                        .build())
+                .toList();
         return OrderFailureResponse.builder()
-            .reasons(failureReasonsDTO)
-            .failureRate(failureRate.getFailureRate())
-            .build();
+                .reasons(failureReasonsDTO)
+                .failureRate(failureRate.getFailureRate())
+                .build();
     }
 }

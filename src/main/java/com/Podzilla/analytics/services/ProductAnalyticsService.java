@@ -13,12 +13,14 @@ import com.Podzilla.analytics.api.projections.product.TopSellingProductProjectio
 import com.Podzilla.analytics.api.dtos.product.TopSellerResponse;
 import com.Podzilla.analytics.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import com.Podzilla.analytics.models.Product;
 import com.Podzilla.analytics.util.StringToUUIDParser;
 import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class ProductAnalyticsService {
 
     private final ProductRepository productRepository;
@@ -39,8 +41,10 @@ public class ProductAnalyticsService {
             final LocalDate startDate,
             final LocalDate endDate,
             final Integer limit,
-            final SortBy sortBy
-) {
+            final SortBy sortBy) {
+        log.info("Getting top sellers between {} and {}"
+                + " with limit {} and sortBy {}", startDate,
+                endDate, limit, sortBy);
 
         final String sortByString = sortBy != null ? sortBy.name()
                 : SortBy.REVENUE.name();
@@ -53,6 +57,8 @@ public class ProductAnalyticsService {
                 .findTopSellers(startDateTime,
                         endDateTime,
                         limit, sortByString);
+
+        log.debug("Query returned {} top sellers", queryResults.size());
 
         List<TopSellerResponse> topSellersList = new ArrayList<>();
 
@@ -71,9 +77,11 @@ public class ProductAnalyticsService {
         }
         topSellersList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
         if (limit != null && limit > 0 && limit < topSellersList.size()) {
+            log.debug("Limiting top sellers list to {}", limit);
             topSellersList = topSellersList.subList(SUBLIST_START_INDEX, limit);
         }
 
+        log.info("Returning {} top sellers", topSellersList.size());
         return topSellersList;
     }
 
@@ -82,8 +90,9 @@ public class ProductAnalyticsService {
             final String productName,
             final String productCategory,
             final BigDecimal productCost,
-            final Integer productLowStockThreshold
-    ) {
+            final Integer productLowStockThreshold) {
+        log.info("Saving product with id: {}, name: {}, "
+                + " category: {}", productId, productName, productCategory);
         UUID id = StringToUUIDParser.parseStringToUUID(productId);
         Product product = Product.builder()
                 .id(id)
@@ -93,5 +102,6 @@ public class ProductAnalyticsService {
                 .lowStockThreshold(productLowStockThreshold)
                 .build();
         productRepository.save(product);
+        log.debug("Product saved: {}", product);
     }
 }

@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/customer-analytics")
+@Slf4j
 public class CustomerReportController {
     private final CustomerAnalyticsService customerAnalyticsService;
 
@@ -30,11 +32,12 @@ public class CustomerReportController {
     @GetMapping("/top-spenders")
     public List<CustomersTopSpendersResponse> getTopSpenders(
             @Valid @ModelAttribute final DateRangePaginationRequest request) {
+        log.info("Request on: /customer-analytics/top-spenders "
+                + "with attributes: {}", request);
         return customerAnalyticsService.getTopSpenders(
                 request.getStartDate(),
                 request.getEndDate(),
                 request.getPage(),
-                request.getSize()
-        );
+                request.getSize());
     }
 }

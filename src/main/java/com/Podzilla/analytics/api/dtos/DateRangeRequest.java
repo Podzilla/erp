@@ -8,11 +8,11 @@ import com.Podzilla.analytics.validation.annotations.ValidDateRange;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @ValidDateRange
-@Getter
+@Data
 @AllArgsConstructor
 public class DateRangeRequest implements IDateRangeRequest {
 

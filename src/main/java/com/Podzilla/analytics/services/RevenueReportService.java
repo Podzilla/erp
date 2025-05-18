@@ -13,9 +13,11 @@ import com.Podzilla.analytics.api.projections.revenue.RevenueSummaryProjection;
 import com.Podzilla.analytics.repositories.OrderRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class RevenueReportService {
 
     private final OrderRepository orderRepository;
@@ -24,6 +26,9 @@ public class RevenueReportService {
             final LocalDate startDate,
             final LocalDate endDate,
             final String periodString) {
+
+        log.info("Getting revenue summary between {} and {}"
+                + " for period '{}'", startDate, endDate, periodString);
 
         final List<RevenueSummaryProjection> revenueData = orderRepository
                 .findRevenueSummaryByPeriod(startDate,
@@ -41,6 +46,7 @@ public class RevenueReportService {
             summaryList.add(summaryItem);
         }
 
+        log.info("Revenue summary result size: {}", summaryList.size());
         return summaryList;
     }
 
@@ -54,6 +60,9 @@ public class RevenueReportService {
      */
     public List<RevenueByCategoryResponse> getRevenueByCategory(
             final LocalDate startDate, final LocalDate endDate) {
+
+        log.info("Getting revenue by category between"
+                + " {} and {}", startDate, endDate);
 
         final List<RevenueByCategoryProjection> queryResults = orderRepository
                 .findRevenueByCategory(startDate,
@@ -72,6 +81,8 @@ public class RevenueReportService {
             summaryList.add(summaryItem);
         }
 
+        log.info("Revenue by category result"
+                + " size: {}", summaryList.size());
         return summaryList;
     }
 }
