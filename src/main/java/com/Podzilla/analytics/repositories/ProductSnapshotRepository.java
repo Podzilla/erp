@@ -22,7 +22,7 @@ public interface ProductSnapshotRepository
                         + "FROM ProductSnapshot s "
                         + "JOIN s.product p "
                         + "WHERE s.timestamp = (SELECT MAX(s2.timestamp) "
-                        + "ROM ProductSnapshot s2 "
+                        + "FROM ProductSnapshot s2 "
                         + "WHERE s2.product.id = s.product.id) "
                         + "GROUP BY p.category")
         List<InventoryValueByCategoryProjection> getInventoryValueByCategory();
