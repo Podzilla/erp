@@ -19,11 +19,13 @@ import com.Podzilla.analytics.util.MetricCalculator;
 import com.Podzilla.analytics.util.StringToUUIDParser;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class CourierAnalyticsService {
-        private final CourierRepository courierRepository;
+    private final CourierRepository courierRepository;
 
         private List<CourierPerformanceProjection> getCourierPerformanceData(
             final LocalDate startDate,
@@ -40,74 +42,78 @@ public class CourierAnalyticsService {
 
         public List<CourierDeliveryCountResponse> getCourierDeliveryCounts(
             final LocalDate startDate,
-            final LocalDate endDate
-        ) {
-                return getCourierPerformanceData(startDate, endDate).stream()
-                        .map(data -> CourierDeliveryCountResponse.builder()
-                                .courierId(data.getCourierId())
-                                .courierName(data.getCourierName())
-                                .deliveryCount(data.getDeliveryCount())
-                                .build())
-                        .toList();
-        }
-
-        public List<CourierSuccessRateResponse> getCourierSuccessRate(
-            final LocalDate startDate,
-            final LocalDate endDate
-        ) {
-                return getCourierPerformanceData(startDate, endDate).stream()
-                        .map(data -> CourierSuccessRateResponse.builder()
-                                .courierId(data.getCourierId())
-                                .courierName(data.getCourierName())
-                                .successRate(
-                                        MetricCalculator.calculateRate(
-                                                data.getCompletedCount(),
-                                                data.getDeliveryCount()))
-                                .build())
-                        .toList();
-        }
-
-        public List<CourierAverageRatingResponse> getCourierAverageRating(
-            final LocalDate startDate,
-            final LocalDate endDate
-        ) {
-                return getCourierPerformanceData(startDate, endDate).stream()
-                        .map(data -> CourierAverageRatingResponse.builder()
-                                .courierId(data.getCourierId())
-                                .courierName(data.getCourierName())
-                                .averageRating(data.getAverageRating())
-                                .build())
-                        .toList();
-        }
-
-        public List<CourierPerformanceReportResponse>
-                getCourierPerformanceReport(
-            final LocalDate startDate,
-            final LocalDate endDate
-        ) {
-                return getCourierPerformanceData(startDate, endDate).stream()
-                        .map(data -> CourierPerformanceReportResponse.builder()
-                                .courierId(data.getCourierId())
-                                .courierName(data.getCourierName())
-                                .deliveryCount(data.getDeliveryCount())
-                                .successRate(
-                                        MetricCalculator.calculateRate(
-                                                data.getCompletedCount(),
-                                                data.getDeliveryCount()))
-                                .averageRating(data.getAverageRating())
-                                .build())
-                        .toList();
+            final LocalDate endDate) {
+        log.info("Getting courier delivery counts between {} and {}",
+                startDate, endDate);
+        return getCourierPerformanceData(startDate, endDate).stream()
+                .map(data -> CourierDeliveryCountResponse.builder()
+                        .courierId(data.getCourierId())
+                        .courierName(data.getCourierName())
+                        .deliveryCount(data.getDeliveryCount())
+                        .build())
+                .toList();
     }
 
-        public void saveCourier(
-                final String courierId,
-                final String courierName
-        ) {
-                UUID id = StringToUUIDParser.parseStringToUUID(courierId);
-                Courier courier = Courier.builder()
-                        .id(id)
-                        .name(courierName)
-                        .build();
-                courierRepository.save(courier);
-        }
+    public List<CourierSuccessRateResponse> getCourierSuccessRate(
+            final LocalDate startDate,
+            final LocalDate endDate) {
+        log.info("Getting courier success rates between {} and {}",
+                startDate, endDate);
+        return getCourierPerformanceData(startDate, endDate).stream()
+                .map(data -> CourierSuccessRateResponse.builder()
+                        .courierId(data.getCourierId())
+                        .courierName(data.getCourierName())
+                        .successRate(
+                                MetricCalculator.calculateRate(
+                                        data.getCompletedCount(),
+                                        data.getDeliveryCount()))
+                        .build())
+                .toList();
+    }
+
+    public List<CourierAverageRatingResponse> getCourierAverageRating(
+            final LocalDate startDate,
+            final LocalDate endDate) {
+        log.info("Getting courier average ratings between {} and {}",
+                startDate, endDate);
+        return getCourierPerformanceData(startDate, endDate).stream()
+                .map(data -> CourierAverageRatingResponse.builder()
+                        .courierId(data.getCourierId())
+                        .courierName(data.getCourierName())
+                        .averageRating(data.getAverageRating())
+                        .build())
+                .toList();
+    }
+
+    public List<CourierPerformanceReportResponse> getCourierPerformanceReport(
+            final LocalDate startDate,
+            final LocalDate endDate) {
+        log.info("Getting courier performance report between {} and {}",
+                startDate, endDate);
+        return getCourierPerformanceData(startDate, endDate).stream()
+                .map(data -> CourierPerformanceReportResponse.builder()
+                        .courierId(data.getCourierId())
+                        .courierName(data.getCourierName())
+                        .deliveryCount(data.getDeliveryCount())
+                        .successRate(
+                                MetricCalculator.calculateRate(
+                                        data.getCompletedCount(),
+                                        data.getDeliveryCount()))
+                        .averageRating(data.getAverageRating())
+                        .build())
+                .toList();
+    }
+
+    public void saveCourier(
+            final String courierId,
+            final String courierName) {
+        log.info("Saving courier with id: {} and name: {}",
+                courierId, courierName);
+        UUID id = StringToUUIDParser.parseStringToUUID(courierId);
+        Courier courier = Courier.builder()
+                .id(id)
+                .name(courierName)
+                .build();
+        courierRepository.save(courier);
+    }
 }

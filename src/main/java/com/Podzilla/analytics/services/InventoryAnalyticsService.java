@@ -18,30 +18,37 @@ import java.util.UUID;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class InventoryAnalyticsService {
     private final ProductSnapshotRepository inventoryRepo;
     private final ProductRepository productRepository;
 
-public List<InventoryValueByCategoryResponse> getInventoryValueByCategory() {
-List<InventoryValueByCategoryResponse> invVByCy = inventoryRepo
-.getInventoryValueByCategory()
-.stream()
-.map(row -> InventoryValueByCategoryResponse.builder()
-.category(row.getCategory())
-.totalStockValue(row.getTotalStockValue())
-.build())
+    public List<InventoryValueByCategoryResponse> getInventoryValueByCategory(
+
+    ) {
+        log.info("Getting inventory value by category");
+        List<InventoryValueByCategoryResponse> invVByCy = inventoryRepo
+                .getInventoryValueByCategory()
+                .stream()
+                .map(row -> InventoryValueByCategoryResponse.builder()
+                        .category(row.getCategory())
+                        .totalStockValue(row.getTotalStockValue())
+                        .build())
                 .toList();
         return invVByCy;
     }
 
-public Page<LowStockProductResponse> getLowStockProducts(final int page,
- final int size) {
+    public Page<LowStockProductResponse> getLowStockProducts(
+            final int page, final int size) {
+        log.info("Getting low stock products, page: {}, size: {}",
+                page, size);
         PageRequest pageRequest = PageRequest.of(page, size);
-Page<LowStockProductResponse> lowStockPro =
- inventoryRepo.getLowStockProducts(pageRequest)
+        Page<LowStockProductResponse> lowStockPro = inventoryRepo
+                .getLowStockProducts(pageRequest)
                 .map(row -> LowStockProductResponse.builder()
                         .productId(row.getProductId())
                         .productName(row.getProductName())
@@ -54,13 +61,15 @@ Page<LowStockProductResponse> lowStockPro =
     public void saveInventorySnapshot(
             final String productId,
             final Integer quantity,
-            final Instant timestamp
-    ) {
+            final Instant timestamp) {
+        log.info("Saving inventory snapshot for productId: {},"
+                + " quantity: {}, timestamp: {}", productId, quantity,
+                timestamp);
         UUID productUUID = StringToUUIDParser.parseStringToUUID(productId);
         Product product = productRepository.findById(productUUID)
                 .orElseThrow(
-                    () -> new IllegalArgumentException("Product not found")
-                );
+                        () -> new IllegalArgumentException(
+                                "Product not found"));
         LocalDateTime snapshotTimestamp = DatetimeFormatter
                 .convertIntsantToDateTime(timestamp);
         ProductSnapshot inventorySnapshot = ProductSnapshot.builder()
@@ -70,5 +79,7 @@ Page<LowStockProductResponse> lowStockPro =
                 .build();
 
         inventoryRepo.save(inventorySnapshot);
+        log.info("Inventory snapshot saved for productId: {}",
+                productId);
     }
 }

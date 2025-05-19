@@ -20,12 +20,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Tag(name = "Courier Reports", description = "Endpoints for courier"
         + " analytics and performance metrics")
 @RestController
 @RequestMapping("/courier-analytics")
 @RequiredArgsConstructor
+@Slf4j
 public final class CourierReportController {
 
     private final CourierAnalyticsService courierAnalyticsService;
@@ -37,6 +39,8 @@ public final class CourierReportController {
     @GetMapping("/delivery-counts")
     public ResponseEntity<List<CourierDeliveryCountResponse>> getDeliveryCounts(
             @Valid @ModelAttribute final DateRangeRequest dateRange) {
+        log.info("Request on: /courier-analytics/delivery-counts "
+                + "with attributes: {}", dateRange);
         List<CourierDeliveryCountResponse> counts = courierAnalyticsService
                 .getCourierDeliveryCounts(dateRange.getStartDate(),
                         dateRange.getEndDate());
@@ -48,6 +52,9 @@ public final class CourierReportController {
     @GetMapping("/success-rate")
     public ResponseEntity<List<CourierSuccessRateResponse>> getSuccessRate(
             @Valid @ModelAttribute final DateRangeRequest dateRange) {
+        log.info("Request on: /courier-analytics/success-rate "
+                + "with attributes: {}",
+                dateRange);
         List<CourierSuccessRateResponse> rates = courierAnalyticsService
                 .getCourierSuccessRate(dateRange.getStartDate(),
                         dateRange.getEndDate());
@@ -59,6 +66,8 @@ public final class CourierReportController {
     @GetMapping("/average-rating")
     public ResponseEntity<List<CourierAverageRatingResponse>> getAverageRating(
             @Valid @ModelAttribute final DateRangeRequest dateRange) {
+        log.info("Request on: /courier-analytics/average-rating "
+                + "with attributes: {}", dateRange);
         List<CourierAverageRatingResponse> ratings = courierAnalyticsService
                 .getCourierAverageRating(dateRange.getStartDate(),
                         dateRange.getEndDate());
@@ -70,6 +79,8 @@ public final class CourierReportController {
     @GetMapping("/performance-report")
     public ResponseEntity<List<CourierPerformanceReportResponse>> getReport(
             @Valid @ModelAttribute final DateRangeRequest dateRange) {
+        log.info("Request on: /courier-analytics/performance-report "
+                + "with attributes: {}", dateRange);
         List<CourierPerformanceReportResponse> report = courierAnalyticsService
                 .getCourierPerformanceReport(dateRange.getStartDate(),
                         dateRange.getEndDate());

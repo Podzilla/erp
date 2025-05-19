@@ -8,12 +8,12 @@ import com.Podzilla.analytics.validation.annotations.ValidPagination;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @ValidDateRange
 @ValidPagination
-@Getter
+@Data
 @AllArgsConstructor
 public class DateRangePaginationRequest
         implements IDateRangeRequest, IPaginationRequest {

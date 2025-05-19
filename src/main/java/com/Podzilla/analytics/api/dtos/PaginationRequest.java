@@ -1,14 +1,14 @@
 package com.Podzilla.analytics.api.dtos;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
 import com.Podzilla.analytics.validation.annotations.ValidPagination;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @ValidPagination
-@Getter
+@Data
 @AllArgsConstructor
 public class PaginationRequest implements IPaginationRequest {
 

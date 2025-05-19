@@ -14,10 +14,11 @@ import com.Podzilla.analytics.services.ProductAnalyticsService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @RestController
-
+@Slf4j
 @RequestMapping("/product-analytics")
 public class ProductReportController {
 
@@ -26,6 +27,9 @@ public class ProductReportController {
     @GetMapping("/top-sellers")
     public ResponseEntity<List<TopSellerResponse>> getTopSellers(
             @Valid @ModelAttribute final TopSellerRequest requestDTO) {
+
+        log.info("Request on: /product-analytics/top-sellers"
+                + " with attributes: {}", requestDTO);
 
         List<TopSellerResponse> topSellersList = productAnalyticsService
                 .getTopSellers(requestDTO.getStartDate(),
