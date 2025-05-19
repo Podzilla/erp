@@ -257,14 +257,14 @@ public class OrderAnalyticsService {
         UUID orderUUID = StringToUUIDParser.parseStringToUUID(orderId);
         LocalDateTime orderFulfillmentFailedTimestamp = DatetimeFormatter
                 .convertIntsantToDateTime(timeStamp);
-        Order order = orderRepository.findById(orderUUID)
-                .orElseThrow(() -> new RuntimeException(
-                        "Order not found"));
-        order.setStatus(OrderStatus.FULFILLMENT_FAILED);
-        order.setFailureReason(reason);
-        order.setOrderFulfillmentFailedTimestamp(
-                orderFulfillmentFailedTimestamp);
-        order.setFinalStatusTimestamp(orderFulfillmentFailedTimestamp);
+        Order order = Order.builder()
+                .id(orderUUID)
+                .status(OrderStatus.FULFILLMENT_FAILED)
+                .failureReason(reason)
+                .orderFulfillmentFailedTimestamp(
+                        orderFulfillmentFailedTimestamp)
+                .finalStatusTimestamp(orderFulfillmentFailedTimestamp)
+                .build();
         orderRepository.save(order);
     }
 }

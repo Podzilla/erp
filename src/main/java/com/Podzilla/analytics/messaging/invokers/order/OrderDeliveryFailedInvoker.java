@@ -21,7 +21,7 @@ public class OrderDeliveryFailedInvoker
         MarkOrderAsFailedToDeliverCommand command =
             commandFactory.createMarkOrderAsFailedToDeliverCommand(
                 event.getOrderId(),
-                event.getCourierId(),
+                event.getReason(),
                 event.getTimestamp()
             );
         command.execute();
