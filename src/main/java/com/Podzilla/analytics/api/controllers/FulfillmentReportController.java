@@ -25,15 +25,16 @@ import java.util.List;
 public class FulfillmentReportController {
     private final FulfillmentAnalyticsService fulfillmentAnalyticsService;
 
-    @Operation(
-        summary = "Get average time from order placement to shipping",
-        description = "Returns the average time (in hours) between when"
+    @Operation(summary = "Get average time from order placement to shipping",
+     description = "Returns the average time (in hours) between when"
             + " an order was placed and when it was shipped, grouped"
-            + " by the specified dimension"
-    )
+            + " by the specified dimension")
     @GetMapping("/place-to-ship-time")
     public ResponseEntity<List<FulfillmentTimeResponse>> getPlaceToShipTime(
             @Valid @ModelAttribute final FulfillmentPlaceToShipRequest req) {
+
+        log.info("Request on: /fulfillment-analytics/place-to-ship-time "
+                + "with attributes: {}", req);
 
         final List<FulfillmentTimeResponse> reportData =
                 fulfillmentAnalyticsService.getPlaceToShipTimeResponse(
@@ -44,22 +45,22 @@ public class FulfillmentReportController {
         return ResponseEntity.ok(reportData);
     }
 
-
-    @Operation(
-        summary = "Get average time from shipping to delivery",
-        description = "Returns the average time (in hours) between when"
+    @Operation(summary = "Get average time from shipping to delivery",
+     description = "Returns the average time (in hours) between when"
             + " an order was shipped and when it was delivered, grouped"
-            + " by the specified dimension"
-    )
+            + " by the specified dimension")
     @GetMapping("/ship-to-deliver-time")
     public ResponseEntity<List<FulfillmentTimeResponse>> getShipToDeliverTime(
             @Valid @ModelAttribute final FulfillmentShipToDeliverRequest req) {
 
+        log.info("Request on: /fulfillment-analytics/ship-to-deliver-time "
+                + "with attributes: {}", req);
+
         final List<FulfillmentTimeResponse> reportData =
-                fulfillmentAnalyticsService.getShipToDeliverTimeResponse(
-                        req.getStartDate(),
-                        req.getEndDate(),
-                        req.getGroupBy());
+        fulfillmentAnalyticsService.getShipToDeliverTimeResponse(
+                req.getStartDate(),
+                req.getEndDate(),
+                req.getGroupBy());
         return ResponseEntity.ok(reportData);
     }
 }

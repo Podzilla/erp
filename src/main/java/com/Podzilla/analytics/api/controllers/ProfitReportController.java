@@ -28,17 +28,18 @@ import java.util.List;
 public class ProfitReportController {
     private final ProfitAnalyticsService profitAnalyticsService;
 
-
-    @Operation(
-            summary = "Get profit by product category",
-            description = "Returns the revenue, cost, and profit metrics "
-                    + "grouped by product category")
+    @Operation(summary = "Get profit by product category",
+     description = "Returns the revenue, cost, and profit metrics "
+            + "grouped by product category")
     @GetMapping("/by-category")
     public ResponseEntity<List<ProfitByCategory>> getProfitByCategory(
             @Valid @ModelAttribute final DateRangeRequest request) {
 
-        List<ProfitByCategory> profitData =
-                profitAnalyticsService.getProfitByCategory(
+        log.info("Request on: /profit-analytics/by-category"
+                + " with attributes: {}", request);
+
+        List<ProfitByCategory> profitData = profitAnalyticsService
+                .getProfitByCategory(
                         request.getStartDate(),
                         request.getEndDate());
         return ResponseEntity.ok(profitData);

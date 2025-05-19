@@ -6,17 +6,12 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderRegionResponse {
-
-    @Schema(description = "Region ID",
-        example = "4731e9e0-c627-43f9-808a-7e8637abb912")
-    private UUID regionId;
 
     @Schema(description = "city name", example = "Metropolis")
     private String city;

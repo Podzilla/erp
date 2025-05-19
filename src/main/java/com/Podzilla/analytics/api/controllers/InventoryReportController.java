@@ -13,6 +13,7 @@ import com.Podzilla.analytics.services.InventoryAnalyticsService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -23,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/inventory-analytics")
+@Slf4j
 public class InventoryReportController {
     private final InventoryAnalyticsService inventoryAnalyticsService;
 
@@ -31,8 +33,10 @@ public class InventoryReportController {
                     + "the total value of inventory "
                     + "grouped by product categories")
     @GetMapping("/value/by-category")
-    public List<InventoryValueByCategoryResponse>
-        getInventoryValueByCategory() {
+    public List<InventoryValueByCategoryResponse> getInventoryValueByCategory(
+
+    ) {
+        log.info("Request on: /inventory-analytics/value/by-category");
         return inventoryAnalyticsService.getInventoryValueByCategory();
     }
 
@@ -41,6 +45,8 @@ public class InventoryReportController {
     @GetMapping("/low-stock")
     public Page<LowStockProductResponse> getLowStockProducts(
             @Valid @ModelAttribute final PaginationRequest paginationRequest) {
+        log.info("Request on: /inventory-analytics/low-stock"
+                + " with attributes: {}", paginationRequest);
         return inventoryAnalyticsService.getLowStockProducts(
                 paginationRequest.getPage(),
                 paginationRequest.getSize());

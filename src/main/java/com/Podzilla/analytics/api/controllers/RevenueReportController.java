@@ -16,7 +16,9 @@ import com.Podzilla.analytics.services.RevenueReportService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/revenue-analytics")
@@ -26,6 +28,8 @@ public class RevenueReportController {
     @GetMapping("/summary")
     public ResponseEntity<List<RevenueSummaryResponse>> getRevenueSummary(
             @Valid @ModelAttribute final RevenueSummaryRequest requestDTO) {
+        log.info("Request on: /revenue-analytics/summary"
+                + " with attributes: {}", requestDTO);
         return ResponseEntity.ok(revenueReportService
                 .getRevenueSummary(requestDTO.getStartDate(),
                         requestDTO.getEndDate(),
@@ -35,6 +39,8 @@ public class RevenueReportController {
     @GetMapping("/by-category")
     public ResponseEntity<List<RevenueByCategoryResponse>> getRevenueByCategory(
             @Valid @ModelAttribute final RevenueByCategoryRequest requestDTO) {
+        log.info("Request on: /revenue-analytics/by-category"
+                + " with attributes: {}", requestDTO);
         List<RevenueByCategoryResponse> summaryList = revenueReportService
                 .getRevenueByCategory(
                         requestDTO.getStartDate(),
