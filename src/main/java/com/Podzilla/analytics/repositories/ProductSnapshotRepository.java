@@ -22,8 +22,8 @@ public interface ProductSnapshotRepository
                         + "FROM ProductSnapshot s "
                         + "JOIN s.product p "
                         + "WHERE s.timestamp = (SELECT MAX(s2.timestamp) "
-                        + "                     FROM ProductSnapshot s2 "
-                        + "                     WHERE s2.product.id = s.product.id) "
+                        + "ROM ProductSnapshot s2 "
+                        + "WHERE s2.product.id = s.product.id) "
                         + "GROUP BY p.category")
         List<InventoryValueByCategoryProjection> getInventoryValueByCategory();
 
@@ -34,8 +34,8 @@ public interface ProductSnapshotRepository
                         + "FROM ProductSnapshot s "
                         + "JOIN s.product p "
                         + "WHERE s.timestamp = (SELECT MAX(s2.timestamp) "
-                        + "                     FROM ProductSnapshot s2 "
-                        + "                     WHERE s2.product.id = s.product.id) "
+                        + "FROM ProductSnapshot s2 "
+                        + "WHERE s2.product.id = s.product.id) "
                         + "AND s.quantity <= p.lowStockThreshold")
         Page<LowStockProductProjection> getLowStockProducts(Pageable pageable);
 }

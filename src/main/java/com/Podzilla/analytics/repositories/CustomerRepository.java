@@ -20,7 +20,7 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
                         + "COALESCE(SUM(o.totalAmount), 0) AS totalSpending "
                         + "FROM Customer c "
                         + "INNER JOIN c.orders o "
-                        + "WITH o.finalStatusTimestamp BETWEEN :startDate AND :endDate "
+                + "WITH o.finalStatusTimestamp BETWEEN :startDate AND :endDate "
                         + "AND o.status = 'DELIVERED' "
                         + "GROUP BY c.id, c.name "
                         + "ORDER BY totalSpending DESC")
