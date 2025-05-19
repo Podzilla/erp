@@ -16,16 +16,16 @@ import java.util.UUID;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
-    @Query("SELECT c.id AS customerId, c.name AS customerName, "
-            + "COALESCE(SUM(o.totalAmount), 0) AS totalSpending "
-            + "FROM Customer c "
-            + "LEFT JOIN c.orders o "
-            + "WITH o.finalStatusTimestamp BETWEEN :startDate AND :endDate "
-            + "AND o.status = 'DELIVERED' "
-            + "GROUP BY c.id, c.name "
-            + "ORDER BY totalSpending DESC")
-    Page<CustomersTopSpendersProjection> findTopSpenders(
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate,
-            Pageable pageable);
+        @Query("SELECT c.id AS customerId, c.name AS customerName, "
+                        + "COALESCE(SUM(o.totalAmount), 0) AS totalSpending "
+                        + "FROM Customer c "
+                        + "INNER JOIN c.orders o "
+                + "WITH o.finalStatusTimestamp BETWEEN :startDate AND :endDate "
+                        + "AND o.status = 'DELIVERED' "
+                        + "GROUP BY c.id, c.name "
+                        + "ORDER BY totalSpending DESC")
+        Page<CustomersTopSpendersProjection> findTopSpenders(
+                        @Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate,
+                        Pageable pageable);
 }
