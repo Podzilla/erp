@@ -48,7 +48,7 @@ public class Order {
     private BigDecimal courierRating;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id", nullable = false)
+    @JoinColumn(name = "customer_id", nullable = true)
     private Customer customer;
 
     @ManyToOne
@@ -56,7 +56,7 @@ public class Order {
     private Courier courier;
 
     @ManyToOne
-    @JoinColumn(name = "region_id", nullable = false)
+    @JoinColumn(name = "region_id", nullable = true)
     private Region region;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
