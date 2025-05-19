@@ -13,7 +13,7 @@ public class CleanupScheduler {
     private final OrderRepository orderRepository;
 
     @Autowired
-    public CleanupScheduler(OrderRepository orderRepository) {
+    public CleanupScheduler(final OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
     }
 

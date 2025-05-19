@@ -169,7 +169,9 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 
     @Modifying
     @Transactional
-    @Query("DELETE FROM OrderItem oi WHERE oi.order.id IN (SELECT o.id FROM Order o WHERE o.orderPlacedTimestamp < :cutoff)")
+    @Query("DELETE FROM OrderItem oi "
+            + "WHERE oi.order.id IN (SELECT o.id FROM Order o "
+            + "WHERE o.orderPlacedTimestamp < :cutoff)")
     void deleteOrderItemsOlderThan(@Param("cutoff") LocalDateTime cutoff);
 
     @Modifying
