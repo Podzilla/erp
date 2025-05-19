@@ -84,8 +84,7 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Query("SELECT r.id AS regionId, "
-            + "r.city AS city, "
+    @Query("SELECT r.city AS city, "
             + "r.country AS country, "
             + "COUNT(o) AS orderCount, "
             + "AVG(o.totalAmount) AS averageOrderValue "
@@ -93,7 +92,7 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
             + "JOIN o.region r "
             + "WHERE o.finalStatusTimestamp BETWEEN :startDate AND :endDate "
             + "AND o.status = 'DELIVERED' "
-            + "GROUP BY r.id, r.city, r.country "
+            + "GROUP BY r.city, r.country "
             + "ORDER BY orderCount DESC, averageOrderValue DESC")
     List<OrderRegionProjection> findOrdersByRegion(
             @Param("startDate") LocalDateTime startDate,
@@ -120,9 +119,9 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Query("SELECT (SUM(CASE WHEN o.status = 'DELIVERY_FAILED' "
+    @Query("SELECT COALESCE(SUM(CASE WHEN o.status = 'DELIVERY_FAILED' "
             + "THEN 1 ELSE 0 END) * 1.0 "
-            + "/ COUNT(o)) AS failureRate "
+            + "/ NULLIF(COUNT(o), 0), 0) AS failureRate "
             + "FROM Order o "
             + "WHERE o.finalStatusTimestamp BETWEEN :startDate AND :endDate")
     OrderFailureRateProjection calculateFailureRate(

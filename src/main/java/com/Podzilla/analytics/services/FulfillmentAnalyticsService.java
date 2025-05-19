@@ -41,7 +41,7 @@ public class FulfillmentAnalyticsService {
                 log.debug("Fetching overall place-to-ship time");
                 FulfillmentTimeProjection overall = orderRepository
                         .findPlaceToShipTimeOverall(startDateTime, endDateTime);
-                if (overall != null) {
+                if (overall.getAverageDuration() != null) {
                     results.add(convertToResponse(overall));
                 }
                 break;
@@ -83,7 +83,7 @@ public class FulfillmentAnalyticsService {
                 FulfillmentTimeProjection overall = orderRepository
                         .findShipToDeliverTimeOverall(
                                 startDateTime, endDateTime);
-                if (overall != null) {
+                if (overall.getAverageDuration() != null) {
                     results.add(convertToResponse(overall));
                 }
                 break;

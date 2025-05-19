@@ -40,7 +40,6 @@ public class OrderAnalyticsService {
                 .findOrdersByRegion(startDateTime, endDateTime);
         return ordersByRegion.stream()
                 .map(data -> OrderRegionResponse.builder()
-                        .regionId(data.getRegionId())
                         .city(data.getCity())
                         .country(data.getCountry())
                         .orderCount(data.getOrderCount())
