@@ -96,37 +96,37 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Override
     @Transactional
     public void run(final String... args) {
-        // System.out.println("Checking if database needs seeding...");
+        System.out.println("Checking if database needs seeding...");
 
-        // if (courierRepository.count() > 0) {
-        //     System.out.println("Database already seeded. Skipping.");
-        //     return;
-        // }
+        if (courierRepository.count() > 0) {
+            System.out.println("Database already seeded. Skipping.");
+            return;
+        }
 
-        // System.out.println("Seeding database...");
+        System.out.println("Seeding database...");
 
-        // List<Region> regions = seedRegions();
-        // System.out.println("Seeded Regions: " + regions.size());
+        List<Region> regions = seedRegions();
+        System.out.println("Seeded Regions: " + regions.size());
 
-        // List<Product> products = seedProducts();
-        // System.out.println("Seeded Products: " + products.size());
+        List<Product> products = seedProducts();
+        System.out.println("Seeded Products: " + products.size());
 
-        // List<Courier> couriers = seedCouriers();
-        // System.out.println("Seeded Couriers: " + couriers.size());
+        List<Courier> couriers = seedCouriers();
+        System.out.println("Seeded Couriers: " + couriers.size());
 
-        // List<Customer> customers = seedCustomers();
-        // System.out.println("Seeded Customers: " + customers.size());
+        List<Customer> customers = seedCustomers();
+        System.out.println("Seeded Customers: " + customers.size());
 
-        // System.out.println("Seeding Orders and SalesLineItems...");
-        // seedOrders(customers, couriers, regions, products);
-        // System.out.println("Seeded Orders: " + orderRepository.count());
+        System.out.println("Seeding Orders and SalesLineItems...");
+        seedOrders(customers, couriers, regions, products);
+        System.out.println("Seeded Orders: " + orderRepository.count());
 
-        // System.out.println("Seeding Inventory Snapshots...");
-        // seedProductSnapshots(products);
-        // System.out.println("Seeded Product Snapshots: "
-        //         + productSnapshotRepository.count());
+        System.out.println("Seeding Inventory Snapshots...");
+        seedProductSnapshots(products);
+        System.out.println("Seeded Product Snapshots: "
+                + productSnapshotRepository.count());
 
-        // System.out.println("Database seeding finished.");
+        System.out.println("Database seeding finished.");
     }
 
     private List<Region> seedRegions() {
