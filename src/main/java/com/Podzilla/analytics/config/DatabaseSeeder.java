@@ -121,7 +121,6 @@ public class DatabaseSeeder implements CommandLineRunner {
         seedOrders(customers, couriers, regions, products);
         System.out.println("Seeded Orders: " + orderRepository.count());
 
-        
         System.out.println("Seeding Inventory Snapshots...");
         seedProductSnapshots(products);
         System.out.println("Seeded Product Snapshots: "
