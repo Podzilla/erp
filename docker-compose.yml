@@ -1,0 +1,52 @@
+
+services:
+  analytics-app:
+    build: .
+    container_name: analytics-app
+    ports:
+      - "8083:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/analytics_db_dev
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 123
+      SPRING_RABBITMQ_HOST: host.docker.internal
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+    depends_on:
+      - db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+
+  db:
+    image: postgres
+    container_name: analytics-db
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_DB: analytics_db_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+
+  # rabbitmq:
+  #   image: rabbitmq:3.12-management-alpine # Use RabbitMQ with the management plugin
+  #   container_name: analytics-rabbitmq
+  #   ports:
+  #     - "5672:5672" # Default AMQP port
+  #     - "15672:15672" # Management UI port (access at http://localhost:15672)
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: analytics_mq_user # RabbitMQ user
+  #     RABBITMQ_DEFAULT_PASS: analytics_mq_password # RabbitMQ password
+  #   healthcheck: # Basic health check for RabbitMQ
+  #     test: ["CMD", "rabbitmq-diagnostics", "check_system_status"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+
+volumes:
+  db_data:
